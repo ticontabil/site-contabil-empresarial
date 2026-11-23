@@ -46,10 +46,5 @@ export default {
       },
     },
   },
-  plugins: [
-    animate,
-    // `ui-dark:` segue a preferência de tema do botão (ícone sol/lua e logo), que no original
-    // é independente das cores da página. Ver PENDENCIAS.md (bug do tema).
-    ({ addVariant }) => addVariant("ui-dark", ':is([data-ui-theme="dark"] &)'),
-  ],
+  plugins: [animate],
 };

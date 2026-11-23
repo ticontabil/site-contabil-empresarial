@@ -31,18 +31,15 @@ const ogImage = new URL(meta.ogImage, Astro.site).toString();
     <meta name="twitter:description" content={meta.ogDescription} />
 
     <!--
-      Tema, reproduzindo o comportamento do original (com o bug, ver PENDENCIAS.md):
-      - ícone sol/lua e logo seguem localStorage "theme" ou, se vazio, a preferência do sistema;
-      - as cores da página ao carregar seguem localStorage "audit_theme" (padrão: claro),
-        então o modo escuro só aparece depois de clicar no botão e volta ao claro ao recarregar.
+      Tema: escolha salva (localStorage "theme") ou, se não houver, a preferência do sistema.
+      Aplicado antes de pintar a página para não piscar. Cores, logo e ícone seguem o mesmo estado.
     -->
     <script is:inline>
       (function () {
-        var t = null, a = null;
-        try { t = localStorage.getItem("theme"); a = localStorage.getItem("audit_theme"); } catch (e) {}
-        if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        document.documentElement.setAttribute("data-ui-theme", t);
-        document.documentElement.classList.toggle("dark", a === "dark");
+        var t = null;
+        try { t = localStorage.getItem("theme"); } catch (e) {}
+        if (t !== "dark" && t !== "light") t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.classList.toggle("dark", t === "dark");
       })();
     </script>
   </head>

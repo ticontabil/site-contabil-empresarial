@@ -5,16 +5,13 @@ import { icons } from "../data/icons";
 const $$ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) =>
   Array.from(root.querySelectorAll<T>(sel as any)) as T[];
 
-// ---------- Tema claro/escuro (igual ao original: o botão inverte o estado do ícone/logo) ----------
+// ---------- Tema claro/escuro (a escolha fica salva e vale ao recarregar) ----------
 $$("[data-theme-toggle]").forEach((btn) =>
   btn.addEventListener("click", () => {
-    const root = document.documentElement;
-    const next = root.getAttribute("data-ui-theme") === "dark" ? "light" : "dark";
+    const dark = document.documentElement.classList.toggle("dark");
     try {
-      localStorage.setItem("theme", next);
+      localStorage.setItem("theme", dark ? "dark" : "light");
     } catch {}
-    root.setAttribute("data-ui-theme", next);
-    root.classList.toggle("dark", next === "dark");
   }),
 );
 

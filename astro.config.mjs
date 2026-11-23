@@ -5,6 +5,8 @@ export default defineConfig({
   site: "https://contabilempresarial.com.br",
   // /trabalheconosco (sem barra final), igual ao original
   trailingSlash: "never",
+  // esconde a barra de ferramentas do Astro no npm run dev (ela nunca vai para o site publicado)
+  devToolbar: { enabled: false },
   build: { format: "file" },
   integrations: [
     sitemap({

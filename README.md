@@ -66,7 +66,10 @@ Comparação feita com Playwright no Chromium, nas larguras 1440 px e 375 px. As
 - **Links:** todos os `href`/`target` idênticos ao original (WhatsApp com a mensagem certa, ONVIO, âncoras, e-mail).
 - **Lighthouse** ([`docs/comparacao/lighthouse.md`](docs/comparacao/lighthouse.md)): celular 37 → 89 em Performance (LCP 5,5 s → 3,0 s); desktop 74 → 75; Acessibilidade, Boas práticas e SEO iguais.
 
-Única diferença técnica (invisível) em relação ao original: a foto do topo e a logo da versão escura usam `loading="lazy"`. No celular a foto fica escondida, e sem isso ela (3 MB) era baixada logo de início e atrasava a fonte.
+As medições acima são da versão clonada (commit inicial). Diferenças em relação ao original desde então:
+
+- a foto do topo e a logo da versão escura usam `loading="lazy"` (invisível). No celular a foto fica escondida, e sem isso ela (3 MB) era baixada logo de início e atrasava a fonte;
+- **correções de 23/11/2026:** o bug do modo escuro (ver [PENDENCIAS.md](PENDENCIAS.md)) e a logo, que agora leva para a página inicial. Com o aparelho em modo escuro, o site agora abre escuro, diferente do original.
 
 ## Como publicar
 

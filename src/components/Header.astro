@@ -7,9 +7,9 @@ const themeBtn = "p-2 rounded-lg border border-border hover:bg-secondary transit
 
 <nav class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
   <div class="container mx-auto flex items-center justify-between h-20 px-4">
-    <a href="#" class="flex items-center">
-      <img src="/logo.png" alt="Contábil Empresarial" class="h-12 ui-dark:hidden" />
-      <img src="/logo-negative.png" alt="Contábil Empresarial" loading="lazy" class="h-12 hidden ui-dark:block" />
+    <a href="/" class="flex items-center">
+      <img src="/logo.png" alt="Contábil Empresarial" class="h-12 dark:hidden" />
+      <img src="/logo-negative.png" alt="Contábil Empresarial" loading="lazy" class="h-12 hidden dark:block" />
     </a>
     <div class="hidden md:flex items-center gap-8">
       {menu.map((m) => (
@@ -18,8 +18,8 @@ const themeBtn = "p-2 rounded-lg border border-border hover:bg-secondary transit
     </div>
     <div class="hidden md:flex items-center gap-3">
       <button class={themeBtn} aria-label="Alternar tema" data-theme-toggle>
-        <Icon name="Moon" size={18} class="ui-dark:hidden" />
-        <Icon name="Sun" size={18} class="hidden ui-dark:block" />
+        <Icon name="Moon" size={18} class="dark:hidden" />
+        <Icon name="Sun" size={18} class="hidden dark:block" />
       </button>
       <a
         href={whatsapp.especialista}
@@ -30,8 +30,8 @@ const themeBtn = "p-2 rounded-lg border border-border hover:bg-secondary transit
     </div>
     <div class="md:hidden flex items-center gap-2">
       <button class={themeBtn} aria-label="Alternar tema" data-theme-toggle>
-        <Icon name="Moon" size={18} class="ui-dark:hidden" />
-        <Icon name="Sun" size={18} class="hidden ui-dark:block" />
+        <Icon name="Moon" size={18} class="dark:hidden" />
+        <Icon name="Sun" size={18} class="hidden dark:block" />
       </button>
       <button class="text-foreground" data-menu-toggle aria-expanded="false">
         <Icon name="Menu" size={24} data-menu-icon="closed" />

@@ -19,9 +19,8 @@ O site foi clonado **como está** em 23/11/2026. Os itens abaixo foram encontrad
 
 ## Comportamento
 
-- [ ] **Bug do modo escuro.** O site tem dois controles de tema que brigam entre si: o do site (`theme`) e o da Auditoria Fiscal (`audit_theme`). O clone reproduz o mesmo comportamento:
-  - quem usa o celular/computador em modo escuro abre o site com as **cores claras**, mas com o ícone de sol e a **logo branca, que quase some** no fundo claro;
-  - o modo escuro só aparece depois de clicar no botão e **volta ao claro ao recarregar** a página.
+- [x] **Bug do modo escuro — corrigido em 23/11/2026.** No original, dois controles de tema brigavam entre si: o do site (`theme`) e o da Auditoria Fiscal (`audit_theme`). Quem usava o aparelho em modo escuro abria o site com cores claras, mas com o ícone de sol e a logo branca quase sumindo, e o modo escuro voltava ao claro ao recarregar. Agora cores, logo e ícone seguem um só estado (a escolha salva ou, sem escolha, a preferência do aparelho), e a escolha vale ao recarregar.
+- [x] **Logo não levava para a página inicial — corrigido em 23/11/2026.** No original o link da logo era `#`: em `/trabalheconosco` o clique não saía da página. Agora a logo leva para `/`.
 - [ ] **Imagem de compartilhamento (OG) expirada.** O `og:image` do original é uma URL assinada do Google Storage que já venceu (responde 403), então o link compartilhado no WhatsApp/redes sai sem imagem. No clone foi colocada uma captura do topo do site original (`public/og-image.png`, 1200×630). Trocar por uma arte oficial.
 - [ ] **`twitter:site` = "@Lovable"** e **meta author "Lovable"** no original. No clone ficou só o `twitter:site` (mesmas meta tags de compartilhamento), sem o author.
 - [ ] **Formulário "Trabalhe Conosco" não envia o currículo.** Ele só abre o programa de e-mail (`mailto:rh@contabilempresarial.com.br`) com nome, cidade e estado civil. O arquivo escolhido em "Anexar Currículo" **não vai junto**: a pessoa precisa anexar de novo no e-mail. Em celular sem app de e-mail configurado, nada acontece além do aviso.
