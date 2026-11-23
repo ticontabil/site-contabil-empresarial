@@ -1,21 +1,32 @@
-# Publicação por FTP na Hostgator. PREPARADO, MAS DESLIGADO:
-# só roda manualmente (Actions > "Publicar na Hostgator (FTP)" > Run workflow)
-# e só depois de a empresa cadastrar os secrets abaixo em Settings > Secrets and variables > Actions:
+# Publicação por FTP na Hostgator. Só roda manualmente:
+#   Actions > "Publicar na Hostgator (FTP)" > Run workflow
+# Precisa dos secrets em Settings > Secrets and variables > Actions:
 #   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD  (e opcionalmente FTP_REMOTE_DIR, padrão ./public_html/)
-# Não rodar antes de: confirmar onde está o DNS, aprovação do Hiago e decisão sobre a Auditoria Fiscal.
+#
+# Modo "simular" (padrão): conecta no FTP e só LISTA o que seria enviado, sem gravar nada.
+# Modo "enviar": grava os arquivos. Exige digitar PUBLICAR.
+#
+# Enviar os arquivos NÃO troca o site no ar: o domínio continua apontando para a Lovable
+# até alguém mudar os registros A no DNS (ver README). Antes dessa troca, resolver a Auditoria Fiscal.
 name: Publicar na Hostgator (FTP)
 
 on:
   workflow_dispatch:
     inputs:
+      modo:
+        description: 'simular = só lista o que seria enviado; enviar = grava no servidor'
+        type: choice
+        options: [simular, enviar]
+        default: simular
       confirmar:
-        description: 'Digite PUBLICAR para confirmar (DNS conferido e Auditoria Fiscal resolvida)'
-        required: true
+        description: 'Para o modo enviar, digite PUBLICAR'
+        required: false
 
 jobs:
   deploy:
-    if: ${{ github.event.inputs.confirmar == 'PUBLICAR' }}
+    if: ${{ inputs.modo == 'simular' || inputs.confirmar == 'PUBLICAR' }}
     runs-on: ubuntu-latest
+    concurrency: deploy-hostgator
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,7 +35,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - name: Enviar dist/ por FTP
+      - name: ${{ inputs.modo == 'enviar' && 'Enviar dist/ por FTP' || 'Simular envio (nada é gravado)' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -33,3 +44,5 @@ jobs:
           protocol: ftps
           local-dir: ./dist/
           server-dir: ${{ secrets.FTP_REMOTE_DIR || './public_html/' }}
+          dry-run: ${{ inputs.modo != 'enviar' }}
+          log-level: verbose
