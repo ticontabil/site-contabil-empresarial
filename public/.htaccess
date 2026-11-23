@@ -1,0 +1,11 @@
+# Usado apenas se o site for publicado na Hostgator (Apache).
+# Serve /trabalheconosco a partir de trabalheconosco.html e usa a página 404 do site.
+Options -MultiViews
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+?)/?$ $1.html [L]
+
+ErrorDocument 404 /404.html

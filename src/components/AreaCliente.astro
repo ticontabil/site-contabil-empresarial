@@ -1,0 +1,29 @@
+---
+import Icon from "./Icon.astro";
+import SectionTitle from "./SectionTitle.astro";
+import { areaCliente } from "../data/secoes";
+---
+
+<section id="cliente" class="py-24">
+  <div class="container mx-auto px-4">
+    <SectionTitle titulo={areaCliente.titulo} destaque={areaCliente.destaque} subtitulo={areaCliente.subtitulo} wrapClass="text-center mb-12" />
+    <div class="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+      {areaCliente.links.map((l) => (
+        <a
+          href={l.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="bg-card border border-border rounded-xl p-6 card-hover flex items-start gap-4 group"
+        >
+          <Icon name={l.icon} size={28} class="text-primary shrink-0 mt-1" />
+          <div class="flex-1">
+            <h3 class="text-lg font-semibold mb-1 flex items-center gap-2">
+              {l.titulo}<Icon name="ExternalLink" size={14} class="opacity-0 group-hover:opacity-100 transition-opacity" />
+            </h3>
+            <p class="text-sm text-muted-foreground">{l.descricao}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

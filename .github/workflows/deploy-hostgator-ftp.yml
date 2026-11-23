@@ -1,0 +1,35 @@
+# Publicação por FTP na Hostgator. PREPARADO, MAS DESLIGADO:
+# só roda manualmente (Actions > "Publicar na Hostgator (FTP)" > Run workflow)
+# e só depois de a empresa cadastrar os secrets abaixo em Settings > Secrets and variables > Actions:
+#   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD  (e opcionalmente FTP_REMOTE_DIR, padrão ./public_html/)
+# Não rodar antes de: confirmar onde está o DNS, aprovação do Hiago e decisão sobre a Auditoria Fiscal.
+name: Publicar na Hostgator (FTP)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: 'Digite PUBLICAR para confirmar (DNS conferido e Auditoria Fiscal resolvida)'
+        required: true
+
+jobs:
+  deploy:
+    if: ${{ github.event.inputs.confirmar == 'PUBLICAR' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Enviar dist/ por FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./dist/
+          server-dir: ${{ secrets.FTP_REMOTE_DIR || './public_html/' }}
