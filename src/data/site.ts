@@ -88,5 +88,5 @@ export const medicao = {
   ga4: "G-QG0X1YQZVC", // Google Analytics 4 · propriedade "Site Contábil Empresarial" (criada em 24/11/2026)
   googleAds: "", // ID de conversão do Google Ads (AW-XXXXXXXXX), se houver
   googleAdsRotuloWhatsapp: "", // rótulo da conversão "clique no WhatsApp" (AW-XXX/rotulo)
-  pixelMeta: "8122980081146757", // Pixel / conjunto de dados da Meta "Site" (criado em 24/11/2026)
+  pixelMeta: "", // ID do conjunto de dados WEB da Meta (aparece em Conjuntos de dados > Identificação). Atenção: 8122980081146757 é o ID da conta da empresa, não do pixel
 };
