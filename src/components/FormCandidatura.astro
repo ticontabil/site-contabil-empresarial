@@ -11,13 +11,14 @@ const btn =
 const input =
   "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm mt-1";
 const label = "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
+const abertas = vagas.filter((v) => v.ativa);
 ---
 
 <section id="trabalhe" class="py-24">
   <div class="container mx-auto px-4">
-    <SectionTitle titulo={trabalheConosco.titulo} destaque={trabalheConosco.destaque} subtitulo={trabalheConosco.subtitulo} />
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-      {vagas.map((v) => (
+    <SectionTitle titulo={trabalheConosco.titulo} destaque={trabalheConosco.destaque} subtitulo={abertas.length ? trabalheConosco.subtitulo : trabalheConosco.subtituloSemVagas} />
+    {abertas.length > 0 && <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+      {abertas.map((v) => (
         <div class="bg-card border border-border rounded-xl p-6 card-hover flex flex-col">
           <Icon name="Briefcase" size={32} class="text-primary mb-4" />
           <h3 class="text-lg font-semibold mb-2">{v.titulo}</h3>
@@ -34,7 +35,8 @@ const label = "text-sm font-medium leading-none peer-disabled:cursor-not-allowed
           <button class={btn} data-ir-form>Candidate-se Agora</button>
         </div>
       ))}
-    </div>
+    </div>}
+    {abertas.length === 0 && <div class="mb-10"></div>}
     <div class="max-w-xl mx-auto bg-card border border-border rounded-xl p-8" data-form-wrap>
       <h3 class="text-2xl font-bold mb-6 text-center">Envie sua <span class="text-primary">Candidatura</span></h3>
       <form class="space-y-5" data-form-candidatura data-email={contato.emailRH} novalidate>

@@ -20,7 +20,7 @@ export const meta = {
 export const paginas = {
   trabalheconosco: {
     title: "Trabalhe Conosco | Contábil Empresarial",
-    description: "Vagas na Contábil Empresarial em Itumbiara, Goiânia e Uberlândia. Envie seu currículo e faça parte de um time de contabilidade desde 1984.",
+    description: "Trabalhe na Contábil Empresarial em Itumbiara, Goiânia, Uberlândia e Cachoeira Dourada. Envie seu currículo para o banco de talentos de um time de contabilidade desde 1984.",
   },
   noticias: {
     title: "Notícias de Contabilidade e Impostos | Contábil Empresarial",
