@@ -175,5 +175,8 @@ try {
 "; exit; }
   responderJson($saida, 200, 600);
 } catch (Throwable $e) {
+  // pela linha de comando (cron) mostra o motivo no registro; na web, só "indisponível"
+  if (PHP_SAPI === 'cli') { echo 'ERRO: ' . $e->getMessage() . ' em ' . basename($e->getFile()) . ':' . $e->getLine() . ' (PHP ' . PHP_VERSION . ")
+"; exit(1); }
   responderJson(['atualizado' => null, 'itens' => [], 'erro' => 'indisponivel'], 503);
 }
