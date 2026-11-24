@@ -46,13 +46,7 @@ jobs:
             if [ "$MODO" = "enviar" ]; then echo "::error::Falta o secret APRESENTACAO_PIN (senha da apresentação)."; exit 1; fi
             echo "::warning::Sem APRESENTACAO_PIN: na simulação segue sem a senha (o portão ficaria fechado)."; exit 0
           fi
-          node -e '
-            const c = require("crypto"); const sal = c.randomBytes(16).toString("hex");
-            const pin = process.env.PIN.replace(/\D/g, "");
-            const hash = c.createHmac("sha256", sal).update(pin).digest("hex");
-            require("fs").writeFileSync("dist/apresentacao-portao-config.php", `<?php return ["sal" => "${sal}", "hash" => "${hash}"];
-`);
-          '
+          node -e 'const c=require("crypto");const sal=c.randomBytes(16).toString("hex");const pin=process.env.PIN.replace(/[^0-9]/g,"");const h=c.createHmac("sha256",sal).update(pin).digest("hex");require("fs").writeFileSync("dist/apresentacao-portao-config.php","<?php return [\"sal\" => \""+sal+"\", \"hash\" => \""+h+"\"];"+String.fromCharCode(10));'
           echo "Senha da apresentação configurada."
       - name: ${{ inputs.modo == 'enviar' && 'Enviar dist/ por FTP' || 'Simular envio (nada é gravado)' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
