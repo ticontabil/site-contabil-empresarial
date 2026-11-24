@@ -64,17 +64,19 @@ export const contato = {
   emailRH: "rh@contabilempresarial.com.br",
   razaoSocial: "CONTABIL EMPRESARIAL ITUMBIARA LTDA",
   cnpj: "44.769.929/0001-55",
+  crc: "CRC 003839/0-7", // registro no Conselho Regional de Contabilidade (informado pela Contábil em 24/11/2026)
   enderecos: [
     "R. Rui de Almeida, 180 - St. Central, Itumbiara - GO",
     "Av. Cesário Alvim, 1135 - Centro, Uberlândia - MG",
     "Av. T-63, 1296, Sala 110, Setor Bueno, Goiânia - GO",
+    "Cachoeira Dourada - GO",
   ],
 };
 
 export const rodape = {
   slogan: "Contabilidade inteligente para empresas que querem crescer. Desde 1984.",
   copyright: "© 2026 Contábil Empresarial. Todos os direitos reservados.",
-  credito: "Agência Abelha",
+  credito: "equipe Contábil Empresarial", // o site passou a ser mantido pela própria Contábil (24/11/2026)
 };
 
 /**
