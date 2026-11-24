@@ -1,0 +1,90 @@
+[
+  {
+    "fonte": "Receita Federal",
+    "url": "https://www.gov.br/receitafederal/pt-br/assuntos/noticias/ultimas-noticias/rss.xml",
+    "formato": "rss2",
+    "temResumo": true,
+    "temImagem": false,
+    "itens": 15,
+    "maisRecente": "2026-11-24",
+    "precisaFiltrar": false,
+    "observacao": "Coleção 'Últimas notícias' (Plone). Os itens NÃO têm <link>: o endereço da notícia está em <guid>. Resumo curto em texto puro no <description>. Inclui notícias aduaneiras (apreensões, Operação Fronteira); pode-se excluir por palavras como 'apreende', 'apreensão', 'Alfândega' se quiser só tributos. Alternativa no mesmo conteúdo em RSS 1.0 (RDF): .../ultimas-noticias/RSS (link em rdf:about). Não usar .../assuntos/noticias/RSS ou rss.xml: listam as subpastas da seção, não as notícias."
+  },
+  {
+    "fonte": "Ministério da Fazenda",
+    "url": "https://www.gov.br/fazenda/RSS",
+    "formato": "rss1",
+    "temResumo": true,
+    "temImagem": false,
+    "itens": 15,
+    "maisRecente": "2026-11-23",
+    "precisaFiltrar": true,
+    "observacao": "Único feed que respondeu: é o RSS 1.0 (RDF) do site inteiro, com notícias misturadas a PDFs, publicações e avisos de pauta. Filtrar pelo link (rdf:about / <link>) contendo '/assuntos/noticias/' e depois por palavras-chave de tributos (muitas notícias são de clima/COP, mercado de carbono etc.). Só cerca de metade dos itens tem <description>. Os feeds da pasta de notícias (/fazenda/pt-br/assuntos/noticias/RSS, rss.xml, /2026/RSS, /2026/novembro/RSS) retornam 404."
+  },
+  {
+    "fonte": "Agência Brasil — Economia",
+    "url": "https://agenciabrasil.ebc.com.br/rss/economia/feed.xml",
+    "formato": "rss2",
+    "temResumo": true,
+    "temImagem": true,
+    "itens": 10,
+    "maisRecente": "2026-11-24",
+    "precisaFiltrar": true,
+    "observacao": "Editoria de economia ampla (Open Finance, Petrobras, CVM etc.); filtrar por palavras-chave. O <description> traz HTML com logo, pixels de rastreio (ebc.png/ebc.gif) e o começo do texto: remover tags e cortar o resumo. Imagem em tag própria não padrão <imagem-destaque> (não é enclosure/media:content)."
+  },
+  {
+    "fonte": "Agência Senado — Economia",
+    "url": "https://www12.senado.leg.br/noticias/rss?tema=economia",
+    "formato": "rss2",
+    "temResumo": true,
+    "temImagem": false,
+    "itens": 15,
+    "maisRecente": "2026-11-23",
+    "precisaFiltrar": true,
+    "observacao": "Filtro por tema 'economia' confirmado (tema inexistente devolve 0 itens; parâmetros tema=tributos e tag=... não funcionam). Inclui orçamento, previdência e itens de áudio/vídeo (títulos começam com 'Áudio:' / 'Vídeo:'). Feed geral sem filtro: https://www12.senado.leg.br/noticias/rss."
+  },
+  {
+    "fonte": "Agência Câmara de Notícias — Economia",
+    "url": "https://www.camara.leg.br/noticias/rss/dinamico/ECONOMIA",
+    "formato": "rss2",
+    "temResumo": true,
+    "temImagem": false,
+    "itens": 10,
+    "maisRecente": "2026-11-24",
+    "precisaFiltrar": true,
+    "observacao": "Tema Economia (MEI, tributos, orçamento etc.). <description> é uma linha curta (ex.: 'Alíquota foi fixada em 11,3%'); quase todos os itens têm. Texto completo em content:encoded, com a foto apenas dentro desse HTML (sem enclosure/media:content). Feed geral: https://www.camara.leg.br/noticias/rss/ultimas-noticias."
+  },
+  {
+    "fonte": "CFC — Conselho Federal de Contabilidade",
+    "url": "https://cfc.org.br/feed/",
+    "formato": "rss2",
+    "temResumo": true,
+    "temImagem": false,
+    "itens": 10,
+    "maisRecente": "2026-11-24",
+    "precisaFiltrar": false,
+    "observacao": "WordPress. Já é tema contábil/tributário (reforma tributária, normas contábeis). Resumo em texto no <description>; imagem só dentro do content:encoded (sem enclosure)."
+  },
+  {
+    "fonte": "Portal Contábeis",
+    "url": "https://www.contabeis.com.br/rss/noticias/",
+    "formato": "rss2",
+    "temResumo": true,
+    "temImagem": true,
+    "itens": 30,
+    "maisRecente": "2026-11-24",
+    "precisaFiltrar": false,
+    "observacao": "Especializado em contabilidade e tributos. Imagem em media:content (870x450). <description> em HTML com <img> e 'Leia mais em ...': remover tags. Tem <category> (ex.: Tributário)."
+  },
+  {
+    "fonte": "Jornal Contábil",
+    "url": "https://jornalcontabil.com.br/feed/",
+    "formato": "rss2",
+    "temResumo": true,
+    "temImagem": false,
+    "itens": 10,
+    "maisRecente": "2026-11-24",
+    "precisaFiltrar": false,
+    "observacao": "WordPress. www.jornalcontabil.com.br/feed/ redireciona para este endereço. Tema contábil/tributário, mas inclui matérias de negócios/empreendedorismo; filtro leve opcional. <description> termina com 'O post ... apareceu primeiro em ...' (remover). Imagem só no HTML do conteúdo."
+  }
+]

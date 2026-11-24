@@ -1,0 +1,155 @@
+---
+// Notícias de contabilidade e tributos: título, resumo e link para a fonte (nunca o texto inteiro).
+// Os dados vêm de /api/noticias.php (Hostgator), que reúne os feeds oficiais e atualiza a cada 2 h.
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import WhatsAppFlutuante from "../components/WhatsAppFlutuante.astro";
+import { paginas, whatsapp } from "../data/site";
+const schema = [{
+  "@context": "https://schema.org", "@type": "CollectionPage", name: "Notícias de contabilidade e impostos",
+  description: paginas.noticias.description, inLanguage: "pt-BR", isPartOf: { "@type": "WebSite", name: "Contábil Empresarial" },
+}];
+---
+<Base title={paginas.noticias.title} description={paginas.noticias.description} schema={schema}>
+  <Header />
+  <main class="pt-28 pb-20" data-noticias>
+    <section class="container mx-auto px-4">
+      <p class="text-sm font-semibold uppercase tracking-widest text-primary">Fique em dia</p>
+      <h1 class="mt-2 text-3xl md:text-5xl font-extrabold leading-tight">Notícias de contabilidade e impostos</h1>
+      <p class="mt-4 max-w-2xl text-lg text-muted-foreground">Receita Federal, Reforma Tributária, Simples Nacional, eSocial e tudo o que muda para a sua empresa, reunido de fontes oficiais e confiáveis. Clique para ver o resumo e ir à matéria original.</p>
+      <p class="mt-2 text-sm text-muted-foreground" data-atualizado aria-live="polite"></p>
+
+      <!-- filtros -->
+      <div class="mt-8 flex flex-col gap-4">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <label class="relative flex-1">
+            <span class="sr-only">Buscar notícias</span>
+            <svg class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="search" data-busca placeholder="Buscar: CBS, MEI, imposto de renda…" class="w-full rounded-lg border border-border bg-background py-3 pl-10 pr-4 text-base outline-none focus:border-primary" />
+          </label>
+          <select data-fonte class="rounded-lg border border-border bg-background px-4 py-3 text-base outline-none focus:border-primary" aria-label="Fonte">
+            <option value="">Todas as fontes</option>
+          </select>
+          <label class="flex items-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium cursor-pointer select-none">
+            <input type="checkbox" data-oficiais class="h-4 w-4 accent-[hsl(var(--primary))]" /> Só fontes oficiais
+          </label>
+        </div>
+        <div class="flex flex-wrap gap-2" data-temas role="group" aria-label="Temas"></div>
+      </div>
+
+      <!-- lista -->
+      <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-lista aria-live="polite">
+        {Array.from({ length: 6 }).map(() => (
+          <div class="h-52 rounded-xl border border-border bg-secondary/40 animate-pulse" aria-hidden="true"></div>
+        ))}
+      </div>
+      <p class="mt-8 hidden text-center text-muted-foreground" data-vazio>Nenhuma notícia encontrada com esses filtros.</p>
+      <div class="mt-10 flex justify-center">
+        <button type="button" data-mais class="hidden rounded-lg border border-border px-6 py-3 font-semibold hover:bg-secondary transition-colors">Carregar mais notícias</button>
+      </div>
+
+      <aside class="mt-16 rounded-2xl border border-border bg-secondary/40 p-8 md:flex md:items-center md:justify-between md:gap-8">
+        <div>
+          <h2 class="text-2xl font-bold">Uma mudança dessas afeta a sua empresa?</h2>
+          <p class="mt-2 text-muted-foreground">Nossos especialistas explicam o que muda no seu caso e o que fazer.</p>
+        </div>
+        <a href={whatsapp.especialista} target="_blank" rel="noopener" class="mt-6 md:mt-0 inline-flex shrink-0 rounded-lg btn-gradient-orange px-6 py-3.5 font-semibold text-primary-foreground glow-orange">Falar com especialista</a>
+      </aside>
+      <p class="mt-6 text-xs text-muted-foreground">As notícias são de responsabilidade das fontes citadas. A Contábil Empresarial mostra o título e o resumo publicados por elas, com o link para a matéria original.</p>
+    </section>
+  </main>
+  <Footer />
+  <WhatsAppFlutuante />
+</Base>
+
+<script>
+  type Noticia = { id: string; titulo: string; resumo: string; link: string; data: string; fonte: string; fonteId: string; oficial: boolean; tema: string };
+  type Dados = { atualizado: string | null; itens: Noticia[]; fontes: { id: string; nome: string; oficial: boolean }[]; temas: string[] };
+  const raiz = document.querySelector<HTMLElement>("[data-noticias]")!;
+  const lista = raiz.querySelector<HTMLElement>("[data-lista]")!;
+  const busca = raiz.querySelector<HTMLInputElement>("[data-busca]")!;
+  const selFonte = raiz.querySelector<HTMLSelectElement>("[data-fonte]")!;
+  const oficiais = raiz.querySelector<HTMLInputElement>("[data-oficiais]")!;
+  const temasEl = raiz.querySelector<HTMLElement>("[data-temas]")!;
+  const vazio = raiz.querySelector<HTMLElement>("[data-vazio]")!;
+  const mais = raiz.querySelector<HTMLButtonElement>("[data-mais]")!;
+  const atualizado = raiz.querySelector<HTMLElement>("[data-atualizado]")!;
+  const POR_PAGINA = 24;
+  let dados: Dados | null = null, tema = "", mostrando = POR_PAGINA;
+
+  const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+  const sem = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  function quando(iso: string) {
+    const d = new Date(iso), seg = (Date.now() - d.getTime()) / 1000;
+    if (seg < 3600) return `há ${Math.max(1, Math.round(seg / 60))} min`;
+    if (seg < 86400) return `há ${Math.round(seg / 3600)} h`;
+    if (seg < 7 * 86400) return `há ${Math.round(seg / 86400)} dia${seg < 2 * 86400 ? "" : "s"}`;
+    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  }
+  // estado nos parâmetros do endereço (dá para mandar o link já filtrado)
+  const q = new URLSearchParams(location.search);
+  busca.value = q.get("q") || ""; tema = q.get("tema") || ""; oficiais.checked = q.get("oficiais") === "1";
+  function salvarEstado() {
+    const p = new URLSearchParams();
+    if (busca.value.trim()) p.set("q", busca.value.trim());
+    if (tema) p.set("tema", tema);
+    if (selFonte.value) p.set("fonte", selFonte.value);
+    if (oficiais.checked) p.set("oficiais", "1");
+    history.replaceState(null, "", p.toString() ? `?${p}` : location.pathname);
+  }
+
+  function desenharTemas() {
+    if (!dados) return;
+    const chip = (nome: string, rotulo: string) =>
+      `<button type="button" data-tema="${esc(nome)}" aria-pressed="${tema === nome}" class="rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${tema === nome ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}">${esc(rotulo)}</button>`;
+    temasEl.innerHTML = chip("", "Todos os temas") + dados.temas.map((t) => chip(t, t)).join("");
+  }
+
+  function desenhar() {
+    if (!dados) return;
+    const termo = sem(busca.value.trim());
+    const filtradas = dados.itens.filter((n) =>
+      (!tema || n.tema === tema) && (!selFonte.value || n.fonteId === selFonte.value) && (!oficiais.checked || n.oficial) &&
+      (!termo || sem(`${n.titulo} ${n.resumo} ${n.fonte}`).includes(termo)));
+    const vis = filtradas.slice(0, mostrando);
+    lista.innerHTML = vis.map((n) => `
+      <article class="group relative flex flex-col rounded-xl border border-border bg-background p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md">
+        <div class="flex items-center gap-2 text-xs">
+          <span class="rounded-full bg-primary/10 px-2.5 py-1 font-semibold text-primary">${esc(n.tema)}</span>
+          <span class="text-muted-foreground">${esc(quando(n.data))}</span>
+        </div>
+        <h2 class="mt-4 text-lg font-bold leading-snug [overflow-wrap:anywhere]"><a href="/noticia?id=${esc(n.id)}" class="after:absolute after:inset-0 focus:outline-none focus-visible:underline">${esc(n.titulo)}</a></h2>
+        <p class="mt-2 line-clamp-3 text-sm text-muted-foreground [overflow-wrap:anywhere]">${esc(n.resumo)}</p>
+        <p class="mt-auto pt-5 text-xs font-semibold text-muted-foreground">${n.oficial ? "● " : ""}${esc(n.fonte)}</p>
+      </article>`).join("");
+    vazio.classList.toggle("hidden", filtradas.length > 0);
+    mais.classList.toggle("hidden", filtradas.length <= mostrando);
+  }
+
+  temasEl.addEventListener("click", (e) => {
+    const b = (e.target as Element).closest<HTMLButtonElement>("[data-tema]");
+    if (!b) return;
+    tema = b.dataset.tema || ""; mostrando = POR_PAGINA; desenharTemas(); desenhar(); salvarEstado();
+  });
+  let t: number | undefined;
+  busca.addEventListener("input", () => { clearTimeout(t); t = window.setTimeout(() => { mostrando = POR_PAGINA; desenhar(); salvarEstado(); }, 180); });
+  [selFonte, oficiais].forEach((el) => el.addEventListener("change", () => { mostrando = POR_PAGINA; desenhar(); salvarEstado(); }));
+  mais.addEventListener("click", () => { mostrando += POR_PAGINA; desenhar(); });
+
+  fetch("/api/noticias.php", { headers: { Accept: "application/json" } })
+    .then((r) => r.json())
+    .then((d: Dados) => {
+      dados = d;
+      try { sessionStorage.setItem("noticias", JSON.stringify(d)); } catch {}
+      selFonte.innerHTML = `<option value="">Todas as fontes</option>` + d.fontes.map((f) => `<option value="${esc(f.id)}">${esc(f.nome)}</option>`).join("");
+      selFonte.value = q.get("fonte") || "";
+      if (d.atualizado) atualizado.textContent = `Atualizado ${quando(d.atualizado)} · ${d.itens.length} notícias de ${d.fontes.length} fontes`;
+      desenharTemas(); desenhar();
+    })
+    .catch(() => {
+      lista.innerHTML = "";
+      vazio.textContent = "Não conseguimos carregar as notícias agora. Tente de novo em alguns minutos.";
+      vazio.classList.remove("hidden");
+    });
+</script>

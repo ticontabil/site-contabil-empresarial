@@ -1,0 +1,58 @@
+---
+// Política de Privacidade. Descreve só o que o site realmente faz (24/11/2026).
+// Revisar com o jurídico/encarregado de dados da Contábil antes de publicar (ver PENDENCIAS.md).
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import WhatsAppFlutuante from "../components/WhatsAppFlutuante.astro";
+import { contato } from "../data/site";
+const atualizada = "24 de novembro de 2026";
+---
+<Base title="Política de Privacidade | Contábil Empresarial" description="Como a Contábil Empresarial trata os dados de quem visita o site: medição de visitas, cookies, WhatsApp e currículos, e como exercer seus direitos pela LGPD.">
+  <Header />
+  <main class="pt-28 pb-20">
+    <article class="container mx-auto max-w-3xl px-4 politica">
+      <p class="text-sm font-semibold uppercase tracking-widest text-primary">LGPD</p>
+      <h1 class="mt-2 text-3xl md:text-4xl font-extrabold">Política de Privacidade</h1>
+      <p class="mt-3 text-muted-foreground">Última atualização: {atualizada}.</p>
+
+      <h2>Quem somos</h2>
+      <p>Este site é da <strong>{contato.razaoSocial}</strong> (Contábil Empresarial), CNPJ {contato.cnpj}, com sede em {contato.enderecos[0]}. Para qualquer assunto sobre seus dados, escreva para <a href={`mailto:${contato.email}`}>{contato.email}</a>.</p>
+
+      <h2>O que coletamos e por quê</h2>
+      <h3>Medição de visitas (sem cookies)</h3>
+      <p>Para saber quantas pessoas visitam o site e quais páginas são mais úteis, registramos, a cada visita: a página aberta, o site de onde a pessoa veio (por exemplo, Google ou Instagram), as etiquetas de campanha do link (utm), o tamanho da tela (celular, tablet ou computador) e cliques nos botões de WhatsApp. <strong>Não usamos cookies para isso e não guardamos o seu endereço IP.</strong> Para contar visitantes diferentes, criamos um código que muda todo dia e não permite identificar quem você é. Esses registros ficam no nosso próprio servidor por até 13 meses.</p>
+
+      <h3 id="cookies">Cookies do Google e da Meta (só se você aceitar)</h3>
+      <p>Se você clicar em <strong>Aceitar</strong> no aviso de cookies, o site carrega o <strong>Google Analytics</strong>, o <strong>Google Ads</strong> e o <strong>Pixel da Meta</strong> (Facebook e Instagram). Eles usam cookies para medir o uso do site e o resultado dos nossos anúncios. Esses dados são tratados pelo Google e pela Meta conforme as políticas de privacidade deles. Se você clicar em <strong>Recusar</strong>, nada disso é carregado. Você pode mudar sua escolha a qualquer momento em <a href="#cookies" data-cookies-abrir>Preferências de cookies</a>.</p>
+
+      <h3>WhatsApp</h3>
+      <p>Os botões de contato abrem uma conversa no WhatsApp com a nossa equipe. O que você enviar por lá é usado para responder ao seu pedido e para o atendimento comercial.</p>
+
+      <h3>Trabalhe Conosco</h3>
+      <p>O formulário de candidatura não envia dados ao nosso servidor: ele abre o seu programa de e-mail com uma mensagem pronta para <a href={`mailto:${contato.emailRH}`}>{contato.emailRH}</a>. Usamos o currículo apenas no processo seletivo.</p>
+
+      <h3>Área de notícias</h3>
+      <p>Mostramos títulos e resumos de notícias de fontes públicas e especializadas, sempre com o link para a matéria original. Ao clicar em “Ler na fonte”, você vai para o site daquela fonte, que tem a sua própria política de privacidade.</p>
+
+      <h2>Com quem compartilhamos</h2>
+      <p>Não vendemos dados. Os dados de medição sem cookies ficam só no nosso servidor. Os cookies de terceiros, quando aceitos, são tratados pelo Google e pela Meta.</p>
+
+      <h2>Seus direitos</h2>
+      <p>Pela Lei Geral de Proteção de Dados (Lei nº 13.709/2018, art. 18), você pode pedir confirmação de que tratamos seus dados, acesso, correção, anonimização, eliminação, informações sobre compartilhamento e revogação do consentimento. É só escrever para <a href={`mailto:${contato.email}`}>{contato.email}</a>.</p>
+
+      <h2>Mudanças nesta política</h2>
+      <p>Se mudarmos o que o site coleta, atualizamos esta página e a data no topo.</p>
+    </article>
+  </main>
+  <Footer />
+  <WhatsAppFlutuante />
+</Base>
+
+<style>
+  .politica :global(h2) { font-size: 1.5rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 0.75rem; }
+  .politica :global(h3) { font-size: 1.125rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+  .politica :global(p) { color: hsl(var(--muted-foreground)); line-height: 1.75; margin-top: 0.5rem; }
+  .politica :global(strong) { color: hsl(var(--foreground)); }
+  .politica :global(a) { color: hsl(var(--primary)); text-decoration: underline; text-underline-offset: 2px; }
+</style>

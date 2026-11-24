@@ -1,0 +1,124 @@
+---
+// Medição do site:
+// 1) Painel próprio (/painel): conta toda visita SEM cookies e sem guardar IP (api/coleta.php).
+// 2) Google Analytics / Google Ads / Pixel da Meta: só carregam depois que o visitante aceita os cookies.
+// Eventos medidos: visita, clique no WhatsApp, candidatura enviada.
+import { medicao } from "../data/site";
+const temTerceiros = !!(medicao.ga4 || medicao.googleAds || medicao.pixelMeta);
+---
+<script type="application/json" id="medicao-config" set:html={JSON.stringify(medicao)}></script>
+{temTerceiros && (
+  <div id="aviso-cookies" class="fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-xl rounded-2xl border border-border bg-background/95 p-5 text-foreground shadow-2xl backdrop-blur-md sm:inset-x-auto sm:left-4 sm:bottom-4" role="dialog" aria-live="polite" aria-label="Aviso de cookies" hidden>
+    <p class="text-sm leading-relaxed text-muted-foreground">
+      Usamos cookies do Google e da Meta para entender como o site é usado e medir nossos anúncios.
+      Você pode aceitar ou recusar. Veja a <a href="/privacidade" class="font-medium text-primary underline underline-offset-2">Política de Privacidade</a>.
+    </p>
+    <div class="mt-4 flex flex-wrap justify-end gap-2">
+      <button type="button" data-cookies="nao" class="rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary">Recusar</button>
+      <button type="button" data-cookies="sim" class="rounded-lg btn-gradient-orange px-5 py-2 text-sm font-semibold text-primary-foreground">Aceitar</button>
+    </div>
+  </div>
+)}
+
+<script>
+  type Config = { ga4: string; googleAds: string; googleAdsRotuloWhatsapp: string; pixelMeta: string };
+  const cfg: Config = JSON.parse(document.getElementById("medicao-config")?.textContent || "{}");
+  const CHAVE = "consentimento-cookies";
+  const w = window as any;
+
+  // ---------- 1) Painel próprio: sem cookies, sem IP guardado ----------
+  function coletar(tipo: string, rotulo = "") {
+    try {
+      const u = new URL(location.href);
+      const dados = JSON.stringify({
+        t: tipo,
+        p: u.pathname + (u.pathname === "/noticia" ? u.search.slice(0, 40) : ""),
+        r: document.referrer && new URL(document.referrer).host !== location.host ? document.referrer : "",
+        l: rotulo.slice(0, 80),
+        w: innerWidth,
+        us: u.searchParams.get("utm_source") || "",
+        um: u.searchParams.get("utm_medium") || "",
+        uc: u.searchParams.get("utm_campaign") || "",
+        g: u.searchParams.has("gclid") ? 1 : 0,
+        f: u.searchParams.has("fbclid") ? 1 : 0,
+      });
+      if (!navigator.sendBeacon?.("/api/coleta.php", new Blob([dados], { type: "text/plain" }))) {
+        fetch("/api/coleta.php", { method: "POST", body: dados, keepalive: true }).catch(() => {});
+      }
+    } catch {}
+  }
+  coletar("visita");
+
+  // ---------- 2) Terceiros, só com consentimento ----------
+  let ligado = false;
+  function ligarTerceiros() {
+    if (ligado) return;
+    ligado = true;
+    if (cfg.ga4 || cfg.googleAds) {
+      const s = document.createElement("script");
+      s.async = true;
+      s.src = `https://www.googletagmanager.com/gtag/js?id=${cfg.ga4 || cfg.googleAds}`;
+      document.head.append(s);
+      w.dataLayer = w.dataLayer || [];
+      w.gtag = function () { w.dataLayer.push(arguments); };
+      w.gtag("js", new Date());
+      if (cfg.ga4) w.gtag("config", cfg.ga4);
+      if (cfg.googleAds) w.gtag("config", cfg.googleAds);
+    }
+    if (cfg.pixelMeta) {
+      /* código padrão do Pixel da Meta */
+      (function (f: any, b: Document, e: string, v: string) {
+        if (f.fbq) return;
+        const n: any = (f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); });
+        if (!f._fbq) f._fbq = n;
+        n.push = n; n.loaded = true; n.version = "2.0"; n.queue = [];
+        const t = b.createElement(e) as HTMLScriptElement; t.async = true; t.src = v;
+        b.head.append(t);
+      })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+      w.fbq("init", cfg.pixelMeta);
+      w.fbq("track", "PageView");
+    }
+  }
+
+  function medir(evento: string, rotulo = "") {
+    coletar(evento, rotulo);
+    if (!ligado) return;
+    if (evento === "whatsapp") {
+      w.gtag?.("event", "generate_lead", { method: "whatsapp", link_text: rotulo });
+      if (cfg.googleAds && cfg.googleAdsRotuloWhatsapp) w.gtag?.("event", "conversion", { send_to: `${cfg.googleAds}/${cfg.googleAdsRotuloWhatsapp}` });
+      w.fbq?.("track", "Contact", { content_name: rotulo });
+    }
+    if (evento === "candidatura") {
+      w.gtag?.("event", "candidatura_enviada");
+      w.fbq?.("track", "SubmitApplication");
+    }
+  }
+
+  // cliques no WhatsApp (todos os botões do site apontam para wa.me)
+  document.addEventListener("click", (e) => {
+    const a = (e.target as Element).closest?.("a[href*='wa.me'], a[href*='api.whatsapp.com']");
+    if (a) medir("whatsapp", (a.textContent || a.getAttribute("aria-label") || "WhatsApp").trim().replace(/\s+/g, " "));
+  }, { capture: true });
+  addEventListener("medir", (e) => medir((e as CustomEvent).detail?.evento || "evento", (e as CustomEvent).detail?.rotulo || ""));
+
+  // ---------- aviso de cookies ----------
+  const aviso = document.getElementById("aviso-cookies");
+  let escolha: string | null = null;
+  try { escolha = localStorage.getItem(CHAVE); } catch {}
+  if (escolha === "sim") ligarTerceiros();
+  else if (escolha !== "nao" && aviso) aviso.hidden = false;
+  aviso?.querySelectorAll<HTMLButtonElement>("[data-cookies]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const v = b.dataset.cookies!;
+      try { localStorage.setItem(CHAVE, v); } catch {}
+      aviso.hidden = true;
+      if (v === "sim") ligarTerceiros();
+      coletar(v === "sim" ? "cookies-aceitos" : "cookies-recusados");
+    }),
+  );
+  // link "Preferências de cookies" no rodapé reabre o aviso
+  document.querySelectorAll("[data-cookies-abrir]").forEach((b) => b.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (aviso) aviso.hidden = false;
+  }));
+</script>

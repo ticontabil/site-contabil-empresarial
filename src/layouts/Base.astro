@@ -1,13 +1,71 @@
 ---
 import "../styles/global.css";
-import { meta } from "../data/site";
+import { meta, contato, whatsapp } from "../data/site";
+import { faq, duvidasRapidas } from "../data/faq";
+import Medicao from "../components/Medicao.astro";
 
 interface Props {
   noindex?: boolean;
   title?: string;
+  description?: string;
+  /** dados estruturados extras da página (FAQ, lista de notícias etc.) */
+  schema?: Record<string, unknown>[];
+  /** home: inclui o FAQ nos dados estruturados */
+  home?: boolean;
 }
-const { noindex = false, title = meta.title } = Astro.props;
-const ogImage = new URL(meta.ogImage, Astro.site).toString();
+const { noindex = false, title = meta.title, description = meta.description, schema = [], home = false } = Astro.props;
+const site = Astro.site!;
+const ogImage = new URL(meta.ogImage, site).toString();
+// endereço canônico sem ".html" e sem barra no fim (o servidor serve /trabalheconosco a partir do .html)
+const caminho = Astro.url.pathname.replace(/\.html$/, "").replace(/\/index$/, "/").replace(/(.)\/$/, "$1");
+const canonico = new URL(caminho, site).toString();
+
+// Dados estruturados (schema.org): o escritório e as três unidades. Ajuda o Google a mostrar
+// nome, endereço, telefone e mapa nas buscas locais ("contabilidade em Itumbiara" etc.).
+const partes = (e: string) => {
+  // "R. Rui de Almeida, 180 - St. Central, Itumbiara - GO" / "Av. T-63, 1296, Sala 110, Setor Bueno, Goiânia - GO"
+  const uf = e.slice(e.lastIndexOf(" - ") + 3).trim();
+  const corpo = e.slice(0, e.lastIndexOf(" - "));
+  const cidade = corpo.split(/,\s*|\s-\s/).pop()!.trim();
+  const rua = corpo.slice(0, corpo.lastIndexOf(cidade)).replace(/[,\s-]+$/, "").trim();
+  return { "@type": "PostalAddress", streetAddress: rua, addressLocality: cidade, addressRegion: uf, addressCountry: "BR" };
+};
+const telefone = "+55-64-3431-6397";
+const org = {
+  "@context": "https://schema.org",
+  "@type": "AccountingService",
+  "@id": `${site}#escritorio`,
+  name: meta.siteName,
+  legalName: contato.razaoSocial,
+  taxID: contato.cnpj,
+  url: site.toString(),
+  logo: new URL("/logo.png", site).toString(),
+  image: ogImage,
+  description: meta.description,
+  foundingDate: "1984",
+  telephone: telefone,
+  email: contato.email,
+  priceRange: "$$",
+  address: partes(contato.enderecos[0]),
+  areaServed: ["Itumbiara", "Goiânia", "Uberlândia", "Goiás", "Minas Gerais"].map((n) => ({ "@type": "Place", name: n })),
+  sameAs: [meta.instagram],
+  contactPoint: [{ "@type": "ContactPoint", telephone: telefone, contactType: "customer service", areaServed: "BR", availableLanguage: "Portuguese", url: whatsapp.numero }],
+  department: contato.enderecos.slice(1).map((e, i) => ({
+    "@type": "AccountingService",
+    "@id": `${site}#unidade-${i + 2}`,
+    name: `${meta.siteName} · ${partes(e).addressLocality}`,
+    address: partes(e),
+    telephone: telefone,
+    url: site.toString(),
+  })),
+};
+const siteSchema = { "@context": "https://schema.org", "@type": "WebSite", name: meta.siteName, url: site.toString(), inLanguage: "pt-BR", publisher: { "@id": `${site}#escritorio` } };
+const faqSchema = home && {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [...faq, ...duvidasRapidas].map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+};
+const blocos = [org, siteSchema, ...(faqSchema ? [faqSchema] : []), ...schema];
 ---
 
 <!doctype html>
@@ -16,19 +74,32 @@ const ogImage = new URL(meta.ogImage, Astro.site).toString();
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
-    <meta name="description" content={meta.description} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow, max-image-preview:large" />}
+    <link rel="canonical" href={canonico} />
     <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <meta name="theme-color" content="#ff6a00" />
+    <meta name="format-detection" content="telephone=no" />
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={meta.siteName} />
+    <meta property="og:locale" content={meta.locale} />
+    <meta property="og:url" content={canonico} />
+    <meta property="og:title" content={title === meta.title ? meta.ogTitle : title} />
+    <meta property="og:description" content={title === meta.title ? meta.ogDescription : description} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Página inicial da Contábil Empresarial" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content={meta.twitterSite} />
+    <meta name="twitter:title" content={title === meta.title ? meta.ogTitle : title} />
+    <meta name="twitter:description" content={title === meta.title ? meta.ogDescription : description} />
     <meta name="twitter:image" content={ogImage} />
-    <meta property="og:title" content={meta.ogTitle} />
-    <meta name="twitter:title" content={meta.ogTitle} />
-    <meta property="og:description" content={meta.ogDescription} />
-    <meta name="twitter:description" content={meta.ogDescription} />
+    <meta name="geo.region" content="BR-GO" />
+    <meta name="geo.placename" content="Itumbiara" />
+
+    {blocos.map((b) => <script type="application/ld+json" set:html={JSON.stringify(b)} />)}
 
     <!--
       Tema: escolha salva (localStorage "theme") ou, se não houver, a preferência do sistema.
@@ -56,6 +127,7 @@ const ogImage = new URL(meta.ogImage, Astro.site).toString();
         <slot />
       </div>
     </div>
+    <Medicao />
     <script>
       import "../scripts/site";
     </script>

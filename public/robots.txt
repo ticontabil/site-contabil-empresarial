@@ -1,0 +1,8 @@
+# Contábil Empresarial
+User-agent: *
+Allow: /
+Disallow: /apresentacao
+Disallow: /painel
+Disallow: /api/
+
+Sitemap: https://contabilempresarial.com.br/sitemap-index.xml

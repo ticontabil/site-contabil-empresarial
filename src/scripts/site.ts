@@ -161,6 +161,8 @@ if (form) {
     const body = encodeURIComponent(`Nome: ${name}\nCidade: ${city}\nEstado Civil: ${marital}\n\nCurrículo em anexo.`);
     window.open(`mailto:${form.dataset.email}?subject=${subject}&body=${body}`, "_blank");
     toast("Redirecionando para o envio do e-mail!");
+    // conta a candidatura no painel e (se o visitante aceitou cookies) no Google/Meta
+    window.dispatchEvent(new CustomEvent("medir", { detail: { evento: "candidatura" } }));
     form.reset();
     cvNome.textContent = "Escolher arquivo";
   });

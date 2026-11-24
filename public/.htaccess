@@ -3,6 +3,20 @@
 Options -MultiViews
 RewriteEngine On
 
+# ---- Um endereço só (SEO): https e sem www ----
+# Só para visitas (GET/HEAD) às páginas do site. As outras aplicações da public_html (chamados, chat,
+# evolution, portal etc.) e a validação do SSL (.well-known) ficam de fora, para não quebrar integrações.
+RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+RewriteCond %{REQUEST_URI} !^/(aquisicao|auditoriafiscal|chamados|chat|comercial|evolution|legalizacaocontabil|link|links|malotes|marketingcontabil|ouvidoria|portal|reinf|requisicao|status|vagas|\.well-known)(/|$)
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^(.*)$ https://contabilempresarial.com.br/$1 [R=301,L,NE]
+
+# ---- Painel de acessos e arquivos internos ----
+RewriteRule ^painel/?$ painel.php [L,QSA]
+RewriteRule ^painel-config\.php$ - [F,L]
+RewriteRule ^api/_ - [F,L]
+
 # ---- Apresentação com senha ----
 # Tudo o que começa com /apresentacao (página, configuração, modo apresentador, vídeos, service worker)
 # passa pelo portão. Sem a senha, nada disso é entregue. Se o PHP falhar, o acesso fica fechado.

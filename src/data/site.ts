@@ -2,13 +2,30 @@
 // Textos copiados do site publicado em 23/11/2026 (inclusive os erros: ver PENDENCIAS.md).
 
 export const meta = {
-  title: "Contabil Empresárial",
-  description: "Contábil Empresárial",
-  ogTitle: "Contabil Empresárial",
-  ogDescription: "Contábil Empresárial",
+  // SEO (revisado em 24/11/2026): títulos e descrições escritos para busca, em português.
+  title: "Contábil Empresarial | Contabilidade em Itumbiara, Goiânia e Uberlândia",
+  description:
+    "Escritório de contabilidade desde 1984: abertura de empresas, contabilidade, departamento pessoal, fiscal, planejamento tributário e BPO financeiro em Itumbiara, Goiânia e Uberlândia.",
+  ogTitle: "Contábil Empresarial · Contabilidade para empresas que querem crescer",
+  ogDescription:
+    "Desde 1984 ao lado do empresário. Abertura de empresas, contabilidade, folha, fiscal e consultoria em Itumbiara (GO), Goiânia (GO) e Uberlândia (MG).",
   ogImage: "/og-image.png",
-  twitterSite: "@Lovable",
-  lang: "en",
+  siteName: "Contábil Empresarial",
+  lang: "pt-BR",
+  locale: "pt_BR",
+  instagram: "https://www.instagram.com/contabilempresarial/",
+};
+
+/** Título e descrição de cada página (a home usa `meta`). */
+export const paginas = {
+  trabalheconosco: {
+    title: "Trabalhe Conosco | Contábil Empresarial",
+    description: "Vagas na Contábil Empresarial em Itumbiara, Goiânia e Uberlândia. Envie seu currículo e faça parte de um time de contabilidade desde 1984.",
+  },
+  noticias: {
+    title: "Notícias de Contabilidade e Impostos | Contábil Empresarial",
+    description: "Novidades da Receita Federal, Reforma Tributária, Simples Nacional, eSocial e obrigações fiscais, reunidas de fontes oficiais e confiáveis, com link para a matéria original.",
+  },
 };
 
 const WA = "https://wa.me/556434316397";
@@ -22,10 +39,11 @@ export const whatsapp = {
 };
 
 export const menu = [
-  { label: "Serviços", href: "#servicos" },
-  { label: "Sobre Nós", href: "#sobre" },
+  { label: "Serviços", href: "/#servicos" },
+  { label: "Sobre Nós", href: "/#sobre" },
+  { label: "Notícias", href: "/noticias" },
   { label: "Trabalhe Conosco", href: "/trabalheconosco" },
-  { label: "Área do Cliente", href: "#cliente" },
+  { label: "Área do Cliente", href: "/#cliente" },
 ];
 
 export const hero = {
@@ -57,4 +75,16 @@ export const rodape = {
   slogan: "Contabilidade inteligente para empresas que querem crescer. Desde 1984.",
   copyright: "© 2026 Contábil Empresarial. Todos os direitos reservados.",
   credito: "Agência Abelha",
+};
+
+/**
+ * Medição. IDs públicos (não são senha). Vazio = desligado.
+ * Google Analytics e Pixel só carregam depois que o visitante aceita os cookies (aviso LGPD).
+ * O painel próprio (/painel) conta as visitas sem cookies e não depende destes IDs.
+ */
+export const medicao = {
+  ga4: "G-QG0X1YQZVC", // Google Analytics 4 · propriedade "Site Contábil Empresarial" (criada em 24/11/2026)
+  googleAds: "", // ID de conversão do Google Ads (AW-XXXXXXXXX), se houver
+  googleAdsRotuloWhatsapp: "", // rótulo da conversão "clique no WhatsApp" (AW-XXX/rotulo)
+  pixelMeta: "", // ID do Pixel / conjunto de dados da Meta (15 a 16 dígitos)
 };
