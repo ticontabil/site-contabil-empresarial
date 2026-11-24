@@ -16,6 +16,8 @@ RewriteRule ^(.*)$ https://contabilempresarial.com.br/$1 [R=301,L,NE]
 RewriteRule ^painel/?$ painel.php [L,QSA]
 RewriteRule ^painel-config\.php$ - [F,L]
 RewriteRule ^api/_ - [F,L]
+# arquivos ocultos (controle do envio por FTP etc.) não são públicos; .well-known fica liberado para o SSL
+RewriteRule (^|/)\.(?!well-known) - [F,L]
 
 # ---- Apresentação com senha ----
 # Tudo o que começa com /apresentacao (página, configuração, modo apresentador, vídeos, service worker)
