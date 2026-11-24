@@ -101,6 +101,7 @@ $campanhas = $lista("SELECT utm_source || ' / ' || utm_campaign n, COUNT(*) c FR
 $aparelhos = $lista("SELECT aparelho n, COUNT(*) c FROM eventos WHERE tipo='visita' AND dia BETWEEN ? AND ? GROUP BY aparelho ORDER BY c DESC", $p);
 $botoes = $lista("SELECT CASE WHEN rotulo='' THEN '(sem texto)' ELSE rotulo END n, COUNT(*) c FROM eventos WHERE tipo='whatsapp' AND dia BETWEEN ? AND ? GROUP BY n ORDER BY c DESC LIMIT 10", $p);
 $whatsPag = $lista("SELECT pagina n, COUNT(*) c FROM eventos WHERE tipo='whatsapp' AND dia BETWEEN ? AND ? GROUP BY pagina ORDER BY c DESC LIMIT 6", $p);
+$rotas = $lista("SELECT rotulo n, COUNT(*) c FROM eventos WHERE tipo='rota' AND dia BETWEEN ? AND ? GROUP BY rotulo ORDER BY c DESC", $p);
 $cookies = $lista("SELECT tipo n, COUNT(*) c FROM eventos WHERE tipo IN ('cookies-aceitos','cookies-recusados') AND dia BETWEEN ? AND ? GROUP BY tipo", $p);
 
 $fmt = fn($n) => number_format((float) $n, 0, ',', '.');
@@ -181,6 +182,7 @@ table.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 
     <section class="cartao"><h2>Botões de WhatsApp mais clicados</h2><?= barras($botoes) ?></section>
     <section class="cartao"><h2>Páginas que mais geraram WhatsApp</h2><?= barras($whatsPag, $nomePagina) ?></section>
     <section class="cartao"><h2>Aparelhos</h2><?= barras(array_map(fn($a) => ['n' => ucfirst($a['n']), 'c' => $a['c']], $aparelhos)) ?></section>
+    <section class="cartao"><h2>Rotas abertas no Waze</h2><p class="d">Cliques nas unidades da página inicial</p><?= barras($rotas) ?></section>
     <section class="cartao"><h2>Campanhas (links com utm)</h2><p class="d">Origem / campanha dos links que vocês usam nos anúncios</p><?= barras($campanhas) ?></section>
   </div>
 

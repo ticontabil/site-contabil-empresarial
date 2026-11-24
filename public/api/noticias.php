@@ -3,7 +3,7 @@
  * Notícias de contabilidade e tributos, reunidas de fontes oficiais e especializadas.
  * O site mostra SÓ título, resumo curto, data e o link para a matéria original (decisão de 24/11/2026).
  * Atualiza sozinho de dois jeitos:
- * *  - tarefa agendada do cPanel (cron), a cada 15 minutos: php /home/<usuario>/public_html/api/noticias.php
+ *  - tarefa agendada do cPanel (cron), a cada 15 minutos: php /home/<usuario>/public_html/api/noticias.php
  *    (pela linha de comando sempre busca de novo, então o visitante encontra tudo pronto);
  *  - se por algum motivo o cache passar de 2 horas, o próximo visitante dispara a atualização.
  * Feeds testados em 24/11/2026 (materiais/noticias/feeds.json).

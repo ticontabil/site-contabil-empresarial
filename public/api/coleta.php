@@ -19,7 +19,7 @@ $corpo = (string) file_get_contents('php://input', false, null, 0, 4096);
 $d = json_decode($corpo, true);
 if (!is_array($d)) { responderJson(['ok' => false], 400); exit; }
 
-$tipos = ['visita', 'whatsapp', 'candidatura', 'cookies-aceitos', 'cookies-recusados'];
+$tipos = ['visita', 'whatsapp', 'candidatura', 'rota', 'cookies-aceitos', 'cookies-recusados'];
 $tipo = (string) ($d['t'] ?? '');
 if (!in_array($tipo, $tipos, true)) { responderJson(['ok' => false], 400); exit; }
 

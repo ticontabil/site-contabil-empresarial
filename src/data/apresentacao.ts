@@ -273,7 +273,7 @@ export const telas = {
       apoioComplemento: { ativo: false, texto: "e um time de referência que conhece a sua empresa" },
       faixaLocais: [
         { ativo: true, texto: "Matriz em Itumbiara (GO)" },
-        { ativo: true, texto: "Unidades em Goiânia (GO) e Uberlândia (MG)" },
+        { ativo: true, texto: "Filiais em Goiânia (GO), Uberlândia (MG) e Cachoeira Dourada (GO)" },
         { ativo: false, texto: "[+ demais unidades]" },
         { ativo: true, texto: "40+ cidades atendidas" },
         { ativo: false, texto: "Clientes nas 5 regiões" },

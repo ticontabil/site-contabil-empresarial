@@ -88,6 +88,10 @@ const temTerceiros = !!(medicao.ga4 || medicao.googleAds || medicao.pixelMeta);
       if (cfg.googleAds && cfg.googleAdsRotuloWhatsapp) w.gtag?.("event", "conversion", { send_to: `${cfg.googleAds}/${cfg.googleAdsRotuloWhatsapp}` });
       w.fbq?.("track", "Contact", { content_name: rotulo });
     }
+    if (evento === "rota") {
+      w.gtag?.("event", "abrir_rota", { unidade: rotulo });
+      w.fbq?.("track", "FindLocation", { content_name: rotulo });
+    }
     if (evento === "candidatura") {
       w.gtag?.("event", "candidatura_enviada");
       w.fbq?.("track", "SubmitApplication");
@@ -98,6 +102,8 @@ const temTerceiros = !!(medicao.ga4 || medicao.googleAds || medicao.pixelMeta);
   document.addEventListener("click", (e) => {
     const a = (e.target as Element).closest?.("a[href*='wa.me'], a[href*='api.whatsapp.com']");
     if (a) medir("whatsapp", (a.textContent || a.getAttribute("aria-label") || "WhatsApp").trim().replace(/\s+/g, " "));
+    const rota = (e.target as Element).closest?.<HTMLElement>("a[data-rota]");
+    if (rota) medir("rota", rota.dataset.rota || "");
   }, { capture: true });
   addEventListener("medir", (e) => medir((e as CustomEvent).detail?.evento || "evento", (e as CustomEvent).detail?.rotulo || ""));
 
