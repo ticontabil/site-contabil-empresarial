@@ -64,7 +64,7 @@ export const contato = {
   emailRH: "rh@contabilempresarial.com.br",
   razaoSocial: "CONTABIL EMPRESARIAL ITUMBIARA LTDA",
   cnpj: "44.769.929/0001-55",
-  crc: "CRC 003839/0-7", // registro no Conselho Regional de Contabilidade (informado pela Contábil em 24/11/2026)
+  crc: "CRC-GO 003839/O-7", // registro da empresa no Conselho Regional de Contabilidade de Goiás (confirmado pela Contábil em 24/11/2026)
   enderecos: [
     "R. Rui de Almeida, 180 - St. Central, Itumbiara - GO",
     "Av. Cesário Alvim, 1135 - Centro, Uberlândia - MG",
