@@ -43,7 +43,6 @@ export const menu = [
   { label: "Sobre Nós", href: "/#sobre" },
   { label: "Notícias", href: "/noticias" },
   { label: "Trabalhe Conosco", href: "/trabalheconosco" },
-  { label: "Área do Cliente", href: "/#cliente" },
 ];
 
 export const hero = {
