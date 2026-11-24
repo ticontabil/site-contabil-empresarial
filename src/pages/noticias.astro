@@ -133,7 +133,9 @@ const schema = [{
     tema = b.dataset.tema || ""; mostrando = POR_PAGINA; desenharTemas(); desenhar(); salvarEstado();
   });
   let t: number | undefined;
-  busca.addEventListener("input", () => { clearTimeout(t); t = window.setTimeout(() => { mostrando = POR_PAGINA; desenhar(); salvarEstado(); }, 180); });
+  busca.addEventListener("input", () => { clearTimeout(t); t = window.setTimeout(() => { mostrando = POR_PAGINA; desenhar(); }, 180); });
+  // o termo buscado entra no endereço só ao sair do campo (assim o Google/Meta não contam cada letra como visita)
+  busca.addEventListener("change", salvarEstado);
   [selFonte, oficiais].forEach((el) => el.addEventListener("change", () => { mostrando = POR_PAGINA; desenhar(); salvarEstado(); }));
   mais.addEventListener("click", () => { mostrando += POR_PAGINA; desenhar(); });
 

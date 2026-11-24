@@ -75,6 +75,8 @@ const temTerceiros = !!(medicao.ga4 || medicao.googleAds || medicao.pixelMeta);
         const t = b.createElement(e) as HTMLScriptElement; t.async = true; t.src = v;
         b.head.append(t);
       })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+      // filtros e busca mudam o endereço sem trocar de página: isso não é uma visita nova
+      w.fbq.disablePushState = true;
       w.fbq("init", cfg.pixelMeta);
       w.fbq("track", "PageView");
     }
