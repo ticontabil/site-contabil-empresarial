@@ -29,7 +29,7 @@ import { hero, whatsapp } from "../data/site";
         </div>
       </div>
       <div class="hidden lg:block animate-fade-in-up" style="animation-delay: 0.2s;">
-        <img src={hero.foto} alt={hero.fotoAlt} loading="lazy" decoding="async" class="rounded-2xl shadow-2xl w-full object-cover max-h-[550px]" />
+        <img src={hero.foto} alt={hero.fotoAlt} loading="eager" fetchpriority="high" decoding="async" class="rounded-2xl shadow-2xl w-full object-cover max-h-[550px]" />
       </div>
     </div>
   </div>

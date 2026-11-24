@@ -167,3 +167,84 @@ if (form) {
     cvNome.textContent = "Escolher arquivo";
   });
 }
+
+// ---------- Animações de entrada (textos, cartões, imagens) ----------
+// Só roda se o <head> ligou a classe "anima" (há IntersectionObserver e a pessoa não pediu menos movimento).
+if (document.documentElement.classList.contains("anima")) {
+  const raiz = document.documentElement;
+
+  // título principal: palavra por palavra (mantém o <span> laranja)
+  const h1 = document.querySelector<HTMLElement>("[data-hero] h1");
+  if (h1) {
+    let i = 0;
+    const partir = (no: Node) => {
+      [...no.childNodes].forEach((filho) => {
+        if (filho.nodeType === Node.TEXT_NODE) {
+          const frag = document.createDocumentFragment();
+          (filho.textContent || "").split(/(\s+)/).forEach((p) => {
+            if (!p) return;
+            if (/^\s+$/.test(p)) return frag.append(document.createTextNode(p));
+            const w = document.createElement("span");
+            w.className = "palavra-hero";
+            const d = document.createElement("span");
+            d.style.setProperty("--i", String(i++));
+            d.textContent = p;
+            w.append(d);
+            frag.append(w);
+          });
+          filho.replaceWith(frag);
+        } else if (filho.nodeType === Node.ELEMENT_NODE) partir(filho);
+      });
+    };
+    partir(h1);
+    // com as palavras no lugar, solta a animação no próximo quadro
+    requestAnimationFrame(() => requestAnimationFrame(() => raiz.classList.add("anima-pronto")));
+    // subtítulo e botões do topo entram logo depois do título
+    const sub = h1.nextElementSibling as HTMLElement | null;
+    if (sub) { sub.classList.add("revela"); sub.style.setProperty("--atraso", `${0.25 + i * 0.05}s`); }
+    const botoes = h1.parentElement?.querySelector<HTMLElement>("a")?.parentElement;
+    if (botoes) { botoes.classList.add("revela"); botoes.style.setProperty("--atraso", `${0.45 + i * 0.05}s`); }
+  }
+
+  // botões de contorno ganham o mesmo brilho dos laranja
+  $$("a.border-primary, button.border-primary").forEach((b) => b.classList.add("btn-contorno"));
+
+  // o que entra ao aparecer na tela
+  const alvos: HTMLElement[] = [];
+  const marcar = (el: HTMLElement | null, atraso = 0) => {
+    if (!el || el.classList.contains("revela") || el.closest("[data-hero]") || el.closest("#aviso-cookies")) return;
+    el.classList.add("revela");
+    el.style.setProperty("--atraso", `${atraso}s`);
+    alvos.push(el);
+  };
+  // títulos de seção (e o subtítulo logo abaixo), com o traço na palavra laranja
+  $$("section h2, main h2").forEach((h) => {
+    if (h.closest("[data-lista]") || h.closest("[data-noticia]")) return;
+    if (h.querySelector(".text-primary")) h.classList.add("titulo-traco");
+    marcar(h);
+    const prox = h.nextElementSibling as HTMLElement | null;
+    if (prox && prox.tagName === "P") marcar(prox, 0.12);
+  });
+  // cartões, perguntas e imagens: em sequência dentro de cada grupo
+  const grupos = new Map<Element, number>();
+  $$(".card-hover, [data-acc-item], section img").forEach((el) => {
+    if (el.closest("[data-hero]")) return;
+    const pai = el.parentElement!;
+    const k = grupos.get(pai) ?? 0;
+    grupos.set(pai, k + 1);
+    marcar(el, Math.min(k, 8) * 0.08);
+  });
+
+  const obs = new IntersectionObserver((entradas) => {
+    entradas.forEach((e) => {
+      if (!e.isIntersecting) return;
+      (e.target as HTMLElement).classList.add("visivel");
+      obs.unobserve(e.target);
+    });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+  alvos.forEach((el) => obs.observe(el));
+  // subtítulo e botões do topo não passam pelo observador
+  requestAnimationFrame(() => requestAnimationFrame(() => $$("[data-hero] .revela").forEach((el) => el.classList.add("visivel"))));
+  // ao imprimir, mostra tudo
+  addEventListener("beforeprint", () => $$(".revela").forEach((el) => el.classList.add("visivel")));
+}
