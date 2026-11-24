@@ -12,7 +12,8 @@ if (!defined('SITE_COMUM')) {
   function pastaDados(): string {
     static $pasta = null;
     if ($pasta !== null) return $pasta;
-    $raiz = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? dirname(__DIR__)), '/\\');
+    // pela linha de comando (cron) DOCUMENT_ROOT vem vazio: usa a pasta do site a partir deste arquivo
+    $raiz = rtrim((string) (($_SERVER['DOCUMENT_ROOT'] ?? '') ?: dirname(__DIR__)), '/\\');
     $candidatas = [dirname($raiz) . '/dados-site', $raiz . '/api/_dados'];
     foreach ($candidatas as $c) {
       if (!is_dir($c)) @mkdir($c, 0750, true);
