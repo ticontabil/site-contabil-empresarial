@@ -1,0 +1,41 @@
+---
+import Tela from "../Tela.astro";
+import Titulo from "../Titulo.astro";
+import Txt from "../Txt.astro";
+import Foto from "../Foto.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.parceiros.tela;
+const todos = t.grupos.flatMap((g) => g.parceiros);
+// a faixa repete a lista para rolar sem emenda
+const voltas = [0, 1, 2, 3];
+---
+<Tela info={info}>
+  <p class="rotulo entra">{t.rotulo}</p>
+  <Titulo t={t.titulo} class="entra d2" />
+  <p class="apoio entra d3"><Txt t={t.apoio} /></p>
+  <div class="grupos">
+    {t.grupos.map((g, i) => (
+      <div class="grupo" data-passo={i + 1}>
+        <h3>({g.nome})</h3>
+        {g.parceiros.map((p) => (
+          <div class="parceiro">
+            <b>{p.nome}</b>
+            <span><Txt t={p.texto} /></span>
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+  <div class="faixa-logos entra" aria-label={`Parceiros: ${todos.map((p) => p.nome).join(", ")}`}>
+    <span class="nevoa esq"></span><span class="nevoa dir"></span>
+    <div class="moldura-faixa"><div class="trilha">
+      {voltas.map((v) => todos.map((p) => (
+        <div class="logo-parceiro" aria-hidden={v > 0 ? "true" : undefined}>
+          {p.logo ? <Foto arquivo={`parceiros/${p.logo}`} descricao={p.nome} alt={p.nome} larguras={[240, 480]} tamanho="240px" /> : <span>{p.nome}</span>}
+        </div>
+      )))}
+    </div></div>
+  </div>
+</Tela>

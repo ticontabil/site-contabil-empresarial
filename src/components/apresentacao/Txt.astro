@@ -1,0 +1,10 @@
+---
+// Texto com [colchetes]: cada trecho entre colchetes vira um placeholder marcado (contorno laranja em ?rascunho=1).
+interface Props { t: string }
+const { t } = Astro.props;
+import { publicar } from "../../data/apresentacao.ts";
+// Na versão publicada, o que ainda está entre colchetes (dado a confirmar) não aparece.
+const esconder = import.meta.env.PROD && !!publicar && import.meta.env.PUBLIC_APRESENTACAO_PREVIA !== "1";
+const partes = t.split(/(\[[^\]]+\])/g).filter(Boolean).filter((p) => !(esconder && p.startsWith("[") && p.endsWith("]")));
+---
+{partes.map((p) => (p.startsWith("[") && p.endsWith("]") ? <span class="ph" title="Dado a confirmar">{p}</span> : p))}

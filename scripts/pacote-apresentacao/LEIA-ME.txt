@@ -1,0 +1,16 @@
+﻿APRESENTAÇÃO COMERCIAL · CONTÁBIL EMPRESARIAL (VERSÃO DE TESTE — NÃO PUBLICAR)
+
+Como abrir (Windows):
+1. Extraia o .zip inteiro numa pasta (botão direito > Extrair tudo).
+2. Dê dois cliques em "ABRIR APRESENTACAO.bat".
+3. O navegador abre sozinho em http://localhost:4400/apresentacao
+   Deixe a janela preta aberta enquanto apresenta; feche-a para encerrar.
+   Se o Windows perguntar sobre o arquivo, clique em "Mais informações" > "Executar assim mesmo".
+
+Atalhos:
+- Seta para a direita, espaço ou passador: avança · seta para a esquerda: volta
+- F: tela cheia · N: modo apresentador (falas e próxima tela) · B: tela preta
+- Número + Enter: vai direto para a tela (ex.: 6 Enter)
+- Tablet: toque na borda direita/esquerda = passo; arrastar para o lado = tela inteira
+
+Funciona sem internet. Ainda há dados entre colchetes a confirmar (valores, autorizações).

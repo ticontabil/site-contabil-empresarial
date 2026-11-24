@@ -1,0 +1,25 @@
+---
+import type { TelaAtiva } from "../../lib/apresentacao-telas.ts";
+interface Props { info: TelaAtiva; tema?: "escura" | "clara"; rodape?: string; class?: string; atmosfera?: boolean }
+const { info, tema = "escura", rodape, class: cls = "", atmosfera = true } = Astro.props;
+---
+<section
+  class:list={["tela", tema, info.chave, cls]}
+  id={`tela-${info.rotuloNumero}`}
+  data-chave={info.chave}
+  data-passos={info.passos}
+  data-tema={tema}
+  data-titulo={info.titulo}
+  data-ato={info.ato}
+  aria-roledescription="tela"
+  aria-label={`Tela ${info.numero}: ${info.titulo}`}
+>
+  {atmosfera && (
+    <div class="atmosfera" aria-hidden="true">
+      <span class="fumaca f1"></span><span class="fumaca f2"></span><span class="fumaca f3"></span>
+      <span class="luz-topo"></span><span class="vinheta"></span>
+    </div>
+  )}
+  <slot />
+  {rodape && <p class="rodape-tela">{rodape}</p>}
+</section>

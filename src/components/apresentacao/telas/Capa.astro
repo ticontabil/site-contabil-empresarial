@@ -1,0 +1,51 @@
+---
+import Tela from "../Tela.astro";
+import Foto from "../Foto.astro";
+import Txt from "../Txt.astro";
+import Video from "../Video.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const d = telas.capa;
+const total = String(d.tunel.length).padStart(2, "0");
+// contraste de pesos: 1ª palavra Black, meio Light, última palavra Light Itálico (acento)
+const palavras = d.tela.titulo.split(" ");
+const primeira = palavras[0];
+const meio = palavras.slice(1, -1).join(" ");
+const ultima = palavras[palavras.length - 1];
+const giro = "AVANÇAR · CONTÁBIL EMPRESARIAL · DESDE 1984 · ";
+---
+<Tela info={info}>
+  <span class="risco-luz" aria-hidden="true"></span>
+  <div class="tunel abre-linha" data-tunel="auto" aria-hidden="true">
+    {d.tunel.map((f, i) => (
+      <div class="camada" data-i={i}>
+        <div class="moldura">{f.video ? <Video nome={f.video} /> : <Foto arquivo={f.arquivo} descricao={f.descricao} larguras={[720, 1440]} tamanho="38vw" />}</div>
+      </div>
+    ))}
+  </div>
+  <!-- visor de câmera sobre a camada da frente (motion de referência) -->
+  <div class="visor" aria-hidden="true">
+    <i class="canto c1"></i><i class="canto c2"></i><i class="canto c3"></i><i class="canto c4"></i>
+    <span class="visor-tc" data-timecode>00:00:00:00</span>
+    <span class="visor-rot">(MATRIZ · ITUMBIARA)</span>
+    <span class="visor-pe">(CONTÁBIL 01)</span>
+    <span class="visor-fmt">16:9</span>
+    <span class="visor-scan"></span>
+  </div>
+  <p class="tunel-contador rotulo" aria-hidden="true">(CAMADA <span data-contador>01</span> / {total})</p>
+  <div class="degrade-base"></div>
+  <p class="topo rotulo entra">({d.tela.sobretitulo})</p>
+  <div class="selo-giro entra d3" aria-hidden="true">
+    <svg viewBox="0 0 200 200" class="giro">
+      <defs><path id="giro-circulo" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" /></defs>
+      <text><textPath href="#giro-circulo" textLength="488">{giro}</textPath></text>
+    </svg>
+    <span class="seta">→</span>
+  </div>
+  <div class="bloco-titulo">
+    <h1 class="titulo entra"><strong>{primeira}</strong> <span class="leve">{meio}</span> <em class="acento">{ultima}</em></h1>
+    <p class="apoio entra d2"><Txt t={d.tela.apoio} /></p>
+  </div>
+  <div class="nome-gigante entra d3" data-ajustar-largura><span>{d.tela.nomeGigante}</span></div>
+</Tela>

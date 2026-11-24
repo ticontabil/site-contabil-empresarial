@@ -1,0 +1,28 @@
+---
+import Tela from "../Tela.astro";
+import Titulo from "../Titulo.astro";
+import Txt from "../Txt.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.numeros.tela;
+// destaque: o trecho depois do travessão fica em laranja
+const [antes, depois] = t.destaque.split(" — ");
+---
+<Tela info={info}>
+  <p class="rotulo entra">{t.rotulo}</p>
+  <Titulo t={t.titulo} class="entra d2" />
+  <div class="grade">
+    {t.itens.map((it, i) => (
+      <div class={`entra d${Math.min(4, 2 + Math.floor(i / 3))}`}>
+        {"valor" in it && it.valor !== undefined ? (
+          <div class="n"><span data-contar={it.valor}>{it.valor}</span>{it.sufixo}</div>
+        ) : (
+          <div class="n"><Txt t={(it as any).texto} /></div>
+        )}
+        <div class="r">{it.rotulo}</div>
+      </div>
+    ))}
+  </div>
+  <p class="destaque" data-passo="1">{antes}{depois && <> — <strong>{depois}</strong></>}</p>
+</Tela>

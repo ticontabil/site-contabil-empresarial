@@ -1,0 +1,24 @@
+---
+import Tela from "../Tela.astro";
+import Titulo from "../Titulo.astro";
+import Txt from "../Txt.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.comoComecar.tela;
+const [p1, p2] = t.apoio.split("? ");
+---
+<Tela info={info} tema="clara">
+  <p class="rotulo entra">{t.rotulo}</p>
+  <Titulo t={t.titulo} class="entra d2" />
+  <div class="etapas">
+    {t.etapas.map((e, i) => (
+      <div class="etapa" data-passo={i + 1} data-destaque={i + 1}>
+        <div class="num">({String(i + 1).padStart(2, "0")})</div>
+        <h3>{e.nome}</h3>
+        <p><Txt t={e.texto} /></p>
+      </div>
+    ))}
+  </div>
+  <p class="apoio-final" data-passo={t.etapas.length + 1}>{p2 ? <><b>{p1}?</b> {p2}</> : t.apoio}</p>
+</Tela>

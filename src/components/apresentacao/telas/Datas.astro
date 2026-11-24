@@ -1,0 +1,28 @@
+---
+import Tela from "../Tela.astro";
+import Titulo from "../Titulo.astro";
+import Txt from "../Txt.astro";
+import { telas, reformaAtualizadoEm } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.datas.tela;
+const n = t.jaMudou.length;
+---
+<Tela info={info} tema="clara" rodape={`${t.fonte} ${reformaAtualizadoEm}.`}>
+  <p class="rotulo entra">{t.rotulo}</p>
+  <Titulo t={t.titulo} class="entra d2" />
+  <div class="colunas">
+    <div class="mudou">
+      <div class="cab entra d3"><span class="ponto"></span>JÁ MUDOU</div>
+      {t.jaMudou.map((it, i) => (
+        <div class="item" data-passo={i + 1}><div class="data">({it.data})</div><p><Txt t={it.texto} /></p></div>
+      ))}
+    </div>
+    <div class="disputa">
+      <div class="cab entra d3"><span class="ponto"></span>EM DISPUTA</div>
+      {t.emDisputa.map((it, i) => (
+        <div class="item" data-passo={n + i + 1}><div class="data">({it.data})</div><p><Txt t={it.texto} /></p></div>
+      ))}
+    </div>
+  </div>
+</Tela>

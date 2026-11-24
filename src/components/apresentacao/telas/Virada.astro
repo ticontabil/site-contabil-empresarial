@@ -1,0 +1,30 @@
+---
+// Tela 05 — frase única. Motions de referência: palavras entram pelos lados, fotos pequenas
+// dentro da frase e a linha de apoio "acende" palavra por palavra (cinza → branco).
+import Tela from "../Tela.astro";
+import Foto from "../Foto.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.virada.tela;
+const imagens: { depoisDe: string; arquivo: string; descricao: string }[] = (t as any).imagensNaFrase ?? [];
+const palavras = t.frase.split(" ");
+const apoio = t.apoio.split(" ");
+---
+<Tela info={info}>
+  <h2 class="frase entra">
+    {palavras.map((p, i) => {
+      const img = imagens.find((m) => m.depoisDe === p);
+      const ultima = i === palavras.length - 1;
+      return (
+        <>
+          {ultima ? <em>{p}</em> : p}{" "}
+          {img && <span class="pilula-img"><Foto arquivo={img.arquivo} descricao={img.descricao} larguras={[240, 480]} tamanho="240px" /></span>}{img && " "}
+        </>
+      );
+    })}
+  </h2>
+  <p class="apoio realce" data-passo="1">
+    {apoio.map((p, i) => <><span style={`--i:${i}`}>{p}</span>{" "}</>)}
+  </p>
+</Tela>

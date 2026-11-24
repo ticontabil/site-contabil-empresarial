@@ -1,0 +1,11 @@
+---
+// Título com contraste de pesos da Montserrat: 1ª frase leve, o resto forte.
+// "A Reforma não é mais promessa. Já está nas notas." → leve + forte.
+import Txt from "./Txt.astro";
+interface Props { t: string; class?: string; tag?: "h1" | "h2" }
+const { t, class: cls = "", tag = "h2" } = Astro.props;
+const i = t.indexOf(". ");
+const [a, b] = i > 0 && i < t.length - 2 ? [t.slice(0, i + 1), t.slice(i + 2)] : ["", t];
+const Tag = tag;
+---
+<Tag class={`titulo ${cls}`}>{a && <span class="leve"><Txt t={a} /> </span>}<strong><Txt t={b} /></strong></Tag>

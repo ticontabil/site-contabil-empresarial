@@ -1,0 +1,81 @@
+---
+// Tela 06 — Nossa história. Mecânica do hero de referência (A), medida quadro a quadro com o /reanimate
+// (.reanimate/ref-substance/probe): recortes espalhados em volta de um ponto de fuga, sem inclinação;
+// a câmera avança, os recortes crescem em perspectiva, os do fundo acendem devagar e os que chegam
+// perto passam pela borda desfocando e sumindo. O nome gigante da base cresce, desfoca e some.
+// Cada passo = um marco. O motor fica em efeitos.ts (tunelHero).
+import Tela from "../Tela.astro";
+import Foto from "../Foto.astro";
+import Txt from "../Txt.astro";
+import Video from "../Video.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import { ativos, type TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const d = telas.historia;
+const t = d.tela;
+const marcos = ativos(d.marcos);
+const tot = String(t.totalMoedas).padStart(2, "0");
+const pad = (n: number) => String(n).padStart(2, "0");
+---
+<Tela info={info} rodape={t.fonte}>
+  <div class="tunel-hero" data-tunel-hero aria-hidden="true">
+    {marcos.map((m, i) => (
+      <div class:list={["cartao", m.faixa, { recorte: (m.imagem as any).recorte }]} data-i={i}>
+        <span class="num">({pad(i + 1)})</span>
+        {m.imagem.arquivo ? (
+          <Foto arquivo={m.imagem.arquivo} descricao={m.imagem.descricao} rotulo="IMAGEM" larguras={[520, 1040]} tamanho="34vw" encaixe="documento" />
+        ) : (
+          <div class="ficha">
+            <span class="ficha-rotulo">{m.faixa === "contabil" ? "(DESDE 1984)" : "(ATO OFICIAL)"}</span>
+            <span class="ficha-data"><Txt t={m.data} /></span>
+            <span class="ficha-ato">{"ficha" in m.imagem ? m.imagem.ficha : m.imagem.descricao}</span>
+          </div>
+        )}
+      </div>
+    ))}
+    <span class="ponto-fuga"></span>
+  </div>
+  <!-- aberração cromática: o canal azul desloca 1 a 5 px (usada nos recortes desfocados e nas bordas) -->
+  <svg class="filtros-lente" width="0" height="0" aria-hidden="true" focusable="false">
+    {[1, 2, 3, 4, 5].map((k) => (
+      <filter id={`aberracao-${k}`} x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+        <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="vermelhoVerde" />
+        <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="azul" />
+        <feOffset in="azul" dx={k} dy={k * 0.35} result="azulDeslocado" />
+        <feBlend in="vermelhoVerde" in2="azulDeslocado" mode="screen" />
+      </filter>
+    ))}
+  </svg>
+
+  <p class="h-topo-esq rotulo entra">{t.rotulo}</p>
+  <p class="h-contador rotulo" data-contador-moeda>(MOEDA <span>01</span> / {tot})</p>
+  <p class="h-avancar rotulo entra">(AVANÇAR)</p>
+
+  <!-- canto inferior esquerdo: título no passo 0; depois, o marco da camada atual -->
+  <div class="h-texto">
+    <div class="h-bloco h-intro" data-bloco="-1">
+      <h2 class="titulo"><Txt t={t.titulo} /></h2>
+      <p><Txt t={t.apoio} /></p>
+    </div>
+    {marcos.map((m, i) => (
+      <div class="h-bloco" data-bloco={i}>
+        <p class="h-marco"><span class="laranja">(<Txt t={m.data} />)</span> {m.titulo}</p>
+        <p><Txt t={m.texto} /></p>
+        <p class="h-ref">{"ficha" in m.imagem && m.imagem.ficha ? m.imagem.ficha : m.imagem.descricao}</p>
+      </div>
+    ))}
+  </div>
+  <div class="h-local rotulo"><span>{t.local}</span><span>{t.coordenadas}</span></div>
+
+  <div class="h-gigante" data-ajustar-largura><span>{t.nomeGigante}</span></div>
+
+  <div class="lista-estatica">
+    {marcos.map((m) => <div><b>(<Txt t={m.data} />)</b> {m.titulo} — <Txt t={m.texto} /></div>)}
+  </div>
+
+  <div class="fecho" data-passo={marcos.length + 1}>
+    {t.videoFecho && <div class="fecho-video"><Video nome={t.videoFecho} /></div>}
+    <h2 class="titulo"><Txt t={t.fecho} /></h2>
+  </div>
+  <script type="application/json" data-moedas set:html={JSON.stringify(marcos.map((m) => m.moeda))}></script>
+</Tela>

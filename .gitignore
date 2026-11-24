@@ -6,3 +6,5 @@ dist/
 .reanimate/
 .claude/
 *.zip
+dist-previa/
+.ferramentas/

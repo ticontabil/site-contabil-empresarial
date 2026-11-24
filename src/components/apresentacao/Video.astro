@@ -1,0 +1,22 @@
+---
+// Vídeo curto sem som, em loop, com visual de película de cinema (grão, tremor do quadro,
+// oscilação de luz, riscos e poeira). Só toca quando a tela está na frente (ver efeitos.ts).
+// Arquivos em public/apresentacao/video/<nome>.webm|.mp4 e <nome>-poster.jpg.
+interface Props { nome: string; class?: string; rotulo?: string; pelicula?: boolean }
+const { nome, class: cls = "", rotulo = "", pelicula = true } = Astro.props;
+const base = `/apresentacao/video/${nome}`;
+---
+<div class:list={["video-quadro", { pelicula }]}>
+  <video class={`video-loop ${cls}`} muted loop playsinline preload="none" poster={`${base}-poster.jpg`} aria-label={rotulo || undefined} aria-hidden={rotulo ? undefined : "true"} data-video>
+    <source src={`${base}.webm`} type="video/webm" />
+    <source src={`${base}.mp4`} type="video/mp4" />
+  </video>
+  {pelicula && (
+    <div class="pelicula-camadas" aria-hidden="true">
+      <span class="pelicula-grao"></span>
+      <span class="pelicula-riscos"></span>
+      <span class="pelicula-poeira"></span>
+      <span class="pelicula-luz"></span>
+    </div>
+  )}
+</div>

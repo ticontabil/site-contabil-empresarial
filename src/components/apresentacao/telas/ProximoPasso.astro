@@ -1,0 +1,49 @@
+---
+import QRCode from "qrcode";
+import { Image } from "astro:assets";
+import Tela from "../Tela.astro";
+import Txt from "../Txt.astro";
+import { publicar } from "../../../data/apresentacao.ts";
+import Icone from "../Icone.astro";
+import logo from "../../../assets/logo-negative.png";
+import { telas, geral } from "../../../data/apresentacao.ts";
+import { ativos, type TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.proximoPasso.tela;
+// na versão publicada, detalhes ainda inteiros entre colchetes saem da frase
+const esconder = import.meta.env.PROD && !!publicar && import.meta.env.PUBLIC_APRESENTACAO_PREVIA !== "1";
+const detalhes = t.ofertaDetalhes.filter((d) => !(esconder && /^\[[^\]]*\]$/.test(d.trim())));
+const wa = `https://wa.me/${geral.whatsapp.numero}?text=${encodeURIComponent(geral.whatsapp.mensagem)}`;
+const qr = await QRCode.toString(wa, { type: "svg", margin: 0, errorCorrectionLevel: "M", color: { dark: "#000000", light: "#ffffff" } });
+const servicos = ativos(telas.departamentos.tela.itens).map((i) => i.nome.toUpperCase());
+const faixa = [...servicos, ...servicos, ...servicos, ...servicos];
+---
+<Tela info={info}>
+  <div class="fechamento entra">
+    <div class="feixes"></div>
+    <h2 class="titulo"><Txt t={t.titulo} /></h2>
+    <p class="oferta"><b>{t.oferta}</b>{detalhes.length > 0 && <> — {detalhes.map((d, i) => <>{i > 0 && " · "}<Txt t={d} /></>)}</>}</p>
+    <div class="acoes">
+      <a class="pilula" href={wa} target="_blank" rel="noopener noreferrer"><Icone nome="whatsapp" tamanho={28} />{t.botao}</a>
+    </div>
+    <div class="qr" aria-label={`QR code do WhatsApp ${geral.whatsapp.exibicao}`}>
+      <Fragment set:html={qr} />
+      <small>WHATSAPP {geral.whatsapp.exibicao}</small>
+    </div>
+  </div>
+  <div class="faixa-servicos entra d2" aria-hidden="true">
+    <div class="trilha">{faixa.map((s) => <><span>{s}</span><span>•</span></>)}</div>
+  </div>
+  <div class="rodape-fecho entra d3">
+    <div>
+      <Image src={logo} alt="Contábil Empresarial" width={160} densities={[1, 2]} />
+      <p class="slogan">{t.assinatura}</p>
+    </div>
+    <div>
+      <b>WhatsApp</b> {geral.whatsapp.exibicao}<br />
+      <b>E-mail</b> {geral.email}<br />
+      {geral.instagram} · {geral.site}
+    </div>
+    <div>{geral.enderecos.map((e) => <>{e}<br /></>)}</div>
+  </div>
+</Tela>

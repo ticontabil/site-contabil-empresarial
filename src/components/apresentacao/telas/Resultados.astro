@@ -1,0 +1,22 @@
+---
+// Tela 12 — só liga com dado real e autorizado (telas.resultados.ativo). Nunca inventar depoimento.
+import Tela from "../Tela.astro";
+import Titulo from "../Titulo.astro";
+import Txt from "../Txt.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.resultados.tela;
+---
+<Tela info={info}>
+  <p class="rotulo entra">{t.rotulo}</p>
+  <Titulo t={t.titulo} class="entra d2" />
+  <div class="grade numeros" style="display:grid;grid-template-columns:repeat(2,1fr);gap:80px;margin-top:70px">
+    {t.numeros.map((n) => (
+      <div class="entra d3"><div class="n" style="font-size:110px;font-weight:900;color:var(--laranja)"><Txt t={n.valor} /></div><div class="r" style="font-size:26px;color:var(--cinza)">{n.rotulo}</div></div>
+    ))}
+  </div>
+  {t.depoimentos.map((d) => (
+    <blockquote class="apoio entra d4" style="margin-top:40px">“<Txt t={d.frase} />” — {d.nome}, {d.cargo} · {d.empresa} · {d.cidade}</blockquote>
+  ))}
+</Tela>

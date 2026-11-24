@@ -1,0 +1,19 @@
+---
+import Tela from "../Tela.astro";
+import Txt from "../Txt.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import { ativos, type TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.preparacao.tela;
+const itens = ativos(t.itens);
+---
+<Tela info={info}>
+  <p class="rotulo entra">{t.rotulo}</p>
+  <h2 class="titulo entra d2"><span class="leve">{t.tituloForte}</span> <strong>{t.tituloLeve}</strong></h2>
+  <ol>
+    {itens.map((it, i) => (
+      <li data-passo={i + 1}><span class="rotulo">({String(i + 1).padStart(2, "0")})</span><span><Txt t={it.texto} /></span></li>
+    ))}
+  </ol>
+  {t.prova.ativo && <p class="prova" data-passo={itens.length + 1}><Txt t={t.prova.texto} /></p>}
+</Tela>

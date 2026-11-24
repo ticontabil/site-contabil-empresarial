@@ -1,0 +1,27 @@
+---
+// Foto real (AVIF/WebP com tamanhos responsivos) ou placeholder marcado "FOTO — ...".
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  arquivo: string | null;
+  descricao: string;
+  larguras?: number[];
+  tamanho?: string;
+  rotulo?: string; // "FOTO" ou "IMAGEM"
+  claro?: boolean;
+  alt?: string;
+  /** "documento": mostra a imagem inteira (página do DOU, cédula) em vez de recortar */
+  encaixe?: "foto" | "documento";
+}
+const { arquivo, descricao, larguras = [480, 960, 1440], tamanho = "50vw", rotulo = "FOTO", claro = false, alt, encaixe = "foto" } = Astro.props;
+const arquivos = import.meta.glob<{ default: ImageMetadata }>("/src/assets/apresentacao/**/*.{png,jpg,jpeg,webp,avif}");
+const chave = arquivo ? `/src/assets/apresentacao/${arquivo}` : null;
+const img = chave && arquivos[chave] ? (await arquivos[chave]()).default : null;
+if (arquivo && !img) throw new Error(`Imagem não encontrada em src/assets/apresentacao/: ${arquivo}`);
+---
+{img ? (
+  <Picture src={img} formats={["avif", "webp"]} fallbackFormat="webp" widths={larguras} sizes={tamanho} alt={alt ?? descricao} loading="lazy" decoding="async" class={encaixe === "documento" ? "encaixe-documento" : undefined} />
+) : (
+  <div class:list={["foto-ph", { claro }]} role="img" aria-label={`${rotulo} a definir: ${descricao}`}>{rotulo} — {descricao}</div>
+)}

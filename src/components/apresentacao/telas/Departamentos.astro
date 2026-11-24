@@ -1,0 +1,36 @@
+---
+import Tela from "../Tela.astro";
+import Txt from "../Txt.astro";
+import Icone from "../Icone.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import { ativos, type TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.departamentos.tela;
+const itens = ativos(t.itens);
+---
+<Tela info={info} tema="clara">
+  <p class="rotulo entra">{t.rotulo}</p>
+  <h2 class="titulo entra d2"><span class="forte">{t.tituloForte}</span> <span class="leve">{t.tituloLeve}</span></h2>
+  <div class="area">
+    <div class="cilindro entra d3" data-cilindro data-n={itens.length} aria-hidden="true">
+      <div class="eixo">
+        {itens.map((it, i) => (
+          <div class="card" data-i={i}>
+            <div class="num-dep"><span>({it.categoria})</span><span class="icone-grande"><Icone nome={it.icone} tamanho={40} /></span></div>
+            <div><b>{it.nome}</b><p class="linha">{it.linhaFina}</p></div>
+          </div>
+        ))}
+      </div>
+    </div>
+    <ol class="lista-dep entra d3">
+      {itens.map((it, i) => (
+        <li data-i={i} class:list={{ ativo: i === 0 }}>
+          <div class="cat">({it.categoria})</div>
+          <div class="nome">{it.nome}</div>
+          <div class="desc"><Txt t={it.texto} /></div>
+          <div class="fina">{it.linhaFina}</div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</Tela>

@@ -1,0 +1,266 @@
+---
+// /apresentacao/configurar — o Pedro troca nome do plano, texto e valores que aparecem na tela de investimento.
+// Fica salvo só neste aparelho (localStorage); nada vai para servidor. Aberta pelo ícone de engrenagem no menu da logo.
+import Apresentacao from "../../layouts/Apresentacao.astro";
+import Icone from "../../components/apresentacao/Icone.astro";
+import { publicar, telas } from "../../data/apresentacao.ts";
+import { telasAtivas } from "../../lib/apresentacao-telas.ts";
+
+const t = telas.investimento.tela;
+const padrao = { nome: t.plano.nome, descricao: t.plano.descricao, valor: t.plano.valor, periodo: t.plano.periodo, desconto: t.desconto };
+const listaTelas = telasAtivas().map(({ chave, rotuloNumero, titulo, ato, passos }) => ({ chave, numero: rotuloNumero, titulo, ato, passos }));
+const telaPreco = "investimento";
+const emPreparacao = import.meta.env.PROD && !publicar && import.meta.env.PUBLIC_APRESENTACAO_PREVIA !== "1";
+---
+<Apresentacao titulo="Configurar valores · Contábil Empresarial">
+  {emPreparacao ? (
+    <main style="height:100%;display:flex;align-items:center;justify-content:center;color:#c7c7c7">(Apresentação em preparação)</main>
+  ) : (
+    <>
+      <style is:global>
+        html, body { overflow: auto; height: auto; min-height: 100%; background: #0a0a0a; }
+        .cfg { max-width: 980px; margin: 0 auto; padding: 40px 28px 60px; }
+        .cfg-topo { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+        .cfg-topo img { height: 52px; width: auto; }
+        .cfg-voltar { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: #1a1a1a; color: #fff; border: 1px solid #2a2a2a; }
+        .cfg h1 { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; margin-top: 36px; }
+        .cfg .sub { color: #a0a0a0; font-size: 17px; line-height: 1.5; margin-top: 10px; max-width: 720px; }
+        .cfg form { margin-top: 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px 22px; }
+        .cfg label { display: flex; flex-direction: column; gap: 9px; font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #9a9a9a; }
+        .cfg label.inteiro { grid-column: 1 / -1; }
+        .cfg input, .cfg textarea { font: 500 22px/1.35 var(--fonte); color: #fff; background: #151515; border: 1.5px solid #2c2c2c; border-radius: 16px; padding: 16px 18px; letter-spacing: 0; text-transform: none; outline: none; transition: border-color 0.2s; width: 100%; }
+        .cfg textarea { resize: vertical; min-height: 96px; }
+        .cfg input:focus, .cfg textarea:focus { border-color: #fb5d02; }
+        .cfg .dinheiro { position: relative; }
+        .cfg .dinheiro::before { content: "R$"; position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 20px; font-weight: 600; color: #8a8a8a; }
+        .cfg .dinheiro input { padding-left: 58px; font-weight: 700; font-size: 28px; }
+        .cfg .ajuda { font-size: 14px; font-weight: 500; letter-spacing: 0; text-transform: none; color: #7a7a7a; }
+        .cfg .previa { grid-column: 1 / -1; margin-top: 6px; border-radius: 22px; padding: 26px 30px; background: linear-gradient(120deg, #161616, #0d0d0d); border: 1px solid #262626; display: grid; grid-template-columns: auto 1fr auto; gap: 26px; align-items: center; }
+        .cfg .previa b { font-size: 30px; font-weight: 700; }
+        .cfg .previa p { color: #c7c7c7; font-size: 17px; line-height: 1.4; border-left: 2px solid #fb5d02; padding-left: 20px; }
+        .cfg .previa .p { text-align: right; }
+        .cfg .previa .p .v { font-size: 34px; font-weight: 700; color: #fb5d02; white-space: nowrap; }
+        .cfg .previa .p .d { font-size: 15px; color: #8a8a8a; margin-top: 4px; }
+        .cfg .previa .p .d s { text-decoration-color: #ff2b2b; text-decoration-thickness: 2px; }
+        .cfg .acoes { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; }
+        .cfg .botao { display: inline-flex; align-items: center; gap: 12px; padding: 18px 28px; border-radius: 999px; font-size: 18px; font-weight: 700; background: #1c1c1c; color: #fff; border: 1px solid #2c2c2c; text-decoration: none; cursor: pointer; }
+        .cfg .botao.principal { background: #fb5d02; border-color: #fb5d02; }
+        .cfg .botao.leve { background: transparent; color: #a0a0a0; }
+        .cfg .salvo { grid-column: 1 / -1; font-size: 16px; color: #7ddc7d; min-height: 22px; }
+        .cfg .nota { margin-top: 36px; font-size: 14px; color: #6e6e6e; line-height: 1.5; }
+        .cfg { padding-bottom: 170px; }
+        .cfg-telas { margin-top: 56px; }
+        .cfg-telas-cab { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .cfg-telas h2 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+        .cfg-lista { list-style: none; margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .cfg-item label { display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 16px; padding: 16px 18px; border-radius: 18px; background: #141414; border: 1.5px solid #262626;
+          cursor: pointer; letter-spacing: 0; text-transform: none; color: #fff; font-size: 16px; font-weight: 500; transition: background 0.25s, border-color 0.25s, opacity 0.25s; }
+        .cfg-item.off label { opacity: 0.45; background: #0e0e0e; }
+        .cfg-item:not(.off) label { border-color: #3a2414; }
+        .cfg-num { font-size: 20px; font-weight: 700; color: #fb5d02; font-variant-numeric: tabular-nums; text-align: center; }
+        .cfg-item.off .cfg-num { color: #555; }
+        .cfg-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .cfg-txt small { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; color: #7a7a7a; }
+        .cfg-txt b { font-size: 16px; font-weight: 600; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .cfg-chave { position: absolute; opacity: 0; width: 1px; height: 1px; }
+        .cfg-interruptor { width: 54px; height: 32px; border-radius: 999px; background: #2a2a2a; position: relative; transition: background 0.25s; flex: none; }
+        .cfg-interruptor::after { content: ""; position: absolute; left: 4px; top: 4px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .cfg-chave:checked + .cfg-interruptor { background: #fb5d02; }
+        .cfg-chave:checked + .cfg-interruptor::after { transform: translateX(22px); }
+        .cfg-chave:focus-visible + .cfg-interruptor { outline: 2px solid #fff; outline-offset: 3px; }
+        .cfg-barra { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px;
+          padding: 16px max(20px, calc((100vw - 1100px) / 2)) calc(16px + env(safe-area-inset-bottom));
+          background: rgba(10, 10, 10, 0.86); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-top: 1px solid #262626; }
+        .cfg-contagem { display: flex; align-items: baseline; gap: 10px; white-space: nowrap; }
+        .cfg-contagem b { font-size: 44px; font-weight: 700; color: #fb5d02; font-variant-numeric: tabular-nums; min-width: 1.3em; text-align: right; display: inline-block; }
+        .cfg-contagem b.pula { animation: cfg-pula 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes cfg-pula { 40% { transform: translateY(-6px) scale(1.12); } }
+        .cfg-contagem span { color: #9a9a9a; font-size: 15px; font-weight: 600; }
+        .cfg-trilha { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 4px 2px; }
+        .cfg-ponto { flex: none; width: 36px; height: 44px; border-radius: 9px; background: #1a1a1a; border: 1px solid #2c2c2c; color: #5a5a5a; font-size: 12px; font-weight: 700;
+          transition: background 0.3s, color 0.3s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s; transform: scale(0.86); opacity: 0.6; }
+        .cfg-ponto.on { background: #fb5d02; border-color: #fb5d02; color: #fff; transform: none; opacity: 1; }
+        .cfg-barra-acoes { display: flex; gap: 10px; }
+        .cfg-barra .botao { display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 999px; font-size: 16px; font-weight: 700;
+          background: #1c1c1c; color: #fff; border: 1px solid #2c2c2c; text-decoration: none; white-space: nowrap; }
+        .cfg-barra .botao.principal { background: #fb5d02; border-color: #fb5d02; }
+        @media (max-width: 900px) { .cfg-lista { grid-template-columns: 1fr; } .cfg-barra { grid-template-columns: auto 1fr; } .cfg-barra-acoes { grid-column: 1 / -1; } .cfg-barra-acoes .botao { flex: 1; justify-content: center; } }
+        @media (max-width: 720px) { .cfg form { grid-template-columns: 1fr; } .cfg .previa { grid-template-columns: 1fr; } .cfg .previa .p { text-align: left; } }
+      </style>
+      <main class="cfg">
+        <div class="cfg-topo">
+          <img src="/logo-negative.png" alt="Contábil Empresarial" width="568" height="229" />
+          <a class="cfg-voltar" href="/apresentacao" aria-label="Voltar para a apresentação"><Icone nome="inicio" tamanho={24} /></a>
+        </div>
+        <h1>Valores da apresentação</h1>
+        <p class="sub">O que você salvar aqui aparece na tela de investimento. Vale só neste aparelho e funciona sem internet.</p>
+
+        <form id="cfg-form" autocomplete="off">
+          <label>Nome do plano<input name="nome" maxlength="40" required /></label>
+          <label>Período <span class="ajuda">opcional, ex.: /mês</span><input name="periodo" maxlength="16" /></label>
+          <label class="inteiro">Descrição<textarea name="descricao" maxlength="140" rows="2"></textarea></label>
+          <label>Valor<span class="dinheiro"><input name="valor" inputmode="decimal" required /></span></label>
+          <label>Valor com desconto <span class="ajuda">aparece depois de riscar o preço</span><span class="dinheiro"><input name="desconto" inputmode="decimal" placeholder="opcional" /></span></label>
+
+          <div class="previa" aria-live="polite">
+            <b id="pv-nome"></b>
+            <p id="pv-desc"></p>
+            <div class="p"><div class="v" id="pv-valor"></div><div class="d" id="pv-desconto"></div></div>
+          </div>
+
+          <p class="salvo" id="cfg-salvo" role="status"></p>
+          <div class="acoes">
+            <button class="botao principal" type="submit" data-depois="preco"><Icone nome="bussola" tamanho={22} /> Salvar e ir para o preço</button>
+            <button class="botao" type="submit" data-depois="inicio"><Icone nome="inicio" tamanho={22} /> Salvar e começar do início</button>
+            <button class="botao leve" type="button" id="cfg-restaurar">Voltar aos valores originais</button>
+          </div>
+        </form>
+        <section class="cfg-telas" aria-labelledby="cfg-telas-titulo">
+          <div class="cfg-telas-cab">
+            <h2 id="cfg-telas-titulo">Telas da apresentação</h2>
+            <div class="cfg-telas-atalhos">
+              <button type="button" class="botao leve" id="cfg-todas">Marcar todas</button>
+            </div>
+          </div>
+          <p class="sub">Desligue as telas que não quer mostrar nesta reunião. A numeração, o modo apresentador e o PDF se ajustam sozinhos.</p>
+          <ol class="cfg-lista" id="cfg-lista">
+            {listaTelas.map((t) => (
+              <li class="cfg-item" data-chave={t.chave}>
+                <label>
+                  <span class="cfg-num">{t.numero}</span>
+                  <span class="cfg-txt"><small>{t.ato}</small><b>{t.titulo}</b></span>
+                  <input type="checkbox" class="cfg-chave" data-chave={t.chave} checked />
+                  <span class="cfg-interruptor" aria-hidden="true"></span>
+                </label>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <p class="nota" id="cfg-offline"></p>
+        <p class="nota"><a href="/apresentacao?sair=1" style="color:#9a9a9a">Bloquear este aparelho</a> — pede a senha de novo na próxima vez (use se emprestar o tablet).</p>
+        <p class="nota">Na tela de investimento: arraste o dedo sobre o preço para riscar. Toque no preço riscado para mostrar o valor com desconto. Toque de novo para voltar. No teclado ou passador, a tecla R faz o mesmo.</p>
+      </main>
+      <nav class="cfg-barra" aria-label="Telas escolhidas">
+        <div class="cfg-contagem"><b id="cfg-n">0</b><span>de <span id="cfg-total">0</span> telas</span></div>
+        <div class="cfg-trilha" id="cfg-trilha">
+          {listaTelas.map((t) => <button type="button" class="cfg-ponto on" data-chave={t.chave} title={t.titulo} aria-label={`Tela ${t.numero}: ${t.titulo}`}>{t.numero}</button>)}
+        </div>
+        <div class="cfg-barra-acoes">
+          <a class="botao" id="cfg-pdf" href="/apresentacao?imprimir=1&auto=1" target="_blank" rel="noopener"><Icone nome="legalizacao" tamanho={20} /> Exportar PDF</a>
+          <a class="botao principal" id="cfg-apresentar" href="/apresentacao#01"><Icone nome="inicio" tamanho={20} /> Apresentar</a>
+        </div>
+      </nav>
+      <script type="application/json" id="cfg-padrao" set:html={JSON.stringify({ padrao, telaPreco, listaTelas })}></script>
+      <script>
+        import { CHAVE_VALORES } from "../../scripts/apresentacao/efeitos.ts";
+        import { lerOcultas, salvarOcultas } from "../../scripts/apresentacao/escolha.ts";
+        const { padrao, telaPreco, listaTelas } = JSON.parse(document.getElementById("cfg-padrao")!.textContent!);
+        const form = document.getElementById("cfg-form") as HTMLFormElement;
+        const campo = (n: string) => form.elements.namedItem(n) as HTMLInputElement;
+        const aviso = document.getElementById("cfg-salvo")!;
+
+        // "1621" → "1.621,00"; "1.621,5" → "1.621,50"; vazio continua vazio
+        const formatar = (s: string) => {
+          const limpo = s.replace(/[^\d,.]/g, "");
+          if (!limpo) return "";
+          const n = limpo.includes(",") ? Number(limpo.replace(/\./g, "").replace(",", ".")) : Number(limpo.replace(/\./g, ""));
+          return Number.isFinite(n) ? n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : s;
+        };
+        const ler = () => { try { return { ...padrao, ...JSON.parse(localStorage.getItem(CHAVE_VALORES) || "{}") }; } catch { return { ...padrao }; } };
+        const preencher = (v: any) => { for (const k of ["nome", "descricao", "valor", "periodo", "desconto"]) campo(k).value = v[k] ?? ""; previa(); };
+        const valores = () => ({ nome: campo("nome").value.trim(), descricao: campo("descricao").value.trim(), valor: formatar(campo("valor").value),
+          periodo: campo("periodo").value.trim(), desconto: formatar(campo("desconto").value) });
+        function previa() {
+          const v = valores();
+          document.getElementById("pv-nome")!.textContent = v.nome;
+          document.getElementById("pv-desc")!.textContent = v.descricao;
+          document.getElementById("pv-valor")!.textContent = `R$ ${v.desconto || v.valor} ${v.periodo}`.trim();
+          document.getElementById("pv-desconto")!.innerHTML = v.desconto ? `de <s>R$ ${v.valor}</s>` : "";
+        }
+        form.addEventListener("input", previa);
+        for (const n of ["valor", "desconto"]) campo(n).addEventListener("blur", () => { campo(n).value = formatar(campo(n).value); previa(); });
+
+        const avisar = (msg: string) => { aviso.textContent = msg; };
+        const canal = "BroadcastChannel" in window ? new BroadcastChannel("contabil-apresentacao") : null;
+        const salvar = () => {
+          const v = valores();
+          try { localStorage.setItem(CHAVE_VALORES, JSON.stringify(v)); } catch { avisar("Não foi possível salvar neste navegador (modo anônimo?)."); return false; }
+          canal?.postMessage({ tipo: "valores" });
+          return true;
+        };
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          if (!form.reportValidity() || !salvar()) return;
+          const depois = ((e as SubmitEvent).submitter as HTMLElement | null)?.dataset.depois;
+          avisar("Salvo.");
+          location.href = depois === "inicio" ? "/apresentacao#01" : `/apresentacao#${telaPreco}`;
+        });
+        document.getElementById("cfg-restaurar")!.addEventListener("click", () => {
+          try { localStorage.removeItem(CHAVE_VALORES); } catch {}
+          canal?.postMessage({ tipo: "valores" });
+          preencher(padrao);
+          avisar("Valores originais restaurados.");
+        });
+        preencher(ler());
+
+        // ---------- telas escolhidas ----------
+        const chaves = [...document.querySelectorAll<HTMLInputElement>(".cfg-chave")];
+        const pontos = [...document.querySelectorAll<HTMLButtonElement>(".cfg-ponto")];
+        const nEl = document.getElementById("cfg-n")!;
+        document.getElementById("cfg-total")!.textContent = String(listaTelas.length);
+        // o número rola até o novo total (um único laço, sempre atrás do alvo mais recente)
+        let mostrado = -1, alvoN = 0, rolando = false;
+        const contar = (alvo: number) => {
+          alvoN = alvo;
+          if (mostrado < 0) { mostrado = alvo; nEl.textContent = String(alvo); return; }
+          nEl.classList.remove("pula"); void nEl.offsetWidth; nEl.classList.add("pula");
+          if (rolando) return;
+          rolando = true;
+          const passo = () => {
+            if (mostrado === alvoN) { rolando = false; return; }
+            mostrado += Math.sign(alvoN - mostrado); nEl.textContent = String(mostrado);
+            setTimeout(passo, 45);
+          };
+          passo();
+        };
+        const aplicarTelas = (avisarApresentacao: boolean) => {
+          const ocultas = chaves.filter((c) => !c.checked).map((c) => c.dataset.chave!);
+          if (ocultas.length === chaves.length) { chaves[0].checked = true; ocultas.shift(); } // pelo menos uma
+          const visiveis = new Set(chaves.filter((c) => c.checked).map((c) => c.dataset.chave!));
+          // numeração nova das telas que ficam
+          let k = 0;
+          chaves.forEach((c) => {
+            const li = c.closest("li")!;
+            li.classList.toggle("off", !c.checked);
+            li.querySelector(".cfg-num")!.textContent = c.checked ? String(++k).padStart(2, "0") : "—";
+          });
+          pontos.forEach((p) => p.classList.toggle("on", visiveis.has(p.dataset.chave!)));
+          contar(visiveis.size);
+          salvarOcultas(ocultas);
+          if (avisarApresentacao) canal?.postMessage({ tipo: "telas" });
+        };
+        const ocultasSalvas = lerOcultas();
+        chaves.forEach((c) => (c.checked = !ocultasSalvas.has(c.dataset.chave!)));
+        chaves.forEach((c) => c.addEventListener("change", () => aplicarTelas(true)));
+        pontos.forEach((p) => p.addEventListener("click", () => {
+          const c = chaves.find((x) => x.dataset.chave === p.dataset.chave)!;
+          c.checked = !c.checked; aplicarTelas(true);
+        }));
+        document.getElementById("cfg-todas")!.addEventListener("click", () => { chaves.forEach((c) => (c.checked = true)); aplicarTelas(true); });
+        aplicarTelas(false);
+
+        // ---------- pronto para usar sem internet? ----------
+        const offline = document.getElementById("cfg-offline")!;
+        (async () => {
+          try {
+            const nomes = (await caches.keys()).filter((k) => k.startsWith("apresentacao-"));
+            let n = 0;
+            for (const nome of nomes) n += (await (await caches.open(nome)).keys()).length;
+            offline.textContent = n > 30 ? `✓ Pronta para usar sem internet neste aparelho (${n} arquivos guardados).`
+              : "Abra a apresentação uma vez com internet para ela ficar guardada neste aparelho.";
+          } catch { offline.textContent = ""; }
+        })();
+      </script>
+    </>
+  )}
+</Apresentacao>

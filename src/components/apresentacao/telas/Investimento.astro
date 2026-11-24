@@ -1,0 +1,36 @@
+---
+// Investimento: um plano, um valor. Os textos e valores podem ser trocados pelo Pedro em
+// /apresentacao/configurar (vale só no aparelho onde ele salvou).
+// No preço: arrastar o dedo/mouse sobre o valor risca em vermelho; tocar no valor riscado troca pelo
+// valor com desconto e o anterior fica pequeno, riscado. Tocar de novo volta ao início.
+import Tela from "../Tela.astro";
+import Foto from "../Foto.astro";
+import Icone from "../Icone.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.investimento.tela;
+const padrao = { nome: t.plano.nome, descricao: t.plano.descricao, valor: t.plano.valor, periodo: t.plano.periodo, desconto: t.desconto };
+---
+<Tela info={info}>
+  <div class="inv-fundo" aria-hidden="true"><Foto arquivo={t.fundo.arquivo} descricao={t.fundo.descricao} larguras={[960, 1920]} tamanho="100vw" /></div>
+  <p class="rotulo entra">{t.rotulo}</p>
+  <h2 class="titulo inv-titulo entra d2">{t.titulo}</h2>
+
+  <article class="inv-cartao" data-investimento>
+    <div class="inv-nome"><span data-campo="nome">{t.plano.nome}</span></div>
+    <span class="inv-divisa" aria-hidden="true"></span>
+    <p class="inv-desc" data-campo="descricao">{t.plano.descricao}</p>
+    <div class="inv-preco" data-preco tabindex="0" role="button" aria-label="Preço. Arraste para riscar; toque para mostrar o valor com desconto.">
+      <span class="inv-anterior" aria-hidden="true"><small>R$</small> <span data-campo="valor-anterior">{t.plano.valor}</span><i class="risco-anterior"></i></span>
+      <span class="inv-valor">
+        <small>R$</small>
+        <span class="inv-numero"><span data-campo="valor">{t.plano.valor}</span><i class="risco-preco" aria-hidden="true"></i></span>
+        <small class="inv-periodo" data-campo="periodo">{t.plano.periodo}</small>
+      </span>
+      <span class="inv-dica" aria-hidden="true">arraste para riscar</span>
+    </div>
+    <div class="inv-icone" aria-hidden="true"><span><Icone nome="bussola" tamanho={64} /></span></div>
+  </article>
+  <script type="application/json" data-investimento-padrao set:html={JSON.stringify(padrao)}></script>
+</Tela>

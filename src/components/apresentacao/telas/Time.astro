@@ -1,0 +1,40 @@
+---
+import Tela from "../Tela.astro";
+import Titulo from "../Titulo.astro";
+import Foto from "../Foto.astro";
+import Txt from "../Txt.astro";
+import Icone from "../Icone.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import { ativos, type TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.time.tela;
+const apoio = t.apoioComplemento.ativo ? `${t.apoio} ${t.apoioComplemento.texto}.` : `${t.apoio}.`;
+// a faixa repete os cartões para rolar sem emenda
+const voltas = [0, 1, 2, 3];
+---
+<Tela info={info}>
+  <span class="risco-luz" aria-hidden="true"></span>
+  <div class="foto-equipe"><Foto arquivo={t.fotoEquipe.arquivo} descricao={t.fotoEquipe.descricao} larguras={[960, 1920, 2880]} tamanho="100vw" /></div>
+  <div class="texto">
+    <p class="rotulo entra">{t.rotulo}</p>
+    <Titulo t={t.titulo} class="entra d2" />
+    <p class="apoio entra d3"><Txt t={apoio} /></p>
+    {t.compromisso.ativo && <p class="apoio entra d4"><Txt t={t.compromisso.texto} /></p>}
+  </div>
+  <div class="faixa-gestoras" data-passo="1">
+    <div class="trilha">
+      {voltas.map((v) => t.gestoras.map((g) => (
+        <article class="cartao-gestora" aria-hidden={v > 0 ? "true" : undefined}>
+          <div class="retrato" style={`--enquadrar:${(g as any).enquadrar ?? "50% 25%"}`}>
+            {g.foto ? <Foto arquivo={g.foto} descricao={`${g.nome}, ${g.setor}`} larguras={[330, 660]} tamanho="17vw" /> : <div class="foto-ph">FOTO — {g.setor}</div>}
+          </div>
+          <div class="info">
+            <div><div class="nome"><Txt t={g.nome} /></div><div class="setor">{g.setor}</div></div>
+            <span class="icone"><Icone nome={g.icone} tamanho={22} /></span>
+          </div>
+        </article>
+      )))}
+    </div>
+  </div>
+  <p class="locais entra d4">{ativos(t.faixaLocais).map((l) => <span><Txt t={l.texto} /></span>)}</p>
+</Tela>

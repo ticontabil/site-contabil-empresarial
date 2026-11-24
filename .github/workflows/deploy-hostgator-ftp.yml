@@ -2,6 +2,8 @@
 #   Actions > "Publicar na Hostgator (FTP)" > Run workflow
 # Precisa dos secrets em Settings > Secrets and variables > Actions:
 #   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD  (e opcionalmente FTP_REMOTE_DIR, padrão ./public_html/)
+#   APRESENTACAO_PIN  (senha da página /apresentacao; só números). Vai para o servidor como sal + HMAC,
+#                     nunca em texto puro e nunca no repositório.
 #
 # Modo "simular" (padrão): conecta no FTP e só LISTA o que seria enviado, sem gravar nada.
 # Modo "enviar": grava os arquivos. Exige digitar PUBLICAR.
@@ -35,6 +37,23 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Senha da apresentação (gera apresentacao-portao-config.php a partir do secret)
+        env:
+          PIN: ${{ secrets.APRESENTACAO_PIN }}
+          MODO: ${{ inputs.modo }}
+        run: |
+          if [ -z "$PIN" ]; then
+            if [ "$MODO" = "enviar" ]; then echo "::error::Falta o secret APRESENTACAO_PIN (senha da apresentação)."; exit 1; fi
+            echo "::warning::Sem APRESENTACAO_PIN: na simulação segue sem a senha (o portão ficaria fechado)."; exit 0
+          fi
+          node -e '
+            const c = require("crypto"); const sal = c.randomBytes(16).toString("hex");
+            const pin = process.env.PIN.replace(/\D/g, "");
+            const hash = c.createHmac("sha256", sal).update(pin).digest("hex");
+            require("fs").writeFileSync("dist/apresentacao-portao-config.php", `<?php return ["sal" => "${sal}", "hash" => "${hash}"];
+`);
+          '
+          echo "Senha da apresentação configurada."
       - name: ${{ inputs.modo == 'enviar' && 'Enviar dist/ por FTP' || 'Simular envio (nada é gravado)' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
