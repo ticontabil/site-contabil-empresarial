@@ -2,7 +2,10 @@
 /**
  * Notícias de contabilidade e tributos, reunidas de fontes oficiais e especializadas.
  * O site mostra SÓ título, resumo curto, data e o link para a matéria original (decisão de 24/11/2026).
- * Atualiza sozinho: quando o cache tem mais de 2 horas, o próximo visitante dispara a atualização.
+ * Atualiza sozinho de dois jeitos:
+ * *  - tarefa agendada do cPanel (cron), a cada 15 minutos: php /home/<usuario>/public_html/api/noticias.php
+ *    (pela linha de comando sempre busca de novo, então o visitante encontra tudo pronto);
+ *  - se por algum motivo o cache passar de 2 horas, o próximo visitante dispara a atualização.
  * Feeds testados em 24/11/2026 (materiais/noticias/feeds.json).
  */
 declare(strict_types=1);
@@ -146,7 +149,8 @@ function atualizar(array $FONTES, array $TEMAS, string $EXCLUIR_RECEITA, array $
 try {
   $arq = pastaDados() . '/noticias.json';
   $cache = is_file($arq) ? json_decode((string) file_get_contents($arq), true) : null;
-  $velho = !$cache || (time() - filemtime($arq)) > IDADE_CACHE;
+  // pela linha de comando (cron) sempre atualiza; na web, só se o cache passou de 2 horas
+  $velho = PHP_SAPI === 'cli' || !$cache || (time() - filemtime($arq)) > IDADE_CACHE;
   if ($velho) {
     $trava = fopen(pastaDados() . '/noticias.lock', 'c');
     // só um visitante atualiza por vez; os outros recebem o cache atual
@@ -167,6 +171,8 @@ try {
   $saida['fontes'] = array_map(fn($f) => ['id' => $f['id'], 'nome' => $f['nome'], 'oficial' => $f['oficial']], $FONTES);
   $saida['temas'] = array_keys($TEMAS);
   unset($saida['status']);
+  if (PHP_SAPI === 'cli') { echo 'noticias: ' . count($saida['itens']) . " itens
+"; exit; }
   responderJson($saida, 200, 600);
 } catch (Throwable $e) {
   responderJson(['atualizado' => null, 'itens' => [], 'erro' => 'indisponivel'], 503);
