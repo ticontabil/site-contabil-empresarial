@@ -27,22 +27,27 @@ export const comoFunciona = {
 
 // Unidades atuais (24/11/2026): matriz em Itumbiara; filiais em Goiânia, Uberlândia e Cachoeira Dourada.
 // Goiatuba, Buriti Alegre e Araporã saíram (não fazem mais parte da empresa).
-// Cada cartão abre a rota no Waze. Sem endereço exato, o Waze busca pelo nome da Contábil na cidade.
+// Links do Waze enviados pela Contábil (24/11/2026), sem o parâmetro de rastreamento fbclid.
+// lat/lng: coordenadas desses links (vão também para os dados estruturados do Google).
 export const filiais = {
   titulo: "Nossas",
   destaque: "Unidades",
   subtitulo: "Matriz em Itumbiara e filiais em Goiânia, Uberlândia e Cachoeira Dourada. Toque para abrir a rota no Waze.",
   cidades: [
-    { cidade: "Itumbiara", uf: "GO", tipo: "Matriz", endereco: "R. Rui de Almeida, 180 - St. Central" },
-    { cidade: "Goiânia", uf: "GO", tipo: "Filial", endereco: "Av. T-63, 1296, Sala 110 - Setor Bueno" },
-    { cidade: "Uberlândia", uf: "MG", tipo: "Filial", endereco: "Av. Cesário Alvim, 1135 - Centro" },
-    { cidade: "Cachoeira Dourada", uf: "GO", tipo: "Filial", endereco: "" },
+    { cidade: "Itumbiara", uf: "GO", tipo: "Matriz", endereco: "R. Rui de Almeida, 180 - St. Central", cep: "75503-090",
+      waze: "https://www.waze.com/pt-BR/live-map/directions/br/go/contabil-empresarial?to=place.ChIJob0NBGoNoZQRyWPHlRwZMpU", lat: null as number | null, lng: null as number | null },
+    { cidade: "Goiânia", uf: "GO", tipo: "Filial", endereco: "Av. T-63, 1296, Sala 110 - Setor Bueno", cep: "",
+      waze: "https://www.waze.com/pt-BR/live-map/directions?to=ll.-16.7139411%2C-49.2706756", lat: -16.7139411 as number | null, lng: -49.2706756 as number | null },
+    { cidade: "Uberlândia", uf: "MG", tipo: "Filial", endereco: "Av. Cesário Alvim, 1135 - Centro", cep: "",
+      waze: "https://www.waze.com/pt-BR/live-map/directions?to=ll.-18.9140648%2C-48.2708671", lat: -18.9140648 as number | null, lng: -48.2708671 as number | null },
+    { cidade: "Cachoeira Dourada", uf: "GO", tipo: "Filial", endereco: "", cep: "",
+      waze: "https://www.waze.com/pt-BR/live-map/directions?to=ll.-18.4937355%2C-49.4781433", lat: -18.4937355 as number | null, lng: -49.4781433 as number | null },
   ],
 };
 
-/** Link do Waze para a rota até a unidade. */
-export const linkWaze = (f: { cidade: string; uf: string; endereco: string }) =>
-  `https://waze.com/ul?q=${encodeURIComponent(f.endereco ? `${f.endereco}, ${f.cidade} - ${f.uf}` : `Contábil Empresarial, ${f.cidade} - ${f.uf}`)}&navigate=yes`;
+/** Link do Waze para a rota até a unidade (o link oficial de cada uma; se faltar, busca pelo endereço). */
+export const linkWaze = (f: { cidade: string; uf: string; endereco: string; waze?: string }) =>
+  f.waze || `https://waze.com/ul?q=${encodeURIComponent(f.endereco ? `${f.endereco}, ${f.cidade} - ${f.uf}` : `Contábil Empresarial, ${f.cidade} - ${f.uf}`)}&navigate=yes`;
 
 // O original tem 3 depoimentos num carrossel (setas anterior/próximo); só o 1º aparece ao carregar.
 export const depoimentos = [

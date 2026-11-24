@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import { meta, contato, whatsapp } from "../data/site";
 import { faq, duvidasRapidas } from "../data/faq";
+import { filiais } from "../data/secoes";
 import Medicao from "../components/Medicao.astro";
 
 interface Props {
@@ -46,15 +47,18 @@ const org = {
   telephone: telefone,
   email: contato.email,
   priceRange: "$$",
-  address: partes(contato.enderecos[0]),
+  address: { ...partes(contato.enderecos[0]), postalCode: filiais.cidades[0].cep },
   areaServed: ["Itumbiara", "Goiânia", "Uberlândia", "Goiás", "Minas Gerais"].map((n) => ({ "@type": "Place", name: n })),
   sameAs: [meta.instagram],
   contactPoint: [{ "@type": "ContactPoint", telephone: telefone, contactType: "customer service", areaServed: "BR", availableLanguage: "Portuguese", url: whatsapp.numero }],
-  department: contato.enderecos.slice(1).map((e, i) => ({
+  hasMap: filiais.cidades[0].waze,
+  department: filiais.cidades.filter((f) => f.tipo === "Filial").map((f, i) => ({
     "@type": "AccountingService",
     "@id": `${site}#unidade-${i + 2}`,
-    name: `${meta.siteName} · ${partes(e).addressLocality}`,
-    address: partes(e),
+    name: `${meta.siteName} · ${f.cidade}`,
+    address: { "@type": "PostalAddress", ...(f.endereco ? { streetAddress: f.endereco } : {}), addressLocality: f.cidade, addressRegion: f.uf, addressCountry: "BR" },
+    ...(f.lat != null ? { geo: { "@type": "GeoCoordinates", latitude: f.lat, longitude: f.lng } } : {}),
+    hasMap: f.waze,
     telephone: telefone,
     url: site.toString(),
   })),
