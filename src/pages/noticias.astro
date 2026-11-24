@@ -41,7 +41,7 @@ const schema = [{
       <!-- lista -->
       <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-lista aria-live="polite">
         {Array.from({ length: 6 }).map(() => (
-          <div class="h-52 rounded-xl border border-border bg-secondary/40 animate-pulse" aria-hidden="true"></div>
+          <div class="h-96 rounded-xl border border-border bg-secondary/40 animate-pulse" aria-hidden="true"></div>
         ))}
       </div>
       <p class="mt-8 hidden text-center text-muted-foreground" data-vazio>Nenhuma notícia encontrada com esses filtros.</p>
@@ -64,7 +64,8 @@ const schema = [{
 </Base>
 
 <script>
-  type Noticia = { id: string; titulo: string; resumo: string; link: string; data: string; fonte: string; fonteId: string; oficial: boolean; tema: string };
+  import { capaNoticia } from "../scripts/capa-noticia";
+  type Noticia = { id: string; titulo: string; resumo: string; link: string; data: string; fonte: string; fonteId: string; oficial: boolean; tema: string; imagem?: string; credito?: string };
   type Dados = { atualizado: string | null; itens: Noticia[]; fontes: { id: string; nome: string; oficial: boolean }[]; temas: string[] };
   const raiz = document.querySelector<HTMLElement>("[data-noticias]")!;
   const lista = raiz.querySelector<HTMLElement>("[data-lista]")!;
@@ -114,7 +115,9 @@ const schema = [{
       (!termo || sem(`${n.titulo} ${n.resumo} ${n.fonte}`).includes(termo)));
     const vis = filtradas.slice(0, mostrando);
     lista.innerHTML = vis.map((n) => `
-      <article class="group relative flex flex-col rounded-xl border border-border bg-background p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md">
+      <article class="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-background shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md">
+        ${capaNoticia(n)}
+        <div class="flex flex-1 flex-col p-6">
         <div class="flex items-center gap-2 text-xs">
           <span class="rounded-full bg-primary/10 px-2.5 py-1 font-semibold text-primary">${esc(n.tema)}</span>
           <span class="text-muted-foreground">${esc(quando(n.data))}</span>
@@ -122,6 +125,7 @@ const schema = [{
         <h2 class="mt-4 text-lg font-bold leading-snug [overflow-wrap:anywhere]"><a href="/noticia?id=${esc(n.id)}" class="after:absolute after:inset-0 focus:outline-none focus-visible:underline">${esc(n.titulo)}</a></h2>
         <p class="mt-2 line-clamp-3 text-sm text-muted-foreground [overflow-wrap:anywhere]">${esc(n.resumo)}</p>
         <p class="mt-auto pt-5 text-xs font-semibold text-muted-foreground">${n.oficial ? "● " : ""}${esc(n.fonte)}</p>
+        </div>
       </article>`).join("");
     vazio.classList.toggle("hidden", filtradas.length > 0);
     mais.classList.toggle("hidden", filtradas.length <= mostrando);

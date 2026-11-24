@@ -98,3 +98,28 @@
 
 /* links do menu (/#servicos etc.) param abaixo da barra fixa do topo */
 [id] { scroll-margin-top: 4.5rem; }
+
+/* ---------- Notícias: capa (foto da fonte oficial ou capa da Contábil por tema) ---------- */
+.capa-noticia { position: relative; aspect-ratio: 16 / 9; overflow: hidden; color: #fff;
+  background: radial-gradient(120% 120% at 0% 0%, hsl(24 100% 52%) 0%, hsl(18 95% 40%) 45%, hsl(20 30% 12%) 100%); }
+.capa-noticia::before { content: ""; position: absolute; inset: 0; opacity: .18;
+  background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 1.4px); background-size: 18px 18px; }
+.capa-noticia::after { content: ""; position: absolute; right: -18%; bottom: -45%; width: 70%; aspect-ratio: 1; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.18); box-shadow: 0 0 0 28px rgba(255,255,255,.05), 0 0 0 56px rgba(255,255,255,.03); }
+.capa-noticia[data-tema="Reforma Tributária"] { background: radial-gradient(120% 120% at 0% 0%, hsl(24 100% 50%), hsl(8 80% 38%) 50%, hsl(10 40% 10%)); }
+.capa-noticia[data-tema="Imposto de Renda"] { background: radial-gradient(120% 120% at 0% 0%, hsl(30 100% 55%), hsl(24 90% 42%) 50%, hsl(220 15% 12%)); }
+.capa-noticia[data-tema="Simples e MEI"] { background: radial-gradient(120% 120% at 0% 0%, hsl(36 100% 55%), hsl(24 95% 45%) 50%, hsl(20 25% 14%)); }
+.capa-noticia[data-tema="Trabalhista"] { background: radial-gradient(120% 120% at 0% 0%, hsl(18 100% 55%), hsl(350 60% 38%) 55%, hsl(340 30% 10%)); }
+.capa-noticia[data-tema="Fiscal"] { background: radial-gradient(120% 120% at 0% 0%, hsl(24 100% 50%), hsl(24 60% 30%) 50%, hsl(0 0% 8%)); }
+.capa-noticia[data-tema="Receita Federal"] { background: radial-gradient(120% 120% at 0% 0%, hsl(24 100% 52%), hsl(210 30% 28%) 60%, hsl(215 35% 10%)); }
+.capa-tema { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: .5rem; padding: 1.25rem; }
+.capa-tema svg { width: 2.75rem; height: 2.75rem; opacity: .95; }
+.capa-tema span { font-weight: 800; font-size: 1.05rem; letter-spacing: -.01em; text-shadow: 0 2px 12px rgba(0,0,0,.25); }
+.capa-noticia > img { z-index: 2; transition: transform .6s ease; }
+.group:hover .capa-noticia > img { transform: scale(1.03); }
+.capa-credito { position: absolute; z-index: 3; right: .5rem; bottom: .5rem; font-size: .68rem; font-weight: 600; color: #fff;
+  background: rgba(0,0,0,.55); padding: .15rem .45rem; border-radius: .35rem; backdrop-filter: blur(4px); }
+.capa-noticia.sem-foto .capa-credito { display: none; }
+.capa-grande .capa-noticia { aspect-ratio: 16 / 8; }
+.capa-grande .capa-tema svg { width: 4rem; height: 4rem; }
+.capa-grande .capa-tema span { font-size: 1.5rem; }

@@ -16,11 +16,11 @@ const MAX_ITENS = 300;
 const DIAS_MAX = 120;
 
 $FONTES = [
-  ['id' => 'receita', 'nome' => 'Receita Federal', 'url' => 'https://www.gov.br/receitafederal/pt-br/assuntos/noticias/ultimas-noticias/rss.xml', 'filtrar' => false, 'excluir' => true, 'oficial' => true],
-  ['id' => 'fazenda', 'nome' => 'Ministério da Fazenda', 'url' => 'https://www.gov.br/fazenda/RSS', 'filtrar' => true, 'linkContem' => '/assuntos/noticias/', 'oficial' => true],
-  ['id' => 'agenciabrasil', 'nome' => 'Agência Brasil', 'url' => 'https://agenciabrasil.ebc.com.br/rss/economia/feed.xml', 'filtrar' => true, 'oficial' => true],
-  ['id' => 'senado', 'nome' => 'Agência Senado', 'url' => 'https://www12.senado.leg.br/noticias/rss?tema=economia', 'filtrar' => true, 'oficial' => true],
-  ['id' => 'camara', 'nome' => 'Agência Câmara', 'url' => 'https://www.camara.leg.br/noticias/rss/dinamico/ECONOMIA', 'filtrar' => true, 'oficial' => true],
+  ['id' => 'receita', 'fotos' => true, 'nome' => 'Receita Federal', 'url' => 'https://www.gov.br/receitafederal/pt-br/assuntos/noticias/ultimas-noticias/rss.xml', 'filtrar' => false, 'excluir' => true, 'oficial' => true],
+  ['id' => 'fazenda', 'fotos' => true, 'nome' => 'Ministério da Fazenda', 'url' => 'https://www.gov.br/fazenda/RSS', 'filtrar' => true, 'linkContem' => '/assuntos/noticias/', 'oficial' => true],
+  ['id' => 'agenciabrasil', 'fotos' => true, 'nome' => 'Agência Brasil', 'url' => 'https://agenciabrasil.ebc.com.br/rss/economia/feed.xml', 'filtrar' => true, 'oficial' => true],
+  ['id' => 'senado', 'fotos' => true, 'nome' => 'Agência Senado', 'url' => 'https://www12.senado.leg.br/noticias/rss?tema=economia', 'filtrar' => true, 'oficial' => true],
+  ['id' => 'camara', 'fotos' => true, 'nome' => 'Agência Câmara', 'url' => 'https://www.camara.leg.br/noticias/rss/dinamico/ECONOMIA', 'filtrar' => true, 'oficial' => true],
   ['id' => 'cfc', 'nome' => 'Conselho Federal de Contabilidade', 'url' => 'https://cfc.org.br/feed/', 'filtrar' => false, 'oficial' => true],
   ['id' => 'contabeis', 'nome' => 'Portal Contábeis', 'url' => 'https://www.contabeis.com.br/rss/noticias/', 'filtrar' => false, 'oficial' => false],
   ['id' => 'jornalcontabil', 'nome' => 'Jornal Contábil', 'url' => 'https://jornalcontabil.com.br/feed/', 'filtrar' => false, 'oficial' => false],
@@ -70,6 +70,23 @@ function baixar(string $url): ?string {
   return $r === false ? null : $r;
 }
 
+/** Só fotos https de verdade (sem logos, ícones, pixels de rastreio ou SVG). */
+function imagemValida(string $u): string {
+  $u = trim($u);
+  if (!preg_match('#^https://[^\s"\x27<>]+$#i', $u)) return '';
+  if (preg_match('#\.svg(\?|$)|logo|icon|pixel|tracking|gravatar|emoji|/feed|1x1#i', $u)) return '';
+  return $u;
+}
+
+/** Capa oficial da matéria (og:image) para fontes que não mandam foto no feed. Uma vez por notícia. */
+function capaDaPagina(string $link): string {
+  $html = baixar($link);
+  if (!$html) return '';
+  if (preg_match('/<meta[^>]+property=["\x27]og:image["\x27][^>]+content=["\x27]([^"\x27]+)/i', $html, $m)
+    || preg_match('/<meta[^>]+content=["\x27]([^"\x27]+)["\x27][^>]+property=["\x27]og:image/i', $html, $m)) return imagemValida(html_entity_decode($m[1]));
+  return '';
+}
+
 /** Lê RSS 2.0, RSS 1.0 (RDF) e Atom. */
 function lerFeed(string $xml): array {
   $prev = libxml_use_internal_errors(true);
@@ -92,7 +109,16 @@ function lerFeed(string $xml): array {
     if ($link === '' && $rdfAbout) $link = (string) $rdfAbout;
     $data = (string) ($i->pubDate ?: $dc->date ?: $i->updated ?: $i->published);
     $desc = (string) ($i->description ?: $i->summary ?: $dc->description);
-    $itens[] = ['titulo' => textoLimpo((string) $i->title, 220), 'link' => $link, 'data' => $data, 'resumo' => textoLimpo($desc, 320)];
+    // imagem que vem no próprio feed: <imagem-destaque> (Agência Brasil), media:content, enclosure ou 1ª <img> do conteúdo
+    $img = trim(strip_tags(html_entity_decode((string) ($i->{'imagem-destaque'} ?? ''))));
+    $media = $i->children('http://search.yahoo.com/mrss/');
+    if ($img === '' && isset($media->content)) $img = (string) $media->content->attributes()['url'];
+    if ($img === '' && isset($i->enclosure) && strpos((string) $i->enclosure['type'], 'image') === 0) $img = (string) $i->enclosure['url'];
+    if ($img === '') {
+      $html = (string) $i->children('http://purl.org/rss/1.0/modules/content/')->encoded . ' ' . $desc;
+      if (preg_match('/<img[^>]+src=["\x27]([^"\x27]+)/i', html_entity_decode($html), $m)) $img = $m[1];
+    }
+    $itens[] = ['titulo' => textoLimpo((string) $i->title, 220), 'link' => $link, 'data' => $data, 'resumo' => textoLimpo($desc, 320), 'imagem' => imagemValida($img)];
   }
   return $itens;
 }
@@ -127,6 +153,9 @@ function atualizar(array $FONTES, array $TEMAS, string $EXCLUIR_RECEITA, array $
         'fonteId' => $f['id'],
         'oficial' => $f['oficial'],
         'tema' => $tema ?: 'Contabilidade',
+        // foto só das fontes oficiais (licença aberta com crédito); as demais usam a capa do tema
+        'imagem' => $f['oficial'] && !empty($f['fotos']) ? ($it['imagem'] ?? '') : '',
+        'credito' => $f['oficial'] && !empty($f['fotos']) ? $f['nome'] : '',
       ];
       $status[$f['id']]['itens']++;
     }
@@ -143,7 +172,20 @@ function atualizar(array $FONTES, array $TEMAS, string $EXCLUIR_RECEITA, array $
     $vistos[$t['id']] = $vistos[$chave] = 1;
     $unicos[] = $t;
   }
-  return ['atualizado' => gmdate('c'), 'status' => $status, 'itens' => array_slice($unicos, 0, MAX_ITENS)];
+  $unicos = array_slice($unicos, 0, MAX_ITENS);
+  // capa oficial das matérias sem foto no feed: reaproveita a anterior; busca no máximo 12 novas por vez
+  $jaTinha = [];
+  foreach ($anterior as $a) if (!empty($a['imagem'])) $jaTinha[$a['id']] = $a['imagem'];
+  $novas = 0;
+  foreach ($unicos as &$u) {
+    if ($u['imagem'] !== '' || $u['credito'] === '') continue;
+    if (isset($jaTinha[$u['id']])) { $u['imagem'] = $jaTinha[$u['id']]; continue; }
+    if ($novas >= 12) continue;
+    $novas++;
+    $u['imagem'] = capaDaPagina($u['link']);
+  }
+  unset($u);
+  return ['atualizado' => gmdate('c'), 'status' => $status, 'itens' => $unicos];
 }
 
 try {
