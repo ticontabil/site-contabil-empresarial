@@ -40,7 +40,8 @@ export const filiais = {
       waze: "https://www.waze.com/pt-BR/live-map/directions?to=ll.-16.7139411%2C-49.2706756", lat: -16.7139411 as number | null, lng: -49.2706756 as number | null },
     { cidade: "Uberlândia", uf: "MG", tipo: "Filial", endereco: "Av. Cesário Alvim, 1135 - Centro", cep: "",
       waze: "https://www.waze.com/pt-BR/live-map/directions?to=ll.-18.9140648%2C-48.2708671", lat: -18.9140648 as number | null, lng: -48.2708671 as number | null },
-    { cidade: "Cachoeira Dourada", uf: "GO", tipo: "Filial", endereco: "", cep: "",
+    // endereço, telefone e horário de Cachoeira Dourada: enviados pela Contábil em 24/11/2026 (resumo do Google; conferir a grafia)
+    { cidade: "Cachoeira Dourada", uf: "GO", tipo: "Filial", endereco: "R. Osmar José García, 830", cep: "75560-000", telefone: "+55-64-3430-6397", horario: "Mo-Fr 08:00-18:00",
       waze: "https://www.waze.com/pt-BR/live-map/directions?to=ll.-18.4937355%2C-49.4781433", lat: -18.4937355 as number | null, lng: -49.4781433 as number | null },
   ],
 };

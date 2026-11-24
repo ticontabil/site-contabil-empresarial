@@ -47,6 +47,7 @@ const org = {
   telephone: telefone,
   email: contato.email,
   priceRange: "$$",
+  openingHours: "Mo-Fr 08:00-18:00", // horário da matriz no Waze/Google (24/11/2026)
   address: { ...partes(contato.enderecos[0]), postalCode: filiais.cidades[0].cep },
   areaServed: ["Itumbiara", "Goiânia", "Uberlândia", "Goiás", "Minas Gerais"].map((n) => ({ "@type": "Place", name: n })),
   sameAs: [meta.instagram],
@@ -56,10 +57,11 @@ const org = {
     "@type": "AccountingService",
     "@id": `${site}#unidade-${i + 2}`,
     name: `${meta.siteName} · ${f.cidade}`,
-    address: { "@type": "PostalAddress", ...(f.endereco ? { streetAddress: f.endereco } : {}), addressLocality: f.cidade, addressRegion: f.uf, addressCountry: "BR" },
+    address: { "@type": "PostalAddress", ...(f.endereco ? { streetAddress: f.endereco } : {}), ...(f.cep ? { postalCode: f.cep } : {}), addressLocality: f.cidade, addressRegion: f.uf, addressCountry: "BR" },
     ...(f.lat != null ? { geo: { "@type": "GeoCoordinates", latitude: f.lat, longitude: f.lng } } : {}),
     hasMap: f.waze,
-    telephone: telefone,
+    telephone: (f as any).telefone || telefone,
+    ...((f as any).horario ? { openingHours: (f as any).horario } : {}),
     url: site.toString(),
   })),
 };

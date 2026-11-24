@@ -69,7 +69,7 @@ export const contato = {
     "R. Rui de Almeida, 180 - St. Central, Itumbiara - GO",
     "Av. Cesário Alvim, 1135 - Centro, Uberlândia - MG",
     "Av. T-63, 1296, Sala 110, Setor Bueno, Goiânia - GO",
-    "Cachoeira Dourada - GO",
+    "R. Osmar José García, 830, Cachoeira Dourada - GO",
   ],
 };
 
