@@ -744,6 +744,11 @@ html body .revelado .palavra > i { transform: none; filter: none; opacity: 1; }
 .tunel-hero .cartao picture, .tunel-hero .cartao img { display: block; width: 100%; height: auto; }
 .tunel-hero .cartao img { filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.55)); object-fit: contain; padding: 0; }
 .tunel-hero .cartao.contabil img { border: 10px solid #efe6d1; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); filter: sepia(0.2) contrast(1.04); }
+/* recortes em 3 camadas (nítida, desfoque médio, desfoque forte): a animação só troca a opacidade */
+.tunel-hero .cartao.recorte img { filter: none; }
+.tunel-hero .cartao .camada { will-change: opacity; }
+.tunel-hero .cartao .c1, .tunel-hero .cartao .c2 { position: absolute; inset: 0; opacity: 0; }
+.tunel-hero .cartao .c1 img, .tunel-hero .cartao .c2 img { width: 100%; height: 100%; }
 .tunel-hero .cartao .num { position: absolute; left: 0; top: -26px; font-size: 14px; font-weight: 600; letter-spacing: 0.14em; color: rgba(255, 255, 255, 0.75); text-shadow: none; }
 .historia .h-gigante { transform-origin: 50% 58%; transition: none; will-change: transform, filter, opacity; }
 
@@ -984,3 +989,14 @@ html:not(.estatico) body { touch-action: none; -webkit-user-select: none; user-s
 
 /* zoom: nada de pinça nem toque duplo, nem na versão em pé (que só rola) */
 html.estatico body { touch-action: pan-x pan-y; }
+
+/* ---- Desempenho: telas fora de vista não animam ----
+   Os laços infinitos (granulado, faixas que rolam, película, brilhos) continuavam rodando nas 13 telas
+   escondidas e o navegador recalculava todas a cada quadro. Fora da tela atual (e da vizinha, durante a
+   troca), ficam pausados; voltam de onde pararam quando a tela aparece. */
+.tela:not(.atual):not(.vizinha),
+.tela:not(.atual):not(.vizinha) *,
+.tela:not(.atual):not(.vizinha)::before,
+.tela:not(.atual):not(.vizinha)::after,
+.tela:not(.atual):not(.vizinha) *::before,
+.tela:not(.atual):not(.vizinha) *::after { animation-play-state: paused !important; }

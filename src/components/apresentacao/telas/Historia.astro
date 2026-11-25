@@ -22,7 +22,13 @@ const pad = (n: number) => String(n).padStart(2, "0");
     {marcos.map((m, i) => (
       <div class:list={["cartao", m.faixa, { recorte: (m.imagem as any).recorte }]} data-i={i}>
         <span class="num">({pad(i + 1)})</span>
-        {m.imagem.arquivo ? (
+        {m.imagem.arquivo && (m.imagem as any).recorte ? (
+          <>
+            <div class="camada c0"><Foto arquivo={m.imagem.arquivo} descricao={m.imagem.descricao} rotulo="IMAGEM" larguras={[560, 1120]} tamanho="34vw" encaixe="documento" carregar="eager" /></div>
+            <div class="camada c1"><Foto arquivo={m.imagem.arquivo.replace(/\.png$/, "-b1.png")} descricao="" larguras={[560]} tamanho="560px" encaixe="documento" carregar="eager" /></div>
+            <div class="camada c2"><Foto arquivo={m.imagem.arquivo.replace(/\.png$/, "-b2.png")} descricao="" larguras={[224]} tamanho="224px" encaixe="documento" carregar="eager" /></div>
+          </>
+        ) : m.imagem.arquivo ? (
           <Foto arquivo={m.imagem.arquivo} descricao={m.imagem.descricao} rotulo="IMAGEM" larguras={[520, 1040]} tamanho="34vw" encaixe="documento" />
         ) : (
           <div class="ficha">
@@ -35,17 +41,6 @@ const pad = (n: number) => String(n).padStart(2, "0");
     ))}
     <span class="ponto-fuga"></span>
   </div>
-  <!-- aberração cromática: o canal azul desloca 1 a 5 px (usada nos recortes desfocados e nas bordas) -->
-  <svg class="filtros-lente" width="0" height="0" aria-hidden="true" focusable="false">
-    {[1, 2, 3, 4, 5].map((k) => (
-      <filter id={`aberracao-${k}`} x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
-        <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="vermelhoVerde" />
-        <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="azul" />
-        <feOffset in="azul" dx={k} dy={k * 0.35} result="azulDeslocado" />
-        <feBlend in="vermelhoVerde" in2="azulDeslocado" mode="screen" />
-      </filter>
-    ))}
-  </svg>
 
   <p class="h-topo-esq rotulo entra">{t.rotulo}</p>
   <p class="h-contador rotulo" data-contador-moeda>(MOEDA <span>01</span> / {tot})</p>

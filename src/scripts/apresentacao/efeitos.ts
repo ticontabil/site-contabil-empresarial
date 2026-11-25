@@ -147,11 +147,15 @@ function tunelHero(tela: HTMLElement) {
     const [x, y] = nuvem[i % nuvem.length];
     return { x, y, z: i * D, gira: 0.4 + (i % 4) * 0.13, fase: i * 1.7 };
   });
+  const camadas = cartoes.map((c) => {
+    const l = [".c0", ".c1", ".c2"].map((q) => c.querySelector<HTMLElement>(q));
+    return l.every(Boolean) ? (l as HTMLElement[]) : null;
+  });
   // largura de leitura conforme o formato da imagem (paisagem, retrato, quadrada)
   cartoes.forEach((c) => {
     const img = c.querySelector("img");
     const r = img && img.width && img.height ? img.width / img.height : 0.8;
-    c.style.width = `${r > 1.2 ? 700 : r < 0.85 ? 460 : 560}px`;
+    c.style.width = `${(r > 1.2 ? 700 : r < 0.85 ? 460 : 560) * (c.classList.contains("recorte") ? 1.13 : 1)}px`; // recortes têm 200 px de margem transparente
   });
 
   // câmera: posição em que o recorte k (1..n) fica no tamanho de leitura
@@ -162,16 +166,20 @@ function tunelHero(tela: HTMLElement) {
   const suave = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2); // ease-in-out cúbico
   const faixa = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
 
+  // tamanho da tela e "reduzir movimento" ficam guardados: ler clientWidth a cada quadro, logo depois
+  // de mexer nos estilos, obrigava o navegador a recalcular a página inteira 60 vezes por segundo
+  let W = 0, H = 0, balanca = true;
+  const medir = () => { W = tela.clientWidth; H = tela.clientHeight; balanca = !reduz(); };
   const desenhar = (agora: number) => {
-    const W = tela.clientWidth, H = tela.clientHeight;
+    if (!W) medir();
     const fx = W / 2, fy = H * FUGA_Y;
-    const balanca = !reduz();
     cartoes.forEach((c, i) => {
       const prof = pos[i].z - cam + P;
-      if (prof <= 40) { c.style.opacity = "0"; c.style.visibility = "hidden"; return; }
+      const some = () => { if (c.style.visibility !== "hidden") { c.style.opacity = "0"; c.style.visibility = "hidden"; } };
+      if (prof <= 40) { some(); return; }
       const s = P / prof;
       const op = Math.min(faixa(s, 0.12, 0.19), 1 - faixa(s, 1.15, 1.9));
-      if (op <= 0.001) { c.style.opacity = "0"; c.style.visibility = "hidden"; return; }
+      if (op <= 0.001) { some(); return; }
       const rot = balanca ? Math.sin(agora / 1000 * pos[i].gira + pos[i].fase) * 0.9 : 0;
       c.style.visibility = "visible";
       c.style.opacity = op.toFixed(3);
@@ -182,9 +190,16 @@ function tunelHero(tela: HTMLElement) {
       const cx = (pos[i].x * s) / (W / 2), cy = (fy + pos[i].y * s - H / 2) / (H / 2);
       const borda = faixa(Math.hypot(cx, cy * 1.2), 0.62, 1.05);
       const desfoque = Math.min(34, lente + borda * 5);
-      // aberração cromática só no canal azul: 1 px no desfoque leve, até 5 px no forte (filtros em Historia.astro)
-      const ab = Math.max(1, Math.min(5, Math.round(1 + desfoque / 7)));
-      c.style.filter = desfoque > 0.4 ? `blur(${desfoque.toFixed(1)}px) url(#aberracao-${ab})` : "";
+      // desfoque + aberração cromática já vêm prontos em camadas (-b1 médio, -b2 forte, gerados por
+      // scripts/gerar-recortes-papel.ts): aqui só muda a opacidade de cada camada, que a placa de vídeo
+      // resolve sozinha. Nada de filtro calculado a cada quadro.
+      const cam3 = camadas[i];
+      if (cam3) {
+        const [c0, c1, c2] = cam3;
+        c0.style.opacity = (1 - faixa(desfoque, 0, 6)).toFixed(3);
+        c1.style.opacity = (Math.min(faixa(desfoque, 0, 1.5), 1 - faixa(desfoque, 8, 22))).toFixed(3);
+        c2.style.opacity = faixa(desfoque, 6, 9).toFixed(3);
+      } else c.style.filter = desfoque > 0.4 ? `blur(${desfoque.toFixed(1)}px)` : "";
       c.style.zIndex = String(Math.round(s * 100));
     });
     if (gigante) {
@@ -209,6 +224,7 @@ function tunelHero(tela: HTMLElement) {
   const parar = () => { rodando = false; cancelAnimationFrame(raf); };
 
   const atualizar = (passo: number, entrou: boolean) => {
+    if (entrou) medir();
     de = cam; para = camDe(passo); t0 = performance.now();
     // ao entrar na tela (ou pular direto), a câmera já começa no lugar; entre passos ela anda 1,6 s
     dur = entrou || reduz() ? 1 : passo > n ? 2400 : 1600;
@@ -223,7 +239,7 @@ function tunelHero(tela: HTMLElement) {
   };
   tela.addEventListener("passo", ((e: CustomEvent<DetalhePasso>) => atualizar(e.detail.passo, e.detail.entrou)) as EventListener);
   tela.addEventListener("saiu", () => setTimeout(parar, 1300));
-  addEventListener("resize", () => desenhar(performance.now()));
+  addEventListener("resize", () => { medir(); desenhar(performance.now()); });
   atualizar(0, true);
   parar();
 }
