@@ -18,6 +18,14 @@ const { titulo = geral.titulo, descricao = geral.slogan } = Astro.props;
     <title>{titulo}</title>
     <meta name="description" content={descricao} />
     <link rel="icon" href="/favicon.ico" />
+    <!-- "Adicionar à Tela de Início" (iPad/Android): abre como app, sempre em tela cheia, sem a barra do navegador.
+         Manifesto e ícones ficam fora de /apresentacao* para não passar pelo portão de senha. -->
+    <link rel="manifest" href="/deck.webmanifest" />
+    <link rel="apple-touch-icon" href="/deck-icone-180.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Apresentação" />
     <script is:inline>
       // modos antes de pintar: rascunho, impressão, embutido
       (function () {

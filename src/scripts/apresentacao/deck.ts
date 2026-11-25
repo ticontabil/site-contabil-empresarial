@@ -189,6 +189,34 @@ if (!embutido) {
     d > 0 ? avancar() : voltar();
   }, { passive: false });
 
+  // ---------------- Tela cheia sozinha e resposta tátil ----------------
+  // O navegador só deixa entrar em tela cheia a partir de um toque. Então o primeiro toque na
+  // apresentação já entra em tela cheia (e os seguintes, se ela tiver saído), a não ser que o Pedro
+  // tenha fechado com a pinça. Aberta pela Tela de Início (como app), já começa sem barra nenhuma.
+  var doc = document as any;
+  var comoApp = matchMedia("(display-mode: fullscreen), (display-mode: standalone)").matches || (navigator as any).standalone === true;
+  var emTelaCheia = () => !!(doc.fullscreenElement || doc.webkitFullscreenElement);
+  var fechouNaPinca = false;
+  try { fechouNaPinca = sessionStorage.getItem("ce-sem-tela-cheia") === "1"; } catch {}
+  var entrarTelaCheia = () => {
+    if (comoApp || emTelaCheia() || fechouNaPinca) return;
+    const el = html as any;
+    try { (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el)?.catch?.(() => {}); } catch {}
+  };
+  // Vibração curta: Android usa a API de vibração; iPhone (iOS 18+) não tem essa API, mas vibra ao
+  // tocar num interruptor nativo (<input switch>), então tocamos num interruptor escondido.
+  // iPad não tem motor de vibração: lá não acontece nada (o toque continua marcado na tela).
+  var tatil = (() => {
+    if (typeof navigator.vibrate === "function") return () => { try { navigator.vibrate(12); } catch {} };
+    const caixa = document.createElement("div");
+    caixa.setAttribute("aria-hidden", "true");
+    caixa.style.cssText = "position:fixed;left:-200px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none";
+    caixa.innerHTML = '<input type="checkbox" switch id="ce-tatil" tabindex="-1"><label for="ce-tatil"></label>';
+    document.body.append(caixa);
+    const l = caixa.querySelector("label")!;
+    return () => l.click();
+  })();
+
   // ---------------- Toque (tablet) e clique nas bordas ----------------
   // - toque na borda direita (último 22% da largura): avança um passo; borda esquerda: volta um passo;
   // - arrastar o dedo para a esquerda/direita (em qualquer lugar): pula a TELA inteira, sem passar
@@ -202,18 +230,19 @@ if (!embutido) {
   addEventListener("pointerup", (e) => {
     if (!e.isPrimary || !ativo) return;
     ativo = false;
+    if (e.pointerType === "touch") entrarTelaCheia();
     if (html.classList.contains("estatico") || ignorar || e.button > 0) return;
     const dx = e.clientX - x0, dy = e.clientY - y0;
     if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.3) {
       // deslizar: tela inteira
-      if (dx < 0 && tela < total - 1) ir(tela + 1, 0);
-      else if (dx > 0 && tela > 0) ir(tela - 1, 0);
+      if (dx < 0 && tela < total - 1) { ir(tela + 1, 0); tatil(); }
+      else if (dx > 0 && tela > 0) { ir(tela - 1, 0); tatil(); }
       return;
     }
     if (Math.hypot(dx, dy) > 14 || e.timeStamp - t0 > 600) return;
     const f = e.clientX / innerWidth;
-    if (f > 0.78) { avancar(); marcarToque(e.clientX, e.clientY, "dir"); }
-    else if (f < 0.22) { voltar(); marcarToque(e.clientX, e.clientY, "esq"); }
+    if (f > 0.78) { avancar(); marcarToque(e.clientX, e.clientY, "dir"); tatil(); }
+    else if (f < 0.22) { voltar(); marcarToque(e.clientX, e.clientY, "esq"); tatil(); }
   });
   addEventListener("pointercancel", () => (ativo = false));
 
@@ -240,6 +269,7 @@ marcaBotao?.addEventListener("click", (e) => {
   const abrir = !marca!.classList.contains("aberto");
   marca!.classList.remove("pulsa"); void marca!.offsetWidth; marca!.classList.add("pulsa");
   marca!.classList.toggle("aberto", abrir);
+  tatil?.();
   marcaBotao.setAttribute("aria-expanded", String(abrir));
 });
 marca?.querySelector("[data-ir-inicio]")?.addEventListener("click", (e) => { e.stopPropagation(); fecharMenu(); ir(0, 0); });
@@ -263,11 +293,14 @@ if (!embutido) {
   }, { passive: false });
   addEventListener("touchend", () => {
     // o pedido de tela cheia precisa sair de um "toque" do usuário: por isso só quando os dedos saem
+    // (no iPad o Safari às vezes não aceita a pinça como "toque"; aí o próximo toque comum entra)
     if (!pinca) return;
-    const doc = document as any, el = html as any;
-    const cheia = !!(doc.fullscreenElement || doc.webkitFullscreenElement);
-    if (pinca === "abrir" && !cheia) (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el)?.catch?.(() => {});
-    if (pinca === "fechar" && cheia) (doc.exitFullscreen || doc.webkitExitFullscreen)?.call(doc)?.catch?.(() => {});
+    const cheia = emTelaCheia();
+    try { sessionStorage.setItem("ce-sem-tela-cheia", pinca === "fechar" ? "1" : "0"); } catch {}
+    fechouNaPinca = pinca === "fechar";
+    if (pinca === "abrir" && !cheia) entrarTelaCheia();
+    if (pinca === "fechar" && cheia) try { (doc.exitFullscreen || doc.webkitExitFullscreen)?.call(doc)?.catch?.(() => {}); } catch {}
+    tatil();
     pinca = null;
   });
   // Safari (iPad): gestos de zoom próprios
