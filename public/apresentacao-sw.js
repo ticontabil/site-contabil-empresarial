@@ -1,7 +1,7 @@
 // Service worker da apresentação: guarda a página, os scripts, as fontes e as imagens
 // depois da primeira visita, para o Pedro apresentar mesmo se a internet cair.
 // Troque a versão abaixo para forçar a limpeza do cache antigo.
-const CACHE = "apresentacao-v5";
+const CACHE = "apresentacao-v6";
 // ignoreVary: servidores que mandam "Vary: Origin" não podem impedir o uso do cache sem internet
 const OPCOES = { ignoreVary: true };
 

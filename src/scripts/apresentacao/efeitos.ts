@@ -151,6 +151,7 @@ function tunelHero(tela: HTMLElement) {
     const l = [".c0", ".c1", ".c2"].map((q) => c.querySelector<HTMLElement>(q));
     return l.every(Boolean) ? (l as HTMLElement[]) : null;
   });
+  const nums = cartoes.map((c) => c.querySelector<HTMLElement>(".num"));
   // largura de leitura conforme o formato da imagem (paisagem, retrato, quadrada)
   cartoes.forEach((c) => {
     const img = c.querySelector("img");
@@ -199,6 +200,7 @@ function tunelHero(tela: HTMLElement) {
         c0.style.opacity = (1 - faixa(desfoque, 0, 6)).toFixed(3);
         c1.style.opacity = (Math.min(faixa(desfoque, 0, 1.5), 1 - faixa(desfoque, 8, 22))).toFixed(3);
         c2.style.opacity = faixa(desfoque, 6, 9).toFixed(3);
+        if (nums[i]) nums[i]!.style.opacity = (1 - faixa(desfoque, 0, 4)).toFixed(3); // o ano some junto com a nitidez
       } else c.style.filter = desfoque > 0.4 ? `blur(${desfoque.toFixed(1)}px)` : "";
       c.style.zIndex = String(Math.round(s * 100));
     });

@@ -21,7 +21,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
   <div class="tunel-hero" data-tunel-hero aria-hidden="true">
     {marcos.map((m, i) => (
       <div class:list={["cartao", m.faixa, { recorte: (m.imagem as any).recorte }]} data-i={i}>
-        <span class="num">({pad(i + 1)})</span>
+        <span class="num">({m.data.replace(/^\d{2}\.\d{2}\./, "")})</span>
         {m.imagem.arquivo && (m.imagem as any).recorte ? (
           <>
             <div class="camada c0"><Foto arquivo={m.imagem.arquivo} descricao={m.imagem.descricao} rotulo="IMAGEM" larguras={[560, 1120]} tamanho="34vw" encaixe="documento" carregar="eager" /></div>
