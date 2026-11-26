@@ -25,8 +25,8 @@ const { titulo = meta.title, descricao = meta.description } = Astro.props;
     <script is:inline>
       // animações só com JS e sem "reduzir movimento"
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) document.documentElement.classList.add("sn-anima");
-      // computador e tablet: páginas na horizontal; celular: rolagem vertical
-      document.documentElement.classList.add(Math.min(innerWidth, innerHeight) >= 600 ? "sn-h" : "sn-v");
+      // o site inteiro rola na vertical (pedido do Hiago, 25/11/2026)
+      document.documentElement.classList.add("sn-v");
     </script>
   </head>
   <body class="sn">

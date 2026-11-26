@@ -55,24 +55,40 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
 <SiteNovo titulo="Contábil Empresarial · Contabilidade desde 1984" descricao="Contabilidade em Itumbiara, Goiânia, Uberlândia e Cachoeira Dourada desde 1984.">
   <!-- ================= LOGO + MENU (canto superior direito, como na apresentação) ================= -->
   <div id="sn-marca">
-    <button type="button" id="sn-marca-botao" aria-label="Abrir o menu" aria-expanded="false" aria-controls="sn-marca-menu">
+    <button type="button" id="sn-marca-botao" aria-label="Abrir o menu" aria-expanded="false" aria-controls="sn-menu">
       <img src="/logo-negative.png" alt="Contábil Empresarial" width="568" height="229" />
       <span class="sn-brilho" aria-hidden="true"></span>
     </button>
-    <nav id="sn-marca-menu" aria-label="Menu">
-      {paginas.map((p) => <a href={`#${p.id}`} class="sn-op" data-ir={p.id}><span class="ic"><Icone nome={p.icone} tamanho={18} /></span>{p.id === "inicio" ? "Home" : p.nome}</a>)}
-      <span class="sn-op-sep" aria-hidden="true"></span>
-      {externos.map((e) => <a href={e.href} class="sn-op" target={e.fora ? "_blank" : undefined} rel={e.fora ? "noopener" : undefined}><span class="ic"><Icone nome={e.icone} tamanho={18} /></span>{e.nome}{e.fora && <span aria-hidden="true"> ↗</span>}</a>)}
+  </div>
+  <!-- menu da logo: tela cheia, no estilo da apresentação (lista numerada, fumaça laranja) -->
+  <div id="sn-menu" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true">
+    <div class="sn-atmosfera" aria-hidden="true"><span class="f1"></span><span class="f2"></span></div>
+    <button type="button" class="sn-menu-fechar" aria-label="Fechar o menu"><span></span><span></span></button>
+    <nav class="sn-menu-lista" aria-label="Páginas">
+      <p class="sn-rotulo">(NAVEGUE)</p>
+      <ol>
+        {paginas.map((p, i) => (
+          <li style={`--k:${i}`}><a href={`#${p.id}`} data-ir={p.id}><span class="n">({pad(i + 1)})</span><span class="ic"><Icone nome={p.icone} tamanho={20} /></span><span class="t">{p.id === "inicio" ? "Home" : p.nome}</span></a></li>
+        ))}
+      </ol>
     </nav>
+    <aside class="sn-menu-lado">
+      <p class="sn-rotulo">(MAIS)</p>
+      <ul>
+        {externos.map((e, i) => <li style={`--k:${i + paginas.length}`}><a href={e.href} target={e.fora ? "_blank" : undefined} rel={e.fora ? "noopener" : undefined}><span class="ic"><Icone nome={e.icone} tamanho={18} /></span>{e.nome}{e.fora && <span aria-hidden="true"> ↗</span>}</a></li>)}
+      </ul>
+      <p class="sn-rotulo">(FALE COM A GENTE)</p>
+      <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
+      <p class="sn-menu-slogan">{rodape.sloganNovo}</p>
+    </aside>
   </div>
 
-  <!-- ================= LINHA DO TEMPO (embaixo): em qual página a pessoa está ================= -->
-  <nav id="sn-linha" aria-label="Páginas do site">
-    <div class="trilho"><span class="cheio" data-cheio></span></div>
-    <ol class="nomes">
-      {paginas.map((p, i) => <li><a href={`#${p.id}`} data-ir={p.id} style={`--i:${i}`}>{p.nome}</a></li>)}
+  <!-- ================= MAPA DA PÁGINA (vertical, lateral esquerda) ================= -->
+  <nav id="sn-mapa" aria-label="Mapa da página">
+    <div class="trilho" aria-hidden="true"><span class="cheio" data-cheio></span></div>
+    <ol>
+      {paginas.map((p, i) => <li><a href={`#${p.id}`} data-ir={p.id}><i aria-hidden="true"></i><span>{p.nome}</span></a></li>)}
     </ol>
-    <p class="atual" aria-hidden="true"><b data-num-atual>01</b> / {pad(paginas.length)} <span data-nome-atual>Início</span></p>
   </nav>
 
   <main id="sn-palco">
@@ -106,21 +122,21 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
         <p class="sn-apoio sn-slogan rv">{rodape.sloganNovo}</p>
         <div class="sn-botoes rv">
           <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
-          <a class="sn-btn" href="/noticias"><Icone nome="jornal" tamanho={16} /> Notícias</a>
-          <a class="sn-btn" href={PORTAL} target="_blank" rel="noopener"><Icone nome="externo" tamanho={16} /> Portal</a>
+          <a class="sn-btn sn-btn-leve" href="/noticias"><Icone nome="jornal" tamanho={14} /> Notícias</a>
+          <a class="sn-btn sn-btn-leve" href={PORTAL} target="_blank" rel="noopener"><Icone nome="externo" tamanho={14} /> Portal</a>
         </div>
       </div>
       <div class="sn-gigante" data-ajustar aria-hidden="true"><span>{capa.tela.nomeGigante}</span></div>
       <!-- produtos: faixa passando na horizontal, em loop -->
       <div class="sn-faixa" aria-label={`Produtos e parceiros: ${produtos.map((p) => p.nome).join(", ")}`}>
-        <div class="trilha">
+        <span class="nevoa esq" aria-hidden="true"></span><span class="nevoa dir" aria-hidden="true"></span>
+        <div class="moldura"><div class="trilha">
           {[0, 1, 2, 3].map((v) => produtos.map((p) => (
             <div class="item" aria-hidden={v > 0 ? "true" : undefined}>
-              {p.logo ? <Foto arquivo={`parceiros/${p.logo}`} descricao={p.nome} alt={p.nome} larguras={[240, 480]} tamanho="200px" carregar="eager" /> : <span>{p.nome}</span>}
-              <small>{p.texto}</small>
+              {p.logo ? <Foto arquivo={`parceiros/${p.logo}`} descricao={p.nome} alt={p.nome} larguras={[160, 320]} tamanho="140px" carregar="eager" /> : <span>{p.nome}</span>}
             </div>
           )))}
-        </div>
+        </div></div>
       </div>
     </section>
 
@@ -219,7 +235,7 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
         <h2 class="sn-titulo rv"><span class="leve">Estrutura de grande.</span> <strong>Atendimento de perto.</strong></h2>
         <p class="sn-apoio rv"><Txt t={`${time.apoio}.`} /></p>
       </div>
-      <div class="faixa-gestoras">
+      <div class="faixa-gestoras" data-arrastar aria-label="Gestores: arraste para os lados">
         <div class="trilha">
           {[0, 1].map((v) => time.gestoras.map((g) => (
             <article class="cartao-gestora" aria-hidden={v > 0 ? "true" : undefined}>

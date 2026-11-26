@@ -1,14 +1,11 @@
-// Site novo (/novo).
-// - Computador e tablet (html.sn-h): uma página por vez, na horizontal. Roda do mouse/touchpad, setas,
-//   deslizar o dedo, a linha do tempo e o menu da logo trocam de página. Páginas com passos (Nossa
-//   História) e com rolagem própria (vídeo da fachada, contato) consomem a rolagem antes de trocar.
-// - Celular (html.sn-v): rolagem vertical normal; as mesmas animações seguem a posição na página.
+// Site novo (/novo): o site inteiro rola na vertical (o modo horizontal saiu a pedido do Hiago em 25/11/2026).
+// Mapa da página na lateral esquerda, menu da logo em tela cheia, animações que seguem a rolagem.
 import "./site"; // acordeão "Dúvidas rápidas" do rodapé (mesmo rodapé do site atual)
 
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s);
 const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => [...r.querySelectorAll<T>(s)];
 const html = document.documentElement;
-const H = html.classList.contains("sn-h");
+const H = false; // modo horizontal desligado
 const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const faixa = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
 const limita = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
@@ -31,36 +28,76 @@ function ajustarGigantes() {
   });
 }
 
-// ---------------- logo: animação e menu com ícone + nome ----------------
+// ---------------- logo: animação e menu em tela cheia ----------------
 const marca = $("#sn-marca")!;
 const marcaBotao = $<HTMLButtonElement>("#sn-marca-botao")!;
-$$("#sn-marca-menu a").forEach((o, k) => o.style.setProperty("--k", String(k)));
-const fecharMenu = () => { marca.classList.remove("aberto"); marcaBotao.setAttribute("aria-expanded", "false"); };
+const menu = $("#sn-menu")!;
+const abrirMenu = (abrir: boolean) => {
+  html.classList.toggle("sn-menu-aberto", abrir);
+  menu.setAttribute("aria-hidden", String(!abrir));
+  marcaBotao.setAttribute("aria-expanded", String(abrir));
+  if (abrir) $<HTMLElement>(".sn-menu-lista a", menu)?.focus({ preventScroll: true });
+};
 marcaBotao.addEventListener("click", (e) => {
   e.stopPropagation();
-  const abrir = !marca.classList.contains("aberto");
   marca.classList.remove("pulsa"); void marca.offsetWidth; marca.classList.add("pulsa");
-  marca.classList.toggle("aberto", abrir);
-  marcaBotao.setAttribute("aria-expanded", String(abrir));
+  abrirMenu(!html.classList.contains("sn-menu-aberto"));
 });
-$$("#sn-marca-menu a").forEach((a) => a.addEventListener("click", fecharMenu));
-addEventListener("click", (e) => { if (!(e.target as Element).closest?.("#sn-marca")) fecharMenu(); });
-addEventListener("keydown", (e) => e.key === "Escape" && fecharMenu());
+$(".sn-menu-fechar", menu)?.addEventListener("click", () => abrirMenu(false));
+$$("#sn-menu a").forEach((a) => a.addEventListener("click", () => abrirMenu(false)));
+addEventListener("keydown", (e) => e.key === "Escape" && abrirMenu(false));
 
-// ---------------- linha do tempo + item ativo do menu ----------------
+// ---------------- mapa da página (vertical) + item ativo do menu ----------------
 const cheio = $("[data-cheio]");
-const nomesLinha = $$<HTMLAnchorElement>("#sn-linha [data-ir]");
-const opcoes = $$<HTMLAnchorElement>("#sn-marca-menu [data-ir]");
-const numAtual = $("[data-num-atual]"), nomeAtual = $("[data-nome-atual]");
+const nomesMapa = $$<HTMLAnchorElement>("#sn-mapa [data-ir]");
+const opcoes = $$<HTMLAnchorElement>("#sn-menu [data-ir]");
 function marcarPagina(k: number, fracao?: number) {
   const id = ids[k];
-  nomesLinha.forEach((a) => a.classList.toggle("ativo", a.dataset.ir === id));
+  nomesMapa.forEach((a, i) => { a.classList.toggle("ativo", i === k); a.classList.toggle("passou", i < k); });
   opcoes.forEach((a) => a.classList.toggle("ativo", a.dataset.ir === id));
-  if (numAtual) numAtual.textContent = String(k + 1).padStart(2, "0");
-  if (nomeAtual) nomeAtual.textContent = nomesLinha[k]?.textContent || "";
   const f = fracao ?? (ids.length > 1 ? k / (ids.length - 1) : 1);
-  if (cheio) cheio.style.width = `${(f * 100).toFixed(2)}%`;
+  if (cheio) cheio.style.height = `${(f * 100).toFixed(2)}%`;
   html.classList.toggle("sn-clara-atual", paginas[k]?.classList.contains("sn-clara") ?? false);
+}
+
+// ---------------- gestores: faixa que anda sozinha e pode ser arrastada (mais rápido ou mais devagar) ----------------
+function arrastar() {
+  const faixa = $("[data-arrastar]");
+  const trilha = faixa ? $(".trilha", faixa) : null;
+  if (!faixa || !trilha) return;
+  trilha.style.animation = "none";
+  const BASE = reduz ? 0 : 38; // px por segundo, para a esquerda
+  let x = 0, vel = BASE, segurando = false, xAnt = 0, tAnt = 0, ultimo = 0, visivel = false, raf = 0;
+  const meio = () => trilha.scrollWidth / 2;
+  const laco = (t: number) => {
+    const dt = Math.min(0.05, (t - (ultimo || t)) / 1000); ultimo = t;
+    if (!segurando) {
+      x -= vel * dt;
+      vel += (BASE - vel) * Math.min(1, dt * 1.6); // o impulso do arraste vai voltando à velocidade normal
+    }
+    const m = meio();
+    if (m > 0) { while (x <= -m) x += m; while (x > 0) x -= m; }
+    trilha.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`;
+    if (visivel) raf = requestAnimationFrame(laco);
+  };
+  faixa.style.cursor = "grab";
+  faixa.style.touchAction = "pan-y";
+  faixa.addEventListener("pointerdown", (e) => {
+    segurando = true; xAnt = e.clientX; tAnt = e.timeStamp; vel = 0;
+    faixa.setPointerCapture(e.pointerId); faixa.style.cursor = "grabbing";
+  });
+  faixa.addEventListener("pointermove", (e) => {
+    if (!segurando) return;
+    const dx = e.clientX - xAnt, dt = Math.max(1, e.timeStamp - tAnt);
+    x += dx;
+    vel = vel * 0.6 + (-dx / dt) * 1000 * 0.4; // velocidade do mouse/dedo (px/s), para continuar depois de soltar
+    xAnt = e.clientX; tAnt = e.timeStamp;
+  });
+  const soltar = () => { if (!segurando) return; segurando = false; faixa.style.cursor = "grab"; vel = limita(vel, -2500, 2500); };
+  faixa.addEventListener("pointerup", soltar);
+  faixa.addEventListener("pointercancel", soltar);
+  faixa.addEventListener("dragstart", (e) => e.preventDefault());
+  new IntersectionObserver(([e]) => { visivel = e.isIntersecting; cancelAnimationFrame(raf); if (visivel) { ultimo = 0; raf = requestAnimationFrame(laco); } }).observe(faixa);
 }
 
 // ======================= 1 · túnel automático da capa =======================
@@ -439,133 +476,10 @@ if (!H) {
   addEventListener("scroll", () => requestAnimationFrame(ver), { passive: true });
   ver();
   afundarNoPreto();
-} else {
-  // ---------- COMPUTADOR / TABLET: páginas na horizontal ----------
-  // atraso em cascata das entradas
-  paginas.forEach((p) => $$(".rv", p).forEach((el, i) => el.style.setProperty("--d", String(Math.min(8, i)))));
-  let atual = -1, travado = false;
-  const efeitos: Record<string, { entrar?: () => void; sair?: () => void } | null> = {
-    inicio: capa ? { entrar: capa.entrar, sair: capa.sair } : null,
-    historia: hist ? { entrar: hist.ligar, sair: hist.desligar } : null,
-    "desde-1984": fach ? { entrar: fach.ligar, sair: fach.desligar } : null,
-    numeros: nums,
-    comecar: etp,
-    contato: ctt,
-  };
-  const ir = (k: number, dir = 1) => {
-    k = limita(k, 0, paginas.length - 1);
-    if (k === atual) return;
-    const antes = atual;
-    travado = true; setTimeout(() => (travado = false), 900);
-    html.classList.add("trocando"); setTimeout(() => html.classList.remove("trocando"), 650);
-    paginas.forEach((p, i) => {
-      p.classList.toggle("atual", i === k);
-      p.classList.toggle("antes", i < k);
-      p.setAttribute("aria-hidden", String(i !== k));
-    });
-    if (antes >= 0) { efeitos[ids[antes]]?.sair?.(); $$(".rv", paginas[antes]).forEach((el) => el.classList.remove("on")); }
-    atual = k;
-    const pg = paginas[k];
-    $$(".rv", pg).forEach((el) => el.classList.add("on"));
-    // entrando pela frente começa do começo; voltando, começa do fim
-    if (ids[k] === "historia" && hist) hist.irPasso(dir > 0 ? 0 : hist.total, true);
-    if (ids[k] === "desde-1984" && fach) fach.definir(dir > 0 ? 0 : 1);
-    if (pg.hasAttribute("data-rola") || pg.classList.contains("sn-bloco")) pg.scrollTop = dir > 0 ? 0 : pg.scrollHeight;
-    efeitos[ids[k]]?.entrar?.();
-    if (ids[k + 1] === "desde-1984") fach?.preparar();
-    marcarPagina(k);
-    history.replaceState(null, "", k === 0 ? location.pathname : `#${ids[k]}`);
-  };
-  // um "passo" para frente ou para trás, respeitando passos internos e rolagem própria
-  const passo = (dir: number) => {
-    if (travado) return;
-    const id = ids[atual];
-    if (id === "historia" && hist) {
-      const p = hist.passo + dir;
-      if (p >= 0 && p <= hist.total) { hist.irPasso(p); travado = true; setTimeout(() => (travado = false), 650); return; }
-    }
-    ir(atual + dir, dir);
-  };
-  hist?.clique(() => passo(1));
-
-  // roda do mouse / touchpad: um gesto = um passo (eventos com menos de 250 ms entre si)
-  let ultimaRoda = 0, gastoGesto = false;
-  addEventListener("wheel", (e) => {
-    if ((e.target as Element).closest?.("#sn-marca-menu")) return;
-    const pg = paginas[atual];
-    const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-    const novo = e.timeStamp - ultimaRoda > 250; ultimaRoda = e.timeStamp;
-    if (novo) gastoGesto = false;
-    // páginas que rolam por dentro: deixam rolar até a borda
-    const rola = pg.classList.contains("sn-bloco") || pg.hasAttribute("data-rola");
-    if (rola && Math.abs(e.deltaY) >= Math.abs(e.deltaX)) {
-      const fim = pg.scrollTop + pg.clientHeight >= pg.scrollHeight - 2, inicio = pg.scrollTop <= 0;
-      if ((d > 0 && !fim) || (d < 0 && !inicio)) { gastoGesto = true; return; }
-    }
-    e.preventDefault();
-    // vídeo da fachada: a rolagem anda o vídeo; nas pontas troca de página
-    if (ids[atual] === "desde-1984" && fach) {
-      const antes = fach.prog;
-      if ((d > 0 && antes < 1) || (d < 0 && antes > 0)) { fach.mover(d / 1400); gastoGesto = true; return; }
-    }
-    if (gastoGesto || Math.abs(d) < 4) return;
-    gastoGesto = true;
-    passo(d > 0 ? 1 : -1);
-  }, { passive: false });
-
-  addEventListener("keydown", (e) => {
-    if (e.ctrlKey || e.metaKey || e.altKey || (e.target as Element).closest?.("input, textarea")) return;
-    if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); if (ids[atual] === "desde-1984" && fach && fach.prog < 1) fach.mover(0.25); else passo(1); }
-    else if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); if (ids[atual] === "desde-1984" && fach && fach.prog > 0) fach.mover(-0.25); else passo(-1); }
-    else if (e.key === "Home") ir(0, -1);
-    else if (e.key === "End") ir(paginas.length - 1, 1);
-  });
-
-  // toque (tablet): deslizar na horizontal troca a página; na vertical anda um passo
-  let x0 = 0, y0 = 0, t0 = 0, yAnt = 0;
-  addEventListener("touchstart", (e) => { const t = e.touches[0]; x0 = t.clientX; y0 = yAnt = t.clientY; t0 = e.timeStamp; }, { passive: true });
-  addEventListener("touchmove", (e) => {
-    if (ids[atual] !== "desde-1984" || !fach) return;
-    const y = e.touches[0].clientY; fach.mover((yAnt - y) / 900); yAnt = y;
-  }, { passive: true });
-  addEventListener("touchend", (e) => {
-    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
-    if (e.timeStamp - t0 > 900) return;
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.3) { ir(atual + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); return; }
-    const pg = paginas[atual];
-    if (Math.abs(dy) > 60 && ids[atual] !== "desde-1984") {
-      const rola = pg.classList.contains("sn-bloco") || pg.hasAttribute("data-rola");
-      const fim = pg.scrollTop + pg.clientHeight >= pg.scrollHeight - 2, inicio = pg.scrollTop <= 0;
-      if (rola && ((dy < 0 && !fim) || (dy > 0 && !inicio))) return;
-      passo(dy < 0 ? 1 : -1);
-    }
-  });
-
-  // links da linha do tempo, do menu e âncoras internas
-  addEventListener("click", (e) => {
-    const a = (e.target as Element).closest?.("a[href^='#']") as HTMLAnchorElement | null;
-    if (!a) return;
-    const k = ids.indexOf(a.getAttribute("href")!.slice(1));
-    if (k < 0) return;
-    e.preventDefault();
-    ir(k, k >= atual ? 1 : -1);
-  });
-
-  // o navegador rola o palco até a âncora do endereço (#numeros etc.); no modo horizontal ele fica sempre parado
-  const palco = $("#sn-palco")!;
-  const zerar = () => { if (palco.scrollTop || palco.scrollLeft) { palco.scrollTop = 0; palco.scrollLeft = 0; } if (scrollY || scrollX) scrollTo(0, 0); };
-  palco.addEventListener("scroll", zerar);
-  addEventListener("scroll", zerar);
-  addEventListener("load", zerar);
-  const inicial = Math.max(0, ids.indexOf(location.hash.slice(1)));
-  ir(inicial, 1);
 }
+arrastar();
 
 addEventListener("resize", ajustarGigantes);
 document.fonts?.ready.then(ajustarGigantes);
 ajustarGigantes();
 
-// muda de celular para computador (ou o contrário) ao girar/redimensionar: recarrega no modo certo
-const modoCerto = () => (Math.min(innerWidth, innerHeight) >= 600 ? "sn-h" : "sn-v");
-let tRes = 0;
-addEventListener("resize", () => { clearTimeout(tRes); tRes = window.setTimeout(() => { if (!html.classList.contains(modoCerto())) location.reload(); }, 400); });
