@@ -22,6 +22,13 @@ const { titulo = meta.title, descricao = meta.description } = Astro.props;
     <title>{titulo}</title>
     <meta name="description" content={descricao} />
     <link rel="icon" href="/favicon.ico?v=2" />
+    <!-- "Adicionar à Tela de Início": abre em tela cheia, sem a barra do navegador (único jeito no iPhone) -->
+    <link rel="manifest" href="/site-novo.webmanifest" />
+    <link rel="apple-touch-icon" href="/site-novo-icone-180.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Contábil" />
     <script is:inline>
       // animações só com JS e sem "reduzir movimento"
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) document.documentElement.classList.add("sn-anima");

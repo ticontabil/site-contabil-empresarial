@@ -38,9 +38,34 @@ const abrirMenu = (abrir: boolean) => {
   marcaBotao.setAttribute("aria-expanded", String(abrir));
   if (abrir) $<HTMLElement>(".sn-menu-lista a", menu)?.focus({ preventScroll: true });
 };
+// dois toques rápidos na logo: liga/desliga a tela cheia (o primeiro toque abre o menu; o segundo o fecha de volta)
+let saiuPelaLogo = false; // quem saiu da tela cheia com os dois toques não é puxado de volta a cada toque
+const telaCheia = (ligar?: boolean) => {
+  const doc = document as any, el = html as any;
+  const esta = !!(doc.fullscreenElement || doc.webkitFullscreenElement);
+  if (ligar === true && saiuPelaLogo) return;
+  if (ligar === undefined) saiuPelaLogo = esta;
+  if (ligar ?? !esta) {
+    if (esta) return;
+    try { (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el, { navigationUI: "hide" })?.catch?.(() => {}); } catch {}
+  } else if (esta) {
+    try { (doc.exitFullscreen || doc.webkitExitFullscreen)?.call(doc)?.catch?.(() => {}); } catch {}
+  }
+};
+const tatil = () => { try { navigator.vibrate?.(12); } catch {} };
+let ultimoToqueLogo = 0;
 marcaBotao.addEventListener("click", (e) => {
   e.stopPropagation();
   marca.classList.remove("pulsa"); void marca.offsetWidth; marca.classList.add("pulsa");
+  const agora = performance.now();
+  if (agora - ultimoToqueLogo < 380) {
+    ultimoToqueLogo = 0;
+    abrirMenu(false);
+    telaCheia();
+    tatil();
+    return;
+  }
+  ultimoToqueLogo = agora;
   abrirMenu(!html.classList.contains("sn-menu-aberto"));
 });
 $(".sn-menu-fechar", menu)?.addEventListener("click", () => abrirMenu(false));
@@ -564,15 +589,11 @@ coresDasBordas();
 // o primeiro arraste) já pede a tela cheia. iPhone não permite tela cheia em páginas; iPad e Android sim.
 (function telaCheiaNoToque() {
   if (!matchMedia("(pointer: coarse)").matches) return;
-  const doc = document as any, el = html as any;
-  const pedir = () => {
-    if (doc.fullscreenElement || doc.webkitFullscreenElement) return;
-    try { (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el, { navigationUI: "hide" })?.catch?.(() => {}); } catch {}
-  };
-  const uma = () => { pedir(); removeEventListener("touchend", uma); removeEventListener("pointerup", umaPonteiro); };
-  const umaPonteiro = (e: PointerEvent) => { if (e.pointerType !== "mouse") uma(); };
-  addEventListener("touchend", uma, { passive: true });
-  addEventListener("pointerup", umaPonteiro);
+  // celular e tablet: todo toque pede a tela cheia de novo se ela não estiver ligada (o navegador só deixa
+  // a partir de um toque; o iPhone não deixa páginas ficarem em tela cheia: lá vale "Adicionar à Tela de Início")
+  const pedir = () => telaCheia(true);
+  addEventListener("touchend", pedir, { passive: true });
+  addEventListener("pointerup", (e) => { if (e.pointerType !== "mouse") pedir(); });
 })();
 
 addEventListener("resize", ajustarGigantes);

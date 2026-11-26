@@ -33,7 +33,7 @@ const paginas = [
 const externos = [
   { href: "/novo/noticias", nome: "Notícias", icone: "jornal", fora: false },
   { href: "/trabalheconosco", nome: "Trabalhe Conosco", icone: "pessoal", fora: false },
-  { href: PORTAL, nome: "Portal", icone: "externo", fora: true },
+  { href: PORTAL, nome: "Portal do Cliente", icone: "externo", fora: true },
 ];
 
 const capa = telas.capa;
@@ -73,7 +73,7 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
   <div class="sn-botoes sn-botoes-topo">
     <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
     <a class="sn-btn sn-btn-leve" href="/novo/noticias"><Icone nome="jornal" tamanho={14} /> Notícias</a>
-    <a class="sn-btn sn-btn-leve" href={PORTAL} target="_blank" rel="noopener"><Icone nome="externo" tamanho={14} /> Portal</a>
+    <a class="sn-btn sn-btn-leve" href={PORTAL} target="_blank" rel="noopener"><Icone nome="externo" tamanho={14} /> Portal do Cliente</a>
   </div>
   <div id="sn-menu" role="dialog" aria-modal="false" aria-label="Menu" aria-hidden="true">
     <div class="sn-atmosfera" aria-hidden="true"><span class="f1"></span><span class="f2"></span></div>
@@ -154,7 +154,7 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
         <div class="sn-botoes sn-botoes-texto rv">
           <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
           <a class="sn-btn sn-btn-leve" href="/novo/noticias"><Icone nome="jornal" tamanho={14} /> Notícias</a>
-          <a class="sn-btn sn-btn-leve" href={PORTAL} target="_blank" rel="noopener"><Icone nome="externo" tamanho={14} /> Portal</a>
+          <a class="sn-btn sn-btn-leve" href={PORTAL} target="_blank" rel="noopener"><Icone nome="externo" tamanho={14} /> Portal do Cliente</a>
         </div>
       </div>
       <div class="sn-gigante" data-ajustar aria-hidden="true"><span>{capa.tela.nomeGigante}</span></div>
