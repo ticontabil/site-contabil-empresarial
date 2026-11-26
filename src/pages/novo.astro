@@ -37,8 +37,8 @@ const externos = [
 ];
 
 const capa = telas.capa;
-const palavras = capa.tela.titulo.split(" ");
-const [primeira, meio, ultima] = [palavras[0], palavras.slice(1, -1).join(" "), palavras[palavras.length - 1]];
+// "Menos impostos. Mais inovação. Mais resultados." → forte / leve / itálico laranja
+const slogan = rodape.sloganNovo.split(/(?<=\.)\s+/);
 const hist = telas.historia;
 const marcos = ativos(hist.marcos);
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -118,8 +118,9 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
       <div class="sn-degrade" aria-hidden="true"></div>
       <div class="sn-hero-texto">
         <p class="sn-rotulo rv">(CONTABILIDADE DESDE 1984)</p>
-        <h1 class="sn-titulo rv"><strong>{primeira}</strong> <span class="leve">{meio}</span> <em class="acento">{ultima}</em></h1>
-        <p class="sn-apoio sn-slogan rv">{rodape.sloganNovo}</p>
+        <!-- slogan novo no lugar de "Tradição que se traduz em resultados." (pedido do Hiago, 26/11/2026) -->
+        <h1 class="sn-titulo rv"><strong>{slogan[0]}</strong> <span class="leve">{slogan[1]}</span> <em class="acento">{slogan[2]}</em></h1>
+        <p class="sn-apoio rv"><Txt t={capa.tela.apoio} /></p>
         <div class="sn-botoes rv">
           <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
           <a class="sn-btn sn-btn-leve" href="/noticias"><Icone nome="jornal" tamanho={14} /> Notícias</a>
