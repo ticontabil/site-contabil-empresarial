@@ -21,7 +21,7 @@ const { titulo = meta.title, descricao = meta.description } = Astro.props;
     <meta name="theme-color" content="#000000" />
     <title>{titulo}</title>
     <meta name="description" content={descricao} />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" href="/favicon.ico?v=2" />
     <script is:inline>
       // animações só com JS e sem "reduzir movimento"
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) document.documentElement.classList.add("sn-anima");
