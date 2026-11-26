@@ -68,8 +68,14 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
       <span class="sn-brilho" aria-hidden="true"></span>
     </button>
   </div>
-  <!-- menu da logo: tela cheia, no estilo da apresentação (lista numerada, fumaça laranja) -->
-  <div id="sn-menu" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true">
+  <!-- menu da logo: painel compacto de vidro fosco que nasce da logo -->
+  <!-- botões no canto superior esquerdo, na mesma linha da logo (telas largas). Fica fora da seção para passar por cima do desfoque da borda; no celular ficam embaixo do texto -->
+  <div class="sn-botoes sn-botoes-topo">
+    <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
+    <a class="sn-btn sn-btn-leve" href="/novo/noticias"><Icone nome="jornal" tamanho={14} /> Notícias</a>
+    <a class="sn-btn sn-btn-leve" href={PORTAL} target="_blank" rel="noopener"><Icone nome="externo" tamanho={14} /> Portal</a>
+  </div>
+  <div id="sn-menu" role="dialog" aria-modal="false" aria-label="Menu" aria-hidden="true">
     <div class="sn-atmosfera" aria-hidden="true"><span class="f1"></span><span class="f2"></span></div>
     <button type="button" class="sn-menu-fechar" aria-label="Fechar o menu"><span></span><span></span></button>
     <nav class="sn-menu-lista" aria-label="Páginas">
@@ -145,7 +151,7 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
         <!-- slogan novo no lugar de "Tradição que se traduz em resultados." (pedido do Hiago, 26/11/2026) -->
         <h1 class="sn-titulo rv"><strong>{slogan[0]}</strong> <span class="leve">{slogan[1]}</span> <em class="acento">{slogan[2]}</em></h1>
         <p class="sn-apoio rv"><Txt t={capa.tela.apoio} /></p>
-        <div class="sn-botoes rv">
+        <div class="sn-botoes sn-botoes-texto rv">
           <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
           <a class="sn-btn sn-btn-leve" href="/novo/noticias"><Icone nome="jornal" tamanho={14} /> Notícias</a>
           <a class="sn-btn sn-btn-leve" href={PORTAL} target="_blank" rel="noopener"><Icone nome="externo" tamanho={14} /> Portal</a>

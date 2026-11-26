@@ -357,7 +357,7 @@ body.sn { background: #000; color: #fff; font-family: var(--fonte); -webkit-font
 .sn-hero-texto { bottom: calc(var(--faixa-b) + var(--faixa-h) + 12px + (100vw - 2 * var(--pad)) * 0.075 + clamp(24px, 4vh, 56px)); max-width: 620px; gap: clamp(10px, 1.6vh, 18px); }
 .sn-hero .sn-titulo { font-size: clamp(28px, 2.3vw + 8px, 54px); }
 .sn-hero .sn-apoio { font-size: clamp(15px, 0.6vw + 10px, 21px); }
-.sn-hero .sn-btn { min-height: 44px; padding: 0 20px; font-size: clamp(13px, 0.3vw + 10px, 15px); }
+.sn-hero .sn-btn, .sn-botoes-topo .sn-btn { min-height: 44px; padding: 0 20px; font-size: clamp(13px, 0.3vw + 10px, 15px); }
 .sn-btn-leve { border-color: transparent; background: transparent; backdrop-filter: none; padding: 0 12px !important; color: #cfcfcf; letter-spacing: 0.12em; text-transform: uppercase; font-size: 12px !important; }
 .sn-btn-leve:hover { color: #fff; border-color: rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.04); }
 /* faixa de produtos como na apresentação: logos pequenos saindo da fumaça, névoa com desfoque nas bordas */
@@ -718,3 +718,79 @@ body.sn { background: #000; color: #fff; font-family: var(--fonte); -webkit-font
   .ct-luz .halo { left: -44vw; width: 88vw; }
 }
 @media (prefers-reduced-motion: reduce) { .ct-escuro { display: none; } }
+
+/* ======================= AJUSTES 26/11 (4): menu compacto e mapa com vidro desfocado ======================= */
+/* menu da logo: em vez de tela cheia, um painel pequeno de vidro fosco (como o iPadOS) que nasce da logo */
+#sn-menu { inset: auto; right: var(--pad); top: calc(clamp(16px, 3vh, 34px) + clamp(38px, 5vh, 54px) + 12px);
+  width: min(320px, calc(100vw - 2 * var(--pad))); max-height: calc(100svh - clamp(16px, 3vh, 34px) - clamp(38px, 5vh, 54px) - 28px);
+  display: block; padding: 10px; border-radius: 22px; gap: 0; align-items: stretch;
+  background: rgba(22, 20, 19, 0.5); -webkit-backdrop-filter: blur(26px) saturate(1.7); backdrop-filter: blur(26px) saturate(1.7);
+  border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 60px rgba(0, 0, 0, 0.45);
+  clip-path: none; opacity: 0; transform: translateY(-8px) scale(0.96); transform-origin: top right; filter: blur(6px);
+  transition: opacity 0.25s, transform 0.35s var(--entrada), filter 0.3s, visibility 0s linear 0.35s; }
+.sn-menu-aberto #sn-menu { clip-path: none; opacity: 1; transform: none; filter: none; transition: opacity 0.2s, transform 0.4s var(--entrada), filter 0.25s, visibility 0s; }
+.sn-menu-aberto { overflow: visible; }
+.sn-menu-aberto body { overflow: visible; overflow-x: clip; }
+#sn-menu .sn-atmosfera, #sn-menu .sn-rotulo, .sn-menu-fechar, .sn-menu-slogan, .sn-menu-lista .n { display: none; }
+@media (max-width: 860px) { #sn-menu { padding-left: 10px; } }
+.sn-menu-lista ol { margin: 0; }
+.sn-menu-lista li { border: 0; }
+.sn-menu-lista a { grid-template-columns: 22px 1fr; gap: 12px; padding: 9px 12px; border-radius: 12px; transition: background 0.2s; }
+.sn-menu-lista .ic { color: #8d8a87; }
+.sn-menu-lista .ic svg { width: 17px; height: 17px; }
+.sn-menu-lista .t { font-size: 15px; font-weight: 500; letter-spacing: 0; line-height: 1.3; color: #eee; }
+.sn-menu-lista a:hover, .sn-menu-lista a:focus-visible { background: rgba(255, 255, 255, 0.07); }
+.sn-menu-lista a:hover .t, .sn-menu-lista a:focus-visible .t { transform: none; font-weight: 500; color: #fff; }
+.sn-menu-lista a:hover .ic { transform: none; color: var(--laranja); }
+.sn-menu-lista a.ativo .t { font-weight: 600; }
+.sn-menu-lado { gap: 0; align-items: stretch; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.sn-menu-lado ul { gap: 0; margin: 0 0 8px; }
+.sn-menu-lado ul a { display: flex; gap: 12px; padding: 9px 12px; border-radius: 12px; font-size: 15px; font-weight: 500; color: #eee; }
+.sn-menu-lado ul a:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+.sn-menu-lado ul .ic { width: 22px; height: 22px; border-radius: 0; background: none; }
+.sn-menu-lado ul .ic svg { width: 17px; height: 17px; }
+.sn-menu-lado .sn-btn { justify-content: center; min-height: 42px; font-size: 14px; padding: 0 16px; }
+#sn-menu li > a, .sn-menu-lado > * { transform: translateY(6px); filter: blur(4px); transition: opacity 0.25s, transform 0.35s var(--entrada), filter 0.3s, background 0.2s; }
+.sn-menu-aberto #sn-menu li > a { transition-delay: calc(0.04s + var(--k, 0) * 18ms), calc(0.04s + var(--k, 0) * 18ms), calc(0.04s + var(--k, 0) * 18ms), 0s; }
+.sn-menu-aberto .sn-menu-lado > * { transition-delay: 0.22s; }
+
+/* mapa da página: no lugar do degradê preto, um vidro fosco atrás dos nomes (ajuda a ler sobre qualquer fundo) */
+@media all {
+  #sn-mapa::before, #sn-mapa:hover::before { content: ""; position: absolute; left: -12px; top: -14px; bottom: -14px; width: auto; right: -18px; z-index: -1;
+    border-radius: 18px; background: rgba(22, 20, 19, 0.42); -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6);
+    border: 1px solid rgba(255, 255, 255, 0.09); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3); opacity: 0; transform: scale(0.97); transform-origin: left center;
+    transition: opacity 0.3s, transform 0.35s var(--entrada); pointer-events: none; }
+  #sn-mapa:hover::before { opacity: 1; transform: none; }
+  #sn-mapa:hover span { color: #d6d6d6; }
+  #sn-mapa:hover a.ativo span { color: var(--laranja); }
+  .sn-clara-atual #sn-mapa::before { background: rgba(255, 255, 255, 0.55); border-color: rgba(0, 0, 0, 0.08); }
+  .sn-clara-atual #sn-mapa:hover span { color: #333; }
+}
+/* menu compacto: mesma fonte e mesmo efeito de passar o mouse do menu anterior (palavra fina que fica laranja,
+   negrito e anda para a direita), só que menor; vidro um pouco mais escuro para ler sobre fundo claro */
+#sn-menu { background: rgba(18, 16, 15, 0.62); }
+.sn-menu-lista a, .sn-menu-lado ul a { background: none !important; padding: 8px 12px; }
+.sn-menu-lista .t { font-size: 19px; font-weight: 300; letter-spacing: -0.03em; line-height: 1.15; color: #e8e8e8;
+  transition: color 0.3s, transform 0.45s var(--entrada), font-weight 0.3s; }
+.sn-menu-lista a:hover .t, .sn-menu-lista a:focus-visible .t { color: var(--laranja); transform: translateX(10px); font-weight: 700; }
+.sn-menu-lista a:hover .ic, .sn-menu-lista a:focus-visible .ic { color: var(--laranja); transform: translateX(6px); }
+.sn-menu-lista a.ativo .t { color: var(--laranja); font-weight: 700; }
+.sn-menu-lado ul a { font-size: 15px; font-weight: 600; color: #dcdcdc; transition: color 0.3s; }
+.sn-menu-lado ul a:hover { color: var(--laranja); }
+
+/* ======================= AJUSTES 26/11 (5): botões da hero no canto e salto entre páginas ======================= */
+/* botões no canto superior esquerdo, centralizados na altura da logo (que fica no canto direito) */
+.sn-botoes-topo { position: absolute; z-index: 90; left: var(--pad); align-items: center; flex-wrap: nowrap; gap: 6px;
+  top: calc(clamp(16px, 3vh, 34px) + (clamp(38px, 5vh, 54px) - 44px) / 2); }
+.sn-anima .sn-botoes-topo { opacity: 0; transform: translateY(-8px); filter: blur(6px); animation: sn-topo-entra 0.9s var(--entrada) 0.9s forwards; }
+@keyframes sn-topo-entra { to { opacity: 1; transform: none; filter: none; } }
+.sn-botoes-texto { display: none; }
+@media (max-width: 760px) {
+  .sn-botoes-topo { display: none; }
+  .sn-botoes-texto { display: flex; }
+}
+
+/* salto: a tela atual afunda no preto, desfocando; a página escolhida surge do desfoque */
+.sn-salto { position: fixed; inset: 0; z-index: 105; pointer-events: none; background: rgba(0, 0, 0, 0.92);
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); opacity: 0; transition: opacity 0.55s ease; }
+.sn-saltando .sn-salto { opacity: 1; transition: opacity 0.4s ease; }

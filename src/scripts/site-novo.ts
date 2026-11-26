@@ -46,6 +46,12 @@ marcaBotao.addEventListener("click", (e) => {
 $(".sn-menu-fechar", menu)?.addEventListener("click", () => abrirMenu(false));
 $$("#sn-menu a").forEach((a) => a.addEventListener("click", () => abrirMenu(false)));
 addEventListener("keydown", (e) => e.key === "Escape" && abrirMenu(false));
+// menu compacto (não ocupa a tela): fecha ao tocar/clicar fora dele
+addEventListener("pointerdown", (e) => {
+  if (!html.classList.contains("sn-menu-aberto")) return;
+  const t = e.target as Node;
+  if (!menu.contains(t) && !marca.contains(t)) abrirMenu(false);
+});
 
 // ---------------- mapa da página (vertical) + item ativo do menu ----------------
 const cheio = $("[data-cheio]");
@@ -59,6 +65,38 @@ function marcarPagina(k: number, fracao?: number) {
   if (cheio) cheio.style.height = `${(f * 100).toFixed(2)}%`;
   html.classList.toggle("sn-clara-atual", paginas[k]?.classList.contains("sn-clara") ?? false);
 }
+
+// ---------------- ir para uma página longe: em vez de rolar o site inteiro (pesado), um "corte" ----------------
+// Se a página escolhida está a mais de ~1,5 tela de distância, a tela atual afunda no preto com desfoque,
+// o site pula direto para lá e a página nova surge do desfoque. Perto, rola normal.
+(function saltoEntrePaginas() {
+  const veu = document.createElement("div");
+  veu.className = "sn-salto"; veu.setAttribute("aria-hidden", "true");
+  document.body.appendChild(veu);
+  let ocupado = false;
+  document.addEventListener("click", (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>("a[data-ir]");
+    if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
+    const alvo = document.getElementById(a.dataset.ir || "");
+    if (!alvo) return;
+    const destino = alvo.getBoundingClientRect().top + scrollY;
+    if (reduz || Math.abs(destino - scrollY) < innerHeight * 1.5) return; // perto: deixa a rolagem suave
+    e.preventDefault();
+    if (ocupado) return;
+    ocupado = true;
+    html.classList.add("sn-saltando");
+    setTimeout(() => {
+      html.style.scrollBehavior = "auto";
+      scrollTo(0, destino);
+      history.replaceState(null, "", "#" + alvo.id);
+      html.style.scrollBehavior = "";
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        html.classList.remove("sn-saltando");
+        setTimeout(() => { ocupado = false; }, 600);
+      }));
+    }, 420);
+  });
+})();
 
 // ---------------- gestores: faixa que anda sozinha e pode ser arrastada (mais rápido ou mais devagar) ----------------
 function arrastar() {
@@ -425,7 +463,10 @@ function contato() {
     let rolado: number;
     if (H) rolado = sec.scrollTop;
     else rolado = innerHeight - palco.getBoundingClientRect().top - 0.35 * innerHeight; // começa quando o cartão aparece
-    const d = 1 - faixa(rolado, 0, 476 * Math.max(0.6, k));
+    // termina de ficar em pé no máximo quando a página acaba (o rodapé ficou mais curto sem as "Dúvidas Rápidas")
+    const falta = H ? 0 : Math.max(0, document.documentElement.scrollHeight - innerHeight - scrollY);
+    const fim = Math.max(1, Math.min(476 * Math.max(0.6, k), rolado + falta - 8));
+    const d = 1 - faixa(rolado, 0, fim);
     sec.style.setProperty("--deita", (reduz ? 0 : Math.pow(d, 1.3)).toFixed(4));
   };
 
