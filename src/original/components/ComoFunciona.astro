@@ -1,0 +1,21 @@
+---
+import Icon from "./Icon.astro";
+import SectionTitle from "./SectionTitle.astro";
+import { comoFunciona } from "../data/secoes";
+---
+
+<section id="sobre" class="py-24 bg-secondary/50">
+  <div class="container mx-auto px-4">
+    <SectionTitle titulo={comoFunciona.titulo} destaque={comoFunciona.destaque} subtitulo={comoFunciona.subtitulo} />
+    <div class="grid md:grid-cols-3 gap-8">
+      {comoFunciona.passos.map((p) => (
+        <div class="text-center">
+          <span class="text-6xl font-extrabold text-primary opacity-30 block mb-2">{p.num}</span>
+          <Icon name={p.icon} size={40} class="text-primary mx-auto mb-4" />
+          <h3 class="text-xl font-semibold mb-2">{p.titulo}</h3>
+          <p class="text-muted-foreground text-sm">{p.descricao}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

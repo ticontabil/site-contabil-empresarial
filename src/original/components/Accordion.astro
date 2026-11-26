@@ -1,0 +1,53 @@
+---
+// Acordeão no mesmo formato do Radix/shadcn do original (tipo "single", recolhível).
+// O comportamento fica em src/scripts/site.ts.
+import Icon from "./Icon.astro";
+
+interface Props {
+  itens: { q: string; a: string }[];
+  variante: "faq" | "rodape";
+}
+const { itens, variante } = Astro.props;
+const rodape = variante === "rodape";
+const listClass = rodape ? "space-y-2" : "space-y-3";
+const itemClass = rodape
+  ? "bg-card border border-border rounded-lg px-4 data-[state=open]:border-primary transition-colors"
+  : "bg-card border border-border rounded-xl px-6 data-[state=open]:border-primary transition-colors";
+const triggerClass = `flex flex-1 items-center justify-between py-4 transition-all [&[data-state=open]>svg]:rotate-180 text-left ${rodape ? "text-sm " : ""}font-semibold hover:no-underline`;
+const innerClass = rodape ? "pb-4 pt-0 text-muted-foreground text-sm" : "pb-4 pt-0 text-muted-foreground";
+const prefix = `acc-${variante}`;
+---
+
+<div class={listClass} data-orientation="vertical" data-accordion>
+  {itens.map((item, i) => (
+    <div data-state="closed" data-orientation="vertical" class={itemClass} data-acc-item>
+      <h3 data-orientation="vertical" data-state="closed" class="flex">
+        <button
+          type="button"
+          aria-controls={`${prefix}-c${i}`}
+          aria-expanded="false"
+          data-state="closed"
+          data-orientation="vertical"
+          id={`${prefix}-t${i}`}
+          class={triggerClass}
+          data-acc-trigger
+        >
+          {item.q}
+          <Icon name="ChevronDown" size={24} class="h-4 w-4 shrink-0 transition-transform duration-200" />
+        </button>
+      </h3>
+      <div
+        data-state="closed"
+        id={`${prefix}-c${i}`}
+        hidden
+        role="region"
+        aria-labelledby={`${prefix}-t${i}`}
+        data-orientation="vertical"
+        class="overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+        data-acc-content
+      >
+        <div class={innerClass}>{item.a}</div>
+      </div>
+    </div>
+  ))}
+</div>

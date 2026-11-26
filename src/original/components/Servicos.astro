@@ -1,0 +1,20 @@
+---
+import Icon from "./Icon.astro";
+import SectionTitle from "./SectionTitle.astro";
+import { servicos } from "../data/secoes";
+---
+
+<section id="servicos" class="py-24">
+  <div class="container mx-auto px-4">
+    <SectionTitle titulo={servicos.titulo} destaque={servicos.destaque} subtitulo={servicos.subtitulo} />
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {servicos.itens.map((s) => (
+        <div class="bg-card border border-border rounded-xl p-6 card-hover">
+          <Icon name={s.icon} size={36} class="text-primary mb-4" />
+          <h3 class="text-lg font-semibold mb-2">{s.titulo}</h3>
+          <p class="text-sm text-muted-foreground">{s.descricao}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

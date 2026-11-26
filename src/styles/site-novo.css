@@ -678,3 +678,43 @@ body.sn { background: #000; color: #fff; font-family: var(--fonte); -webkit-font
 .ct-cartao { padding-bottom: calc(40 * var(--k) + 30px); -webkit-mask-image: linear-gradient(to bottom, #000 78%, rgba(0, 0, 0, 0.55) 90%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 78%, rgba(0, 0, 0, 0.55) 90%, transparent 100%); }
 .ct-produtos { margin-top: 0; padding-bottom: clamp(30px, 5vh, 56px); }
+
+/* ======================= AJUSTES 26/11 (3): luminária de LED e rodapé apagado até a luz acender ======================= */
+/* a seção não pode virar uma "caixa rolável" (overflow-x: hidden faz isso): o brilho que passa da borda de baixo
+   deixava a rodinha do mouse rolar a seção por dentro e sobrava um espaço preto no fim da página */
+.sn-contato { overflow: hidden; overflow: clip; }
+
+/* tudo apagado até a lâmpada acender; quando acende, ilumina o rodapé inteiro (pisca junto com ela) */
+.ct-escuro { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: rgba(5, 4, 3, 0.86); transition: opacity 0.05s; }
+.sn-contato.luz-on .ct-escuro { opacity: 0; }
+.ct-luz { z-index: 5; }
+
+/* a luminária: barra de metal escura com o tubo de LED embaixo, presa por dois suportes */
+.ct-luz .lampada { display: none; }
+.ct-luz .luminaria { position: absolute; left: calc(-310 * var(--k)); top: calc(var(--topo) - 4px); width: calc(620 * var(--k)); height: 9px; }
+.ct-luz .barra { position: absolute; inset: 0; border-radius: 6px; background: linear-gradient(to bottom, #45403c, #1a1816 45%, #0c0b0a);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 6px rgba(0, 0, 0, 0.6); }
+.ct-luz .tubo { position: absolute; left: 4px; right: 4px; bottom: -1px; height: 3px; border-radius: 3px; background: #3a2c22; transition: background 0.05s, box-shadow 0.05s; }
+.sn-contato.luz-on .ct-luz .tubo { background: linear-gradient(90deg, #ffd9bd, #fff7ef 50%, #ffd9bd);
+  box-shadow: 0 0 4px 1px rgba(255, 236, 220, 0.95), 0 3px 16px 4px rgba(255, 190, 140, 0.5), 0 8px 40px 10px rgba(251, 130, 60, 0.22); }
+.ct-luz .suporte { position: absolute; bottom: 100%; width: 3px; height: 18px; background: linear-gradient(90deg, #2a2724, #5a544e, #2a2724); }
+.ct-luz .suporte::before { content: ""; position: absolute; left: 50%; top: -5px; width: 11px; height: 7px; margin-left: -5.5px; border-radius: 3px;
+  background: linear-gradient(to bottom, #4a4540, #191715); }
+.ct-luz .suporte.e { left: 14%; } .ct-luz .suporte.d { right: 14%; }
+
+/* o facho sai da largura da barra inteira e abre para baixo, bem suave (sem borda dura) */
+.ct-luz .cone { left: calc(-500 * var(--k)); top: calc(var(--topo) + 4px); width: calc(1000 * var(--k)); height: calc(780 * var(--k) + 60px);
+  filter: blur(calc(26 * var(--k) + 8px)); mix-blend-mode: screen; }
+.ct-luz .cone i { clip-path: polygon(19% 0, 81% 0, 100% 100%, 0 100%);
+  background: linear-gradient(to bottom, rgba(255, 232, 212, 0.34), rgba(245, 185, 140, 0.15) 32%, rgba(210, 130, 80, 0.06) 65%, transparent); }
+.ct-luz .miolo { left: calc(-360 * var(--k)); top: calc(var(--topo) + 3px); width: calc(720 * var(--k)); height: calc(260 * var(--k) + 30px);
+  background: radial-gradient(ellipse 50% 100% at 50% 0%, rgba(255, 240, 225, 0.34), rgba(255, 200, 160, 0.1) 50%, transparent 75%); mix-blend-mode: screen; }
+.ct-luz .halo { left: calc(-400 * var(--k)); top: calc(var(--topo) - 50 * var(--k)); width: calc(800 * var(--k)); height: calc(110 * var(--k) + 20px);
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 200, 160, 0.3), transparent 70%); opacity: 0.12; }
+@media (max-width: 760px) {
+  .ct-luz .luminaria { left: -34vw; width: 68vw; }
+  .ct-luz .cone { left: -55vw; width: 110vw; height: 110vw; }
+  .ct-luz .miolo { left: -40vw; width: 80vw; height: 40vw; }
+  .ct-luz .halo { left: -44vw; width: 88vw; }
+}
+@media (prefers-reduced-motion: reduce) { .ct-escuro { display: none; } }

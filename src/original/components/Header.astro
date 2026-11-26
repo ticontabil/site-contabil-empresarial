@@ -1,0 +1,53 @@
+---
+import Icon from "./Icon.astro";
+import { menu, whatsapp } from "../data/site";
+
+const themeBtn = "p-2 rounded-lg border border-border hover:bg-secondary transition-colors";
+---
+
+<nav class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+  <div class="container mx-auto flex items-center justify-between h-20 px-4">
+    <a href="#" class="flex items-center">
+      <img src="/logo.png" alt="Contábil Empresarial" class="h-12 ui-dark:hidden" />
+      <img src="/logo-negative.png" alt="Contábil Empresarial" loading="lazy" class="h-12 hidden ui-dark:block" />
+    </a>
+    <div class="hidden md:flex items-center gap-8">
+      {menu.map((m) => (
+        <a href={m.href} class="text-sm text-muted-foreground hover:text-foreground transition-colors">{m.label}</a>
+      ))}
+    </div>
+    <div class="hidden md:flex items-center gap-3">
+      <button class={themeBtn} aria-label="Alternar tema" data-theme-toggle>
+        <Icon name="Moon" size={18} class="ui-dark:hidden" />
+        <Icon name="Sun" size={18} class="hidden ui-dark:block" />
+      </button>
+      <a
+        href={whatsapp.especialista}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center px-5 py-2.5 rounded-lg btn-gradient-orange text-primary-foreground font-semibold text-sm"
+      >Falar com Especialista</a>
+    </div>
+    <div class="md:hidden flex items-center gap-2">
+      <button class={themeBtn} aria-label="Alternar tema" data-theme-toggle>
+        <Icon name="Moon" size={18} class="ui-dark:hidden" />
+        <Icon name="Sun" size={18} class="hidden ui-dark:block" />
+      </button>
+      <button class="text-foreground" data-menu-toggle aria-expanded="false">
+        <Icon name="Menu" size={24} data-menu-icon="closed" />
+        <Icon name="X" size={24} class="hidden" data-menu-icon="open" />
+      </button>
+    </div>
+  </div>
+  <div class="md:hidden bg-background border-b border-border px-4 pb-4 hidden" data-mobile-menu>
+    {menu.map((m) => (
+      <a href={m.href} class="block py-2 text-muted-foreground hover:text-foreground transition-colors" data-mobile-link>{m.label}</a>
+    ))}
+    <a
+      href={whatsapp.especialista}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex mt-2 items-center px-5 py-2.5 rounded-lg btn-gradient-orange text-primary-foreground font-semibold text-sm"
+    >Falar com Especialista</a>
+  </div>
+</nav>

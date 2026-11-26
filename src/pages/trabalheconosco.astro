@@ -1,13 +1,12 @@
 ---
-import Base from "../layouts/Base.astro";
-import { paginas } from "../data/site";
-import Header from "../components/Header.astro";
-import FormCandidatura from "../components/FormCandidatura.astro";
-import Footer from "../components/Footer.astro";
-import WhatsAppFlutuante from "../components/WhatsAppFlutuante.astro";
+import Base from "../original/layouts/Base.astro";
+import Header from "../original/components/Header.astro";
+import FormCandidatura from "../original/components/FormCandidatura.astro";
+import Footer from "../original/components/Footer.astro";
+import WhatsAppFlutuante from "../original/components/WhatsAppFlutuante.astro";
 ---
 
-<Base title={paginas.trabalheconosco.title} description={paginas.trabalheconosco.description}>
+<Base>
   <Header />
   <div class="pt-16">
     <FormCandidatura />

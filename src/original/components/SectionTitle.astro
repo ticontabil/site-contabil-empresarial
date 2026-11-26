@@ -1,0 +1,16 @@
+---
+// Cabeçalho de seção: "Palavra <laranja>Destaque</laranja>" + subtítulo opcional.
+interface Props {
+  titulo: string;
+  destaque: string;
+  depois?: string;
+  subtitulo?: string;
+  wrapClass?: string;
+}
+const { titulo, destaque, depois, subtitulo, wrapClass = "text-center mb-16" } = Astro.props;
+---
+
+<div class={wrapClass}>
+  <h2 class="text-3xl md:text-4xl font-bold mb-4">{titulo} <span class="text-primary">{destaque}</span>{depois}</h2>
+  {subtitulo && <p class="text-muted-foreground max-w-2xl mx-auto">{subtitulo}</p>}
+</div>

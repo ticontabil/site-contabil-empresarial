@@ -1,0 +1,78 @@
+---
+// Seção "Trabalhe Conosco": cards de vagas (src/data/vagas.ts) + formulário que abre um mailto.
+import Icon from "./Icon.astro";
+import SectionTitle from "./SectionTitle.astro";
+import { vagas, trabalheConosco } from "../data/vagas";
+import { contato } from "../data/site";
+
+// Mesmas classes do Button/Input/Label do shadcn usados no original
+const btn =
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full";
+const input =
+  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm mt-1";
+const label = "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
+---
+
+<section id="trabalhe" class="py-24">
+  <div class="container mx-auto px-4">
+    <SectionTitle titulo={trabalheConosco.titulo} destaque={trabalheConosco.destaque} subtitulo={trabalheConosco.subtitulo} />
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+      {vagas.map((v) => (
+        <div class="bg-card border border-border rounded-xl p-6 card-hover flex flex-col">
+          <Icon name="Briefcase" size={32} class="text-primary mb-4" />
+          <h3 class="text-lg font-semibold mb-2">{v.titulo}</h3>
+          <div class="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+            <Icon name="MapPin" size={14} /> {v.local}
+          </div>
+          <div class="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+            <Icon name="Clock" size={14} /> Tempo Integral
+          </div>
+          {v.requisitos && (
+            <p class="text-sm text-muted-foreground mb-2 whitespace-pre-line"><strong>Requisitos:</strong> {v.requisitos}</p>
+          )}
+          <p class="text-sm text-muted-foreground mb-4 flex-1 whitespace-pre-line">{v.descricao}</p>
+          <button class={btn} data-ir-form>Candidate-se Agora</button>
+        </div>
+      ))}
+    </div>
+    <div class="max-w-xl mx-auto bg-card border border-border rounded-xl p-8" data-form-wrap>
+      <h3 class="text-2xl font-bold mb-6 text-center">Envie sua <span class="text-primary">Candidatura</span></h3>
+      <form class="space-y-5" data-form-candidatura data-email={contato.emailRH} novalidate>
+        <div>
+          <label for="name" class={label}>Nome Completo *</label>
+          <input id="name" name="name" class={input} placeholder="Seu nome completo" />
+        </div>
+        <div>
+          <label for="city" class={label}>Cidade *</label>
+          <input id="city" name="city" class={input} placeholder="Ex: Goiânia - GO" />
+        </div>
+        <div>
+          <label for="maritalStatus" class={label}>Estado Civil *</label>
+          <select
+            id="maritalStatus"
+            name="maritalStatus"
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-1"
+          >
+            <option value="">Selecione</option>
+            {trabalheConosco.estadosCivis.map((e) => <option value={e}>{e}</option>)}
+          </select>
+        </div>
+        <div>
+          <label for="cv" class={label}>Anexar Currículo</label>
+          <div class="mt-1 flex items-center gap-2">
+            <label
+              for="cv"
+              class="flex items-center gap-2 px-4 py-2 rounded-md border border-input bg-background text-sm cursor-pointer hover:bg-secondary transition-colors"
+            >
+              <Icon name="Paperclip" size={16} /><span data-cv-nome>Escolher arquivo</span>
+            </label>
+            <input id="cv" type="file" accept=".pdf,.doc,.docx" class="hidden" />
+          </div>
+        </div>
+        <button type="submit" class={btn}>
+          <Icon name="Send" size={16} />Enviar Candidatura
+        </button>
+      </form>
+    </div>
+  </div>
+</section>

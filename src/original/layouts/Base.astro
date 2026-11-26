@@ -1,0 +1,66 @@
+---
+import "../styles/global.css";
+import { meta } from "../data/site";
+
+interface Props {
+  noindex?: boolean;
+  title?: string;
+}
+const { noindex = false, title = meta.title } = Astro.props;
+const ogImage = new URL(meta.ogImage, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang={meta.lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={meta.description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" href="/favicon.ico" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={meta.twitterSite} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta property="og:title" content={meta.ogTitle} />
+    <meta name="twitter:title" content={meta.ogTitle} />
+    <meta property="og:description" content={meta.ogDescription} />
+    <meta name="twitter:description" content={meta.ogDescription} />
+
+    <!--
+      Tema, reproduzindo o comportamento do original (com o bug, ver PENDENCIAS.md):
+      - ícone sol/lua e logo seguem localStorage "theme" ou, se vazio, a preferência do sistema;
+      - as cores da página ao carregar seguem localStorage "audit_theme" (padrão: claro),
+        então o modo escuro só aparece depois de clicar no botão e volta ao claro ao recarregar.
+    -->
+    <script is:inline>
+      (function () {
+        var t = null, a = null;
+        try { t = localStorage.getItem("theme"); a = localStorage.getItem("audit_theme"); } catch (e) {}
+        if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-ui-theme", t);
+        document.documentElement.classList.toggle("dark", a === "dark");
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;">
+        <ol
+          tabindex="-1"
+          class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"
+          data-toast-viewport
+        ></ol>
+      </div>
+      <div class="min-h-screen bg-background text-foreground">
+        <slot />
+      </div>
+    </div>
+    <script>
+      import "../scripts/site";
+    </script>
+  </body>
+</html>

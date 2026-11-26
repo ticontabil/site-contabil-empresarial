@@ -1,0 +1,20 @@
+---
+import Icon from "./Icon.astro";
+import SectionTitle from "./SectionTitle.astro";
+import { filiais } from "../data/secoes";
+---
+
+<section id="filiais" class="py-24">
+  <div class="container mx-auto px-4">
+    <SectionTitle titulo={filiais.titulo} destaque={filiais.destaque} subtitulo={filiais.subtitulo} wrapClass="text-center mb-12" />
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      {filiais.cidades.map((f) => (
+        <div class="bg-card border border-border rounded-xl p-5 text-center card-hover">
+          <Icon name="MapPin" size={28} class="text-primary mx-auto mb-3" />
+          <h3 class="font-semibold text-sm">{f.cidade}</h3>
+          <p class="text-xs text-muted-foreground">{f.uf}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
