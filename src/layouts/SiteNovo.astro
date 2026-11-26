@@ -1,0 +1,33 @@
+---
+// Layout da versão nova do site (em construção em /novo, atrás de senha).
+// Visual da apresentação (preto, laranja, Montserrat), em página que rola.
+// Usa também o global.css do site atual porque o rodapé continua o mesmo por enquanto.
+// Sem Analytics/Pixel/painel: enquanto for /novo, as visitas são só da equipe.
+import "@fontsource-variable/montserrat";
+import "@fontsource-variable/montserrat/wght-italic.css";
+import "../styles/global.css";
+import "../styles/site-novo.css";
+import { meta } from "../data/site";
+
+interface Props { titulo?: string; descricao?: string }
+const { titulo = meta.title, descricao = meta.description } = Astro.props;
+---
+<!doctype html>
+<html lang="pt-BR" class="dark sn-html">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#000000" />
+    <title>{titulo}</title>
+    <meta name="description" content={descricao} />
+    <link rel="icon" href="/favicon.ico" />
+    <script is:inline>
+      // animações só com JS e sem "reduzir movimento"
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) document.documentElement.classList.add("sn-anima");
+    </script>
+  </head>
+  <body class="sn">
+    <slot />
+  </body>
+</html>

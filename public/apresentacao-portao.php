@@ -83,7 +83,8 @@ function limparTentativas(): void { @unlink(arquivoTentativas()); }
 // ---------- pedido ----------
 $pedido = (string) ($_GET['arquivo'] ?? 'apresentacao');
 $pedido = trim(str_replace('\\', '/', $pedido), '/');
-if ($pedido === '' || strpos($pedido, '..') !== false || !preg_match('#^apresentacao[A-Za-z0-9/_.\-]*$#', $pedido)) {
+// /novo = versão nova do site em construção (mesma senha da apresentação até virar a página principal)
+if ($pedido === '' || strpos($pedido, '..') !== false || !preg_match('#^(apresentacao|novo)[A-Za-z0-9/_.\-]*$#', $pedido)) {
   http_response_code(404);
   exit;
 }
@@ -91,7 +92,7 @@ if ($pedido === '' || strpos($pedido, '..') !== false || !preg_match('#^apresent
 // sair (bloquear este aparelho)
 if (isset($_GET['sair'])) {
   gravarCookie('', time() - 3600, $https);
-  header('Location: /apresentacao', true, 303);
+  header('Location: ' . (strpos($pedido, 'novo') === 0 ? '/novo' : '/apresentacao'), true, 303);
   exit;
 }
 
@@ -108,7 +109,7 @@ if (!$semSenha && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && isset($_PO
     $expira = time() + VALIDADE;
     gravarCookie($expira . '.' . assinatura($expira), $expira, $https);
     $volta = (string) ($_SERVER['REQUEST_URI'] ?? '/apresentacao');
-    if (strpos($volta, '/apresentacao') !== 0) $volta = '/apresentacao';
+    if (strpos($volta, '/apresentacao') !== 0 && strpos($volta, '/novo') !== 0) $volta = '/apresentacao';
     header('Location: ' . $volta, true, 303);
     exit;
   } else {
@@ -121,7 +122,7 @@ if (!$semSenha && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && isset($_PO
 if (!liberado()) {
   cabecalhosBase();
   header('Cache-Control: no-store');
-  $ehPagina = strpos((string) ($_SERVER['HTTP_ACCEPT'] ?? ''), 'text/html') !== false || preg_match('#^apresentacao(/configurar|/apresentador)?(\.html)?$#', $pedido);
+  $ehPagina = strpos((string) ($_SERVER['HTTP_ACCEPT'] ?? ''), 'text/html') !== false || preg_match('#^(apresentacao(/configurar|/apresentador)?|novo)(\.html)?$#', $pedido);
   if (!$ehPagina) { http_response_code(401); exit; }
   http_response_code(401);
   mostrarPortao($erro);

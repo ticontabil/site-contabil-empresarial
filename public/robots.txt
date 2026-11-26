@@ -2,6 +2,7 @@
 User-agent: *
 Allow: /
 Disallow: /apresentacao
+Disallow: /novo
 Disallow: /painel
 Disallow: /api/
 

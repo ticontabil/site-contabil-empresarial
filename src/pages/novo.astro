@@ -1,0 +1,343 @@
+---
+// /novo — versão nova do site, em construção (atrás de senha, noindex, fora do sitemap e do menu).
+// Ordem das seções e pedidos: materiais/site-novo-anotacoes.md. Conteúdo vem dos mesmos dados da
+// apresentação (src/data/apresentacao.ts) e do site atual (src/data/site.ts, secoes.ts, faq.ts).
+import SiteNovo from "../layouts/SiteNovo.astro";
+import Footer from "../components/Footer.astro";
+import WhatsAppFlutuante from "../components/WhatsAppFlutuante.astro";
+import Foto from "../components/apresentacao/Foto.astro";
+import Txt from "../components/apresentacao/Txt.astro";
+import Icone from "../components/apresentacao/Icone.astro";
+import { telas } from "../data/apresentacao.ts";
+import { ativos } from "../lib/apresentacao-telas.ts";
+import { whatsapp, rodape } from "../data/site";
+import { servicos, filiais, linkWaze } from "../data/secoes";
+import { faq } from "../data/faq";
+
+const PORTAL = "https://portal.contabilempresarial.com.br/";
+
+// seções na ordem da página: o nome aparece embaixo da linha do menu e no menu da logo
+const secoes = [
+  { id: "inicio", nome: "Início" },
+  { id: "historia", nome: "Nossa História" },
+  { id: "servicos", nome: "Serviços" },
+  { id: "numeros", nome: "Números" },
+  { id: "time", nome: "Time" },
+  { id: "comecar", nome: "Como Começar" },
+  { id: "unidades", nome: "Unidades" },
+  { id: "perguntas", nome: "Perguntas" },
+  { id: "produtos", nome: "Produtos" },
+  { id: "contato", nome: "Contato" },
+];
+
+// 1 · hero (capa da apresentação)
+const capa = telas.capa;
+const palavras = capa.tela.titulo.split(" ");
+const [primeira, meio, ultima] = [palavras[0], palavras.slice(1, -1).join(" "), palavras[palavras.length - 1]];
+
+// 2 · nossa história (túnel de recortes)
+const hist = telas.historia;
+const marcos = ativos(hist.marcos);
+const pad = (n: number) => String(n).padStart(2, "0");
+
+// 3 · serviços: os 4 departamentos + os serviços especializados que o site atual já oferece
+const deps = ativos(telas.departamentos.tela.itens);
+const especializados = servicos.itens.filter((s) => ["Contabilidade Rural", "Constituição de Holding", "Consultoria"].includes(s.titulo));
+
+// 4 · números
+const num = telas.numeros.tela;
+const [destA, destB] = num.destaque.split(" — ");
+
+// 5 · time
+const time = telas.time.tela;
+
+// 6 · como começar
+const comecar = telas.comoComecar.tela;
+const [ap1, ap2] = comecar.apoio.split("? ");
+
+// 9 · produtos (TekZap fora: não é produto da Contábil)
+const produtos = telas.parceiros.tela.grupos
+  .map((g) => ({ ...g, parceiros: g.parceiros.filter((p) => p.nome !== "TekZap") }))
+  .filter((g) => g.parceiros.length);
+
+// 10 · contato
+const proximo = telas.proximoPasso.tela;
+---
+<SiteNovo titulo="Contábil Empresarial · Contabilidade desde 1984" descricao="Contabilidade em Itumbiara, Goiânia, Uberlândia e Cachoeira Dourada desde 1984.">
+  <!-- ================= MENU FIXO ================= -->
+  <header class="sn-topo" data-topo>
+    <div id="sn-marca">
+      <button type="button" id="sn-marca-botao" aria-label="Abrir o menu" aria-expanded="false" aria-controls="sn-marca-menu">
+        <img src="/logo-negative.png" alt="Contábil Empresarial" width="568" height="229" />
+        <span class="sn-brilho" aria-hidden="true"></span>
+      </button>
+      <nav id="sn-marca-menu" aria-label="Menu">
+        <a href="#inicio" class="sn-op"><Icone nome="inicio" tamanho={18} /> Home</a>
+        {secoes.slice(1).map((s) => <a href={`#${s.id}`} class="sn-op">{s.nome}</a>)}
+        <span class="sn-op-sep" aria-hidden="true"></span>
+        <a href="/noticias" class="sn-op">Notícias</a>
+        <a href="/trabalheconosco" class="sn-op">Trabalhe Conosco</a>
+        <a href={PORTAL} class="sn-op" target="_blank" rel="noopener">Portal <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+    <div class="sn-trilha" aria-hidden="true"><span class="sn-trilha-cheia" data-trilha></span></div>
+    <nav class="sn-nomes" aria-label="Seções da página">
+      {secoes.map((s) => <a href={`#${s.id}`} data-nome-de={s.id}>{s.nome}</a>)}
+    </nav>
+    <p class="sn-atual" aria-hidden="true" data-atual>Início</p>
+  </header>
+
+  <main>
+    <!-- ================= 1 · HERO ================= -->
+    <section id="inicio" class="sn-secao sn-hero" data-secao>
+      <div class="sn-atmosfera" aria-hidden="true"><span class="f1"></span><span class="f2"></span><span class="f3"></span></div>
+      <div class="sn-tunel" data-tunel-auto aria-hidden="true">
+        {capa.tunel.map((f, i) => (
+          <div class="camada" data-i={i}>
+            <div class="moldura">
+              {f.video ? (
+                <video muted loop playsinline autoplay preload="metadata" poster={`/apresentacao/video/${f.video}-poster.jpg`}>
+                  <source src={`/apresentacao/video/${f.video}.webm`} type="video/webm" />
+                  <source src={`/apresentacao/video/${f.video}.mp4`} type="video/mp4" />
+                </video>
+              ) : <Foto arquivo={f.arquivo} descricao={f.descricao} larguras={[640, 1280]} tamanho="(max-width: 900px) 80vw, 40vw" carregar={i < 2 ? "eager" : "lazy"} />}
+            </div>
+          </div>
+        ))}
+        <div class="sn-visor">
+          <i class="canto c1"></i><i class="canto c2"></i><i class="canto c3"></i><i class="canto c4"></i>
+          <span class="visor-rot">(MATRIZ · ITUMBIARA)</span>
+          <span class="visor-pe">(CAMADA <span data-contador>01</span> / {pad(capa.tunel.length)})</span>
+          <span class="visor-scan"></span>
+        </div>
+      </div>
+      <div class="sn-degrade" aria-hidden="true"></div>
+      <div class="sn-hero-texto">
+        <p class="sn-rotulo rv">(CONTABILIDADE DESDE 1984)</p>
+        <h1 class="sn-titulo rv"><strong>{primeira}</strong> <span class="leve">{meio}</span> <em class="acento">{ultima}</em></h1>
+        <p class="sn-apoio rv"><Txt t={capa.tela.apoio} /></p>
+        <div class="sn-botoes rv">
+          <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
+          <a class="sn-btn" href="/noticias">Notícias</a>
+          <a class="sn-btn" href={PORTAL} target="_blank" rel="noopener">Portal <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <div class="sn-gigante" data-ajustar aria-hidden="true"><span>{capa.tela.nomeGigante}</span></div>
+    </section>
+
+    <!-- ================= 2 · NOSSA HISTÓRIA (túnel de recortes) ================= -->
+    <section id="historia" class="sn-secao sn-historia" data-secao data-tunel-hist style={`--marcos:${marcos.length}`}>
+      <div class="sn-fixo">
+        <div class="tunel-hero" aria-hidden="true">
+          {marcos.map((m, i) => (
+            <div class:list={["cartao", m.faixa, { recorte: (m.imagem as any).recorte }]} data-i={i}>
+              <span class="num">({m.data.replace(/^\d{2}\.\d{2}\./, "")})</span>
+              {m.imagem.arquivo && (m.imagem as any).recorte ? (
+                <>
+                  <div class="camada c0"><Foto arquivo={m.imagem.arquivo} descricao={m.imagem.descricao} larguras={[560, 1120]} tamanho="(max-width: 900px) 60vw, 34vw" encaixe="documento" /></div>
+                  <div class="camada c1"><Foto arquivo={m.imagem.arquivo.replace(/\.png$/, "-b1.png")} descricao="" larguras={[560]} tamanho="560px" encaixe="documento" /></div>
+                  <div class="camada c2"><Foto arquivo={m.imagem.arquivo.replace(/\.png$/, "-b2.png")} descricao="" larguras={[224]} tamanho="224px" encaixe="documento" /></div>
+                </>
+              ) : m.imagem.arquivo ? (
+                <Foto arquivo={m.imagem.arquivo} descricao={m.imagem.descricao} larguras={[520, 1040]} tamanho="34vw" encaixe="documento" />
+              ) : null}
+            </div>
+          ))}
+        </div>
+        <p class="h-topo-esq sn-rotulo">{hist.tela.rotulo}</p>
+        <p class="h-contador sn-rotulo" data-contador-moeda>(MOEDA <span>01</span> / {pad(hist.tela.totalMoedas)})</p>
+        <div class="h-texto">
+          <div class="h-bloco h-intro ativo" data-bloco="-1">
+            <h2 class="sn-titulo"><Txt t={hist.tela.titulo} /></h2>
+            <p><Txt t={hist.tela.apoio} /></p>
+          </div>
+          {marcos.map((m, i) => (
+            <div class="h-bloco" data-bloco={i}>
+              <p class="h-marco"><span class="laranja">(<Txt t={m.data} />)</span> {m.titulo}</p>
+              <p><Txt t={m.texto} /></p>
+            </div>
+          ))}
+        </div>
+        <div class="h-local sn-rotulo"><span>{hist.tela.local}</span><span>{hist.tela.coordenadas}</span></div>
+        <div class="h-gigante" data-ajustar><span>{hist.tela.nomeGigante}</span></div>
+        <p class="h-dica" data-dica><span class="toque">Toque para avançar</span><span class="mouse">Role ou clique para avançar</span></p>
+      </div>
+      <script type="application/json" data-moedas set:html={JSON.stringify(marcos.map((m) => m.moeda))}></script>
+    </section>
+
+    <!-- 2b · a fachada de 1984 virando a de hoje: o vídeo anda com a rolagem -->
+    <section class="sn-secao sn-fachada" data-secao="historia" data-video-rolagem data-quadros="82" aria-label="A fachada da Contábil, antes e depois">
+      <div class="sn-fixo">
+        <canvas aria-hidden="true"></canvas>
+        <div class="sn-fachada-texto">
+          <p class="sn-rotulo">(DE 1984 A HOJE)</p>
+          <h2 class="sn-titulo"><Txt t={hist.tela.fecho} /></h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3 · SERVIÇOS ================= -->
+    <section id="servicos" class="sn-secao sn-servicos sn-bloco" data-secao>
+      <div class="sn-atmosfera" aria-hidden="true"><span class="f1"></span><span class="f2"></span></div>
+      <div class="sn-cab">
+        <p class="sn-rotulo rv">(NOSSOS SERVIÇOS)</p>
+        <h2 class="sn-titulo rv"><strong>{telas.departamentos.tela.tituloForte}</strong> <span class="leve">{telas.departamentos.tela.tituloLeve}</span></h2>
+      </div>
+      <ol class="sn-servicos-lista">
+        {deps.map((d, i) => (
+          <li class="rv">
+            <span class="n">({pad(i + 1)})</span>
+            <span class="ic"><Icone nome={d.icone as any} tamanho={28} /></span>
+            <h3>{d.nome}</h3>
+            <p><Txt t={d.texto} /><small>{d.linhaFina}</small></p>
+          </li>
+        ))}
+      </ol>
+      <p class="sn-rotulo sn-sub rv">(TAMBÉM FAZEMOS)</p>
+      <ul class="sn-especial">
+        {especializados.map((s) => <li class="rv"><b>{s.titulo}</b><span>{s.descricao}</span></li>)}
+      </ul>
+    </section>
+
+    <!-- ================= 4 · NÚMEROS ================= -->
+    <section id="numeros" class="sn-secao sn-numeros sn-bloco" data-secao>
+      <div class="sn-cab">
+        <p class="sn-rotulo rv">{num.rotulo}</p>
+        <h2 class="sn-titulo rv"><strong><Txt t={num.titulo} /></strong></h2>
+      </div>
+      <div class="grade" data-contagem>
+        {num.itens.map((it) => (
+          <div class="rv">
+            {"valor" in it && it.valor !== undefined ? <div class="n"><span data-contar={it.valor}>{it.valor}</span>{it.sufixo}</div> : <div class="n"><Txt t={(it as any).texto} /></div>}
+            <div class="r">{it.rotulo}</div>
+          </div>
+        ))}
+      </div>
+      <p class="destaque rv">{destA}{destB && <> — <strong>{destB}</strong></>}</p>
+    </section>
+
+    <!-- ================= 5 · TIME (gestores) ================= -->
+    <section id="time" class="sn-secao sn-time" data-secao>
+      <div class="foto-equipe" aria-hidden="true"><Foto arquivo={time.fotoEquipe.arquivo} descricao={time.fotoEquipe.descricao} larguras={[960, 1920, 2880]} tamanho="100vw" /></div>
+      <div class="sn-cab">
+        <p class="sn-rotulo rv">{time.rotulo}</p>
+        <h2 class="sn-titulo rv"><span class="leve">Estrutura de grande.</span> <strong>Atendimento de perto.</strong></h2>
+        <p class="sn-apoio rv"><Txt t={`${time.apoio}.`} /></p>
+      </div>
+      <div class="faixa-gestoras">
+        <div class="trilha">
+          {[0, 1].map((v) => time.gestoras.map((g) => (
+            <article class="cartao-gestora" aria-hidden={v > 0 ? "true" : undefined}>
+              <div class="retrato" style={`--enquadrar:${(g as any).enquadrar ?? "50% 25%"}`}>
+                {g.foto && <Foto arquivo={g.foto} descricao={`${g.nome}, ${g.setor}`} larguras={[330, 660]} tamanho="(max-width: 700px) 60vw, 300px" />}
+              </div>
+              <div class="info">
+                <div><div class="nome">{g.nome}</div><div class="setor">{g.setor}</div></div>
+                <span class="icone"><Icone nome={g.icone as any} tamanho={20} /></span>
+              </div>
+            </article>
+          )))}
+        </div>
+      </div>
+      <p class="locais">{ativos(time.faixaLocais).map((l) => <span><Txt t={l.texto} /></span>)}</p>
+    </section>
+
+    <!-- ================= 6 · COMO COMEÇAR ================= -->
+    <section id="comecar" class="sn-secao sn-comecar sn-bloco sn-clara" data-secao>
+      <div class="sn-cab">
+        <p class="sn-rotulo rv">{comecar.rotulo}</p>
+        <h2 class="sn-titulo rv"><strong><Txt t={comecar.titulo} /></strong></h2>
+      </div>
+      <div class="etapas" data-etapas>
+        {comecar.etapas.map((e, i) => (
+          <div class="etapa rv">
+            <div class="num">({pad(i + 1)})</div>
+            <h3>{e.nome}</h3>
+            <p><Txt t={e.texto} /></p>
+          </div>
+        ))}
+      </div>
+      <div class="sn-final rv">
+        <p>{ap2 ? <><b>{ap1}?</b> {ap2}</> : comecar.apoio}</p>
+        <a class="sn-btn sn-btn-cheio" href={whatsapp.abraEmpresa} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <!-- ================= 7 · UNIDADES ================= -->
+    <section id="unidades" class="sn-secao sn-unidades sn-bloco" data-secao>
+      <div class="sn-atmosfera" aria-hidden="true"><span class="f2"></span></div>
+      <div class="sn-cab">
+        <p class="sn-rotulo rv">(NOSSAS UNIDADES)</p>
+        <h2 class="sn-titulo rv"><span class="leve">Matriz em Itumbiara.</span> <strong>Perto de você em Goiás e Minas.</strong></h2>
+        <p class="sn-apoio rv">Toque numa unidade para abrir a rota no Waze.</p>
+      </div>
+      <div class="sn-unidades-grade">
+        {filiais.cidades.map((f, i) => (
+          <a class="unidade rv" href={linkWaze(f)} target="_blank" rel="noopener" aria-label={`Abrir rota no Waze até a unidade de ${f.cidade}`}>
+            <span class="n">({pad(i + 1)})</span>
+            <span class="tipo">{f.tipo}</span>
+            <h3>{f.cidade} <small>{f.uf}</small></h3>
+            <p>{f.endereco}</p>
+            <span class="waze">Abrir no Waze <span aria-hidden="true">↗</span></span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- ================= 8 · PERGUNTAS FREQUENTES ================= -->
+    <section id="perguntas" class="sn-secao sn-perguntas sn-bloco" data-secao>
+      <div class="sn-cab">
+        <p class="sn-rotulo rv">(PERGUNTAS FREQUENTES)</p>
+        <h2 class="sn-titulo rv"><span class="leve">Dúvidas comuns,</span> <strong>respostas diretas.</strong></h2>
+      </div>
+      <div class="sn-faq">
+        {faq.map((f, i) => (
+          <details class="rv">
+            <summary><span class="n">({pad(i + 1)})</span><span class="q">{f.q}</span><span class="mais" aria-hidden="true"></span></summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <!-- ================= 9 · PRODUTOS ================= -->
+    <section id="produtos" class="sn-secao sn-produtos sn-bloco" data-secao>
+      <div class="sn-cab">
+        <p class="sn-rotulo rv">{telas.parceiros.tela.rotulo}</p>
+        <h2 class="sn-titulo rv"><span class="leve">Mais que contabilidade:</span> <strong>um ecossistema de gestão.</strong></h2>
+        <p class="sn-apoio rv"><Txt t={telas.parceiros.tela.apoio} /></p>
+      </div>
+      <div class="sn-produtos-grade">
+        {produtos.flatMap((g) => g.parceiros.map((p) => (
+          <article class="produto rv">
+            <span class="grupo">({g.nome})</span>
+            <div class="logo">{p.logo ? <Foto arquivo={`parceiros/${p.logo}`} descricao={p.nome} alt={p.nome} larguras={[240, 480]} tamanho="240px" /> : <span class="nome-logo">{p.nome}</span>}</div>
+            <h3>{p.nome}</h3>
+            <p><Txt t={p.texto} /></p>
+          </article>
+        )))}
+      </div>
+    </section>
+
+    <!-- ================= 10 · CONTATO (luz em pé) ================= -->
+    <section id="contato" class="sn-secao sn-contato" data-secao>
+      <div class="sn-luz" aria-hidden="true"><span class="feixe"></span><span class="halo"></span><span class="chao"></span></div>
+      <div class="sn-contato-texto">
+        <p class="sn-rotulo rv">(FALE COM A GENTE)</p>
+        <h2 class="sn-titulo rv"><strong><Txt t={proximo.titulo} /></strong></h2>
+        <p class="sn-apoio rv">{rodape.sloganNovo}</p>
+        <div class="sn-botoes rv">
+          <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
+          <a class="sn-btn" href={PORTAL} target="_blank" rel="noopener">Portal <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="sn-rodape"><Footer slogan={rodape.sloganNovo} /></div>
+  <WhatsAppFlutuante />
+
+  <script>
+    import "../scripts/site-novo.ts";
+  </script>
+</SiteNovo>

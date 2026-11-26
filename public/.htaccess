@@ -27,6 +27,8 @@ RewriteRule ^apresentacao-portao\.php$ - [L]
 RewriteRule ^\.portao-chave\.php$ - [F,L]
 RewriteRule ^apresentacao-portao-config\.php$ - [F,L]
 RewriteRule ^(apresentacao.*)$ apresentacao-portao.php?arquivo=$1 [L,QSA,B]
+# /novo: versão nova do site, em construção, atrás da mesma senha (sai daqui quando virar a página principal)
+RewriteRule ^(novo(?:[./].*)?)$ apresentacao-portao.php?arquivo=$1 [L,QSA,B]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

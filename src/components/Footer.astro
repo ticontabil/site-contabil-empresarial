@@ -3,6 +3,9 @@ import Icon from "./Icon.astro";
 import Accordion from "./Accordion.astro";
 import { duvidasRapidas } from "../data/faq";
 import { contato, rodape } from "../data/site";
+// o site novo (/novo) usa o mesmo rodapé, só com outro slogan
+interface Props { slogan?: string }
+const { slogan = rodape.slogan } = Astro.props;
 ---
 
 <footer class="border-t border-border bg-background">
@@ -18,7 +21,7 @@ import { contato, rodape } from "../data/site";
         <div>
           <img src="/logo.png" alt="Contábil Empresarial" class="h-14 mb-3 dark:hidden" />
           <img src="/logo-negative.png" alt="Contábil Empresarial" loading="lazy" class="h-14 mb-3 hidden dark:inline" />
-          <p class="text-sm text-muted-foreground">{rodape.slogan}</p>
+          <p class="text-sm text-muted-foreground">{slogan}</p>
         </div>
         <div>
           <h4 class="font-semibold mb-3">Links Rápidos</h4>

@@ -74,6 +74,7 @@ export const contato = {
 
 export const rodape = {
   slogan: "Contabilidade inteligente para empresas que querem crescer. Desde 1984.",
+  sloganNovo: "Menos impostos. Mais inovação. Mais resultados.", // site novo (/novo), pedido do Hiago em 25/11/2026
   copyright: "© 2026 Contábil Empresarial. Todos os direitos reservados.",
   credito: "equipe Contábil Empresarial", // o site passou a ser mantido pela própria Contábil (24/11/2026)
 };

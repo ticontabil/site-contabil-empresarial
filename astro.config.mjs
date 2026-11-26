@@ -45,7 +45,7 @@ export default defineConfig({
     travaApresentacao,
     sitemap({
       // /apresentacao fica fora do sitemap (noindex)
-      filter: (page) => !page.includes("/apresentacao") && !page.includes("/404") && !/\/noticia\/?$/.test(page),
+      filter: (page) => !page.includes("/apresentacao") && !/\/novo(\/|$)/.test(page) && !page.includes("/404") && !/\/noticia\/?$/.test(page),
     }),
   ],
 });
