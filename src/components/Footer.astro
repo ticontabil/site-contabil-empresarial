@@ -4,8 +4,12 @@ import Accordion from "./Accordion.astro";
 import { duvidasRapidas } from "../data/faq";
 import { contato, rodape } from "../data/site";
 // o site novo (/novo) usa o mesmo rodapé, só com outro slogan
-interface Props { slogan?: string }
-const { slogan = rodape.slogan } = Astro.props;
+// novo: links para as páginas do site novo (/novo), para quem está nele não cair no site atual
+interface Props { slogan?: string; novo?: boolean }
+const { slogan = rodape.slogan, novo = false } = Astro.props;
+const links = novo
+  ? { servicos: "/novo#servicos", sobre: "/novo#historia", noticias: "/novo/noticias" }
+  : { servicos: "/#servicos", sobre: "/#sobre", noticias: "/noticias" };
 ---
 
 <footer class="border-t border-border bg-background">
@@ -26,9 +30,9 @@ const { slogan = rodape.slogan } = Astro.props;
         <div>
           <h4 class="font-semibold mb-3">Links Rápidos</h4>
           <ul class="space-y-2 text-sm text-muted-foreground">
-            <li><a href="/#servicos" class="hover:text-foreground transition-colors">Serviços</a></li>
-            <li><a href="/#sobre" class="hover:text-foreground transition-colors">Sobre Nós</a></li>
-            <li><a href="/noticias" class="hover:text-foreground transition-colors">Notícias</a></li>
+            <li><a href={links.servicos} class="hover:text-foreground transition-colors">Serviços</a></li>
+            <li><a href={links.sobre} class="hover:text-foreground transition-colors">Sobre Nós</a></li>
+            <li><a href={links.noticias} class="hover:text-foreground transition-colors">Notícias</a></li>
             <li><a href="/trabalheconosco" class="hover:text-foreground transition-colors">Trabalhe Conosco</a></li>
             <li><a href="/privacidade" class="hover:text-foreground transition-colors">Política de Privacidade</a></li>
             <li><a href="/privacidade#cookies" data-cookies-abrir class="hover:text-foreground transition-colors">Preferências de cookies</a></li>
