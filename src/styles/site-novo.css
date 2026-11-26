@@ -646,3 +646,8 @@ body.sn { background: #000; color: #fff; font-family: var(--fonte); -webkit-font
 .nt-carregando { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 16px; }
 .nt-carregando span { height: 28px; border-radius: 12px; background: linear-gradient(100deg, #0e0e0e 30%, #171717 50%, #0e0e0e 70%); background-size: 300% 100%; animation: nt-brilho 1.4s linear infinite; }
 .nt-carregando span:nth-child(2) { height: 60px; } .nt-carregando span:nth-child(3) { height: 120px; }
+
+
+/* ======================= IMERSÃO: sem barra de rolagem (a página continua rolando normalmente) ======================= */
+.sn-html, .sn-html body { scrollbar-width: none; -ms-overflow-style: none; }
+.sn-html::-webkit-scrollbar, .sn-html body::-webkit-scrollbar { width: 0; height: 0; display: none; }

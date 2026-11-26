@@ -55,6 +55,7 @@ import { whatsapp, rodape } from "../../data/site";
 
 <script>
   import "../../scripts/site";
+  import "../../scripts/tela-cheia-toque";
   import { fotoNoticia, quando, esc } from "../../scripts/noticias-novo";
   type Noticia = { id: string; titulo: string; resumo: string; link: string; data: string; fonte: string; fonteId: string; oficial: boolean; tema: string; imagem?: string; credito?: string };
   type Dados = { atualizado: string | null; itens: Noticia[]; fontes: { id: string; nome: string; oficial: boolean }[]; temas: string[] };

@@ -518,6 +518,22 @@ if (!H) {
 arrastar();
 coresDasBordas();
 
+// ---------------- celular e tablet: tela cheia no primeiro toque (mais imersão) ----------------
+// O navegador só deixa entrar em tela cheia a partir de um toque da pessoa; por isso o primeiro toque (ou
+// o primeiro arraste) já pede a tela cheia. iPhone não permite tela cheia em páginas; iPad e Android sim.
+(function telaCheiaNoToque() {
+  if (!matchMedia("(pointer: coarse)").matches) return;
+  const doc = document as any, el = html as any;
+  const pedir = () => {
+    if (doc.fullscreenElement || doc.webkitFullscreenElement) return;
+    try { (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el, { navigationUI: "hide" })?.catch?.(() => {}); } catch {}
+  };
+  const uma = () => { pedir(); removeEventListener("touchend", uma); removeEventListener("pointerup", umaPonteiro); };
+  const umaPonteiro = (e: PointerEvent) => { if (e.pointerType !== "mouse") uma(); };
+  addEventListener("touchend", uma, { passive: true });
+  addEventListener("pointerup", umaPonteiro);
+})();
+
 addEventListener("resize", ajustarGigantes);
 document.fonts?.ready.then(ajustarGigantes);
 ajustarGigantes();
