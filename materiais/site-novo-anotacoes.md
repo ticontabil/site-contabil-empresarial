@@ -91,3 +91,18 @@ Plano: construir em página oculta com senha; quando estiver pronta, vira a pág
 - O vídeo que já está na apresentação (antes e depois da Contábil) entra no site.
 - Ele **avança quando a pessoa rola para baixo e volta quando rola para cima** (scroll video, quadro a quadro).
 - Usar a skill scroll-video na hora de construir. Posição na página: a confirmar.
+
+## Revisão de 25/11/2026 (feita)
+- Computador e tablet: páginas na **horizontal** (uma por vez); celular: **vertical**.
+- Sem barra de rolagem; menu de cima removido; **linha do tempo embaixo** com o nome de cada página
+  (cinza; laranja na atual).
+- Logo no canto superior direito, **com animação** (nasce de uma linha de luz, brilho de tempos em tempos,
+  pulo ao clicar); menu da logo com **ícone + nome**. (Logo em SVG melhoraria a animação: pedir ao Hiago.)
+- Hero: slogan "Menos impostos. Mais inovação. Mais resultados." no lugar da frase; **faixa de produtos**
+  passando em loop (sem TekZap); página de Produtos do fim removida.
+- Vídeo da fachada: só **DESDE 1984** grande, no estilo do design.
+- Troca de página: câmera recua, **desfoque de lente** e o **preto engole** o conteúdo.
+- Contato: clone do hero da Aligno (/reanimate em .reanimate/aligno-rodape): título que pisca, **luz que pisca
+  e acende**, **partículas**, grade de guias, e o **rodapé começa deitado e fica em pé** com a rolagem.
+- Sem o botão flutuante do WhatsApp.
+- Pendente: referência da transição de câmera (vídeo Oncominas, minuto a confirmar) e referência de Serviços.

@@ -1,67 +1,24 @@
-// Site novo (/novo): menu fixo com o nome das seções, menu da logo, entradas ao rolar, túnel da capa,
-// Nossa História (câmera pelos recortes, pela rolagem ou clique/toque), vídeo da fachada quadro a quadro
-// com a rolagem, números em odômetro, etapas de "Como começar" e a luz do contato.
+// Site novo (/novo).
+// - Computador e tablet (html.sn-h): uma página por vez, na horizontal. Roda do mouse/touchpad, setas,
+//   deslizar o dedo, a linha do tempo e o menu da logo trocam de página. Páginas com passos (Nossa
+//   História) e com rolagem própria (vídeo da fachada, contato) consomem a rolagem antes de trocar.
+// - Celular (html.sn-v): rolagem vertical normal; as mesmas animações seguem a posição na página.
 import "./site"; // acordeão "Dúvidas rápidas" do rodapé (mesmo rodapé do site atual)
 
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s);
 const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => [...r.querySelectorAll<T>(s)];
+const html = document.documentElement;
+const H = html.classList.contains("sn-h");
 const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const faixa = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
 const limita = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
-/** quanto da seção já passou pela tela presa (0 no começo, 1 quando a cena solta) */
+const paginas = $$("[data-pg]");
+const ids = paginas.map((p) => p.id);
+/** no celular: quanto da seção alta já passou pela tela presa (0 → 1) */
 const progressoFixo = (sec: HTMLElement) => {
   const r = sec.getBoundingClientRect();
   return limita(-r.top / Math.max(1, r.height - innerHeight), 0, 1);
 };
-
-// ---------------- menu fixo: linha de progresso + nome da seção atual ----------------
-const trilha = $("[data-trilha]");
-const nomes = $$<HTMLAnchorElement>("[data-nome-de]");
-const atual = $("[data-atual]");
-const opcoes = $$<HTMLAnchorElement>("#sn-marca-menu .sn-op");
-const secoes = $$("[data-secao]").map((el) => ({ el, id: el.dataset.secao || el.id }));
-let idAtual = "";
-function marcarSecao() {
-  const max = document.documentElement.scrollHeight - innerHeight;
-  if (trilha) trilha.style.width = `${(limita(scrollY / Math.max(1, max), 0, 1) * 100).toFixed(2)}%`;
-  let id = secoes[0]?.id || "";
-  for (const s of secoes) if (s.el.getBoundingClientRect().top <= innerHeight * 0.4) id = s.id;
-  if (scrollY >= max - 4) id = secoes[secoes.length - 1].id; // fim da página: contato
-  if (id === idAtual) return;
-  idAtual = id;
-  nomes.forEach((a) => a.classList.toggle("ativo", a.dataset.nomeDe === id));
-  opcoes.forEach((a) => a.classList.toggle("ativo", a.getAttribute("href") === `#${id}`));
-  const nome = nomes.find((a) => a.dataset.nomeDe === id)?.textContent;
-  if (atual && nome) atual.textContent = nome;
-}
-
-// ---------------- logo: animação e menu com as páginas ----------------
-const marca = $("#sn-marca");
-const marcaBotao = $<HTMLButtonElement>("#sn-marca-botao");
-opcoes.forEach((o, k) => o.style.setProperty("--k", String(k)));
-$$("#sn-marca-menu a").forEach((o, k) => (o as HTMLElement).style.setProperty("--k", String(k)));
-const fecharMenu = () => { marca?.classList.remove("aberto"); marcaBotao?.setAttribute("aria-expanded", "false"); };
-marcaBotao?.addEventListener("click", (e) => {
-  e.stopPropagation();
-  const abrir = !marca!.classList.contains("aberto");
-  marca!.classList.remove("pulsa"); void marca!.offsetWidth; marca!.classList.add("pulsa");
-  marca!.classList.toggle("aberto", abrir);
-  marcaBotao.setAttribute("aria-expanded", String(abrir));
-});
-$$("#sn-marca-menu a").forEach((a) => a.addEventListener("click", fecharMenu));
-addEventListener("click", (e) => { if (!(e.target as Element).closest?.("#sn-marca")) fecharMenu(); });
-addEventListener("keydown", (e) => e.key === "Escape" && fecharMenu());
-
-// ---------------- entradas ao rolar ----------------
-if (document.documentElement.classList.contains("sn-anima")) {
-  // atraso em cascata entre irmãos
-  $$(".rv").forEach((el) => {
-    const irmaos = el.parentElement ? [...el.parentElement.children].filter((c) => c.classList.contains("rv")) : [];
-    el.style.transitionDelay = `${Math.min(6, irmaos.indexOf(el)) * 90}ms`;
-  });
-  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
-  $$(".rv").forEach((el) => io.observe(el));
-}
 
 // ---------------- textos gigantes ocupam a largura toda ----------------
 function ajustarGigantes() {
@@ -69,12 +26,44 @@ function ajustarGigantes() {
     const s = g.querySelector("span") as HTMLElement;
     if (!s) return;
     g.style.fontSize = "100px";
-    const larg = g.clientWidth, w = s.getBoundingClientRect().width;
+    const larg = g.clientWidth, w = s.offsetWidth; // offsetWidth: tamanho real, sem a perspectiva da troca de página
     if (w > 0) g.style.fontSize = `${(100 * larg) / w}px`;
   });
 }
 
-// ---------------- 1 · túnel automático da capa ----------------
+// ---------------- logo: animação e menu com ícone + nome ----------------
+const marca = $("#sn-marca")!;
+const marcaBotao = $<HTMLButtonElement>("#sn-marca-botao")!;
+$$("#sn-marca-menu a").forEach((o, k) => o.style.setProperty("--k", String(k)));
+const fecharMenu = () => { marca.classList.remove("aberto"); marcaBotao.setAttribute("aria-expanded", "false"); };
+marcaBotao.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const abrir = !marca.classList.contains("aberto");
+  marca.classList.remove("pulsa"); void marca.offsetWidth; marca.classList.add("pulsa");
+  marca.classList.toggle("aberto", abrir);
+  marcaBotao.setAttribute("aria-expanded", String(abrir));
+});
+$$("#sn-marca-menu a").forEach((a) => a.addEventListener("click", fecharMenu));
+addEventListener("click", (e) => { if (!(e.target as Element).closest?.("#sn-marca")) fecharMenu(); });
+addEventListener("keydown", (e) => e.key === "Escape" && fecharMenu());
+
+// ---------------- linha do tempo + item ativo do menu ----------------
+const cheio = $("[data-cheio]");
+const nomesLinha = $$<HTMLAnchorElement>("#sn-linha [data-ir]");
+const opcoes = $$<HTMLAnchorElement>("#sn-marca-menu [data-ir]");
+const numAtual = $("[data-num-atual]"), nomeAtual = $("[data-nome-atual]");
+function marcarPagina(k: number, fracao?: number) {
+  const id = ids[k];
+  nomesLinha.forEach((a) => a.classList.toggle("ativo", a.dataset.ir === id));
+  opcoes.forEach((a) => a.classList.toggle("ativo", a.dataset.ir === id));
+  if (numAtual) numAtual.textContent = String(k + 1).padStart(2, "0");
+  if (nomeAtual) nomeAtual.textContent = nomesLinha[k]?.textContent || "";
+  const f = fracao ?? (ids.length > 1 ? k / (ids.length - 1) : 1);
+  if (cheio) cheio.style.width = `${(f * 100).toFixed(2)}%`;
+  html.classList.toggle("sn-clara-atual", paginas[k]?.classList.contains("sn-clara") ?? false);
+}
+
+// ======================= 1 · túnel automático da capa =======================
 function tunelCapa() {
   const tunel = $("[data-tunel-auto]");
   if (!tunel) return;
@@ -93,12 +82,7 @@ function tunelCapa() {
       if (d === n - 1 && !inicio) {
         c.style.transform = `translate3d(${x * 1.8}px, ${y * 1.8}px, ${z * 1.2}px)`;
         c.style.opacity = "0";
-        setTimeout(() => {
-          c.style.transition = "none";
-          c.style.transform = `translate3d(${x}px, ${y}px, ${-(n - 1) * z}px)`;
-          void c.offsetWidth;
-          c.style.transition = "";
-        }, 1400);
+        setTimeout(() => { c.style.transition = "none"; c.style.transform = `translate3d(${x}px, ${y}px, ${-(n - 1) * z}px)`; void c.offsetWidth; c.style.transition = ""; }, 1400);
         return;
       }
       c.style.transform = d === 0 ? "translate3d(0,0,0)" : `translate3d(${x}px, ${y}px, ${-d * z}px)`;
@@ -109,28 +93,26 @@ function tunelCapa() {
     if (contador) contador.textContent = String(frente + 1).padStart(2, "0");
   };
   aplicar(true);
-  if (reduz) return;
-  const iniciar = () => { clearInterval(timer); timer = window.setInterval(() => { frente = (frente + 1) % n; aplicar(); }, 2800); };
-  // só anda com a capa na tela
-  new IntersectionObserver(([e]) => (e.isIntersecting ? iniciar() : clearInterval(timer))).observe(tunel);
+  if (reduz) return { entrar() {}, sair() {} };
+  const entrar = () => { clearInterval(timer); timer = window.setInterval(() => { frente = (frente + 1) % n; aplicar(); }, 2800); };
+  const sair = () => clearInterval(timer);
+  if (!H) new IntersectionObserver(([e]) => (e.isIntersecting ? entrar() : sair())).observe(tunel);
+  return { entrar, sair };
 }
 
-// ---------------- 2 · Nossa História: câmera pelos recortes ----------------
-// Mesma mecânica da apresentação (projeção em perspectiva, desfoque em camadas prontas), mas a câmera
-// anda com a rolagem. Clique (computador) ou toque (celular/tablet) leva até o próximo marco.
+// ======================= 2 · Nossa História: câmera pelos recortes =======================
 function historia() {
-  const sec = $("[data-tunel-hist]");
-  if (!sec) return;
+  const sec = $("#historia");
+  if (!sec) return null;
   const cena = $(".sn-fixo", sec)!;
   const cartoes = $$(".cartao", sec);
   const n = cartoes.length;
   const P = 1000, D = 640, FUGA_Y = 0.46;
-  const FIM = n + 0.5; // passo em que a cena solta (o último recorte já passando pela borda)
+  const FIM = n + 0.5;
   const moedas: number[] = JSON.parse($("[data-moedas]", sec)?.textContent || "[]");
   const contador = $("[data-contador-moeda] span", sec);
   const blocos = $$(".h-bloco", sec);
   const gigante = $(".h-gigante", sec);
-  const dica = $("[data-dica]", sec);
   const nuvem = [[560, -140], [-620, -300], [520, 190], [-480, -360], [680, -20], [-700, -260], [400, -330], [600, 170],
     [-560, -330], [700, -220], [-440, -380], [520, 150], [-660, -280], [620, -300], [-520, -340], [680, 90]];
   const pos = cartoes.map((_, i) => ({ x: nuvem[i % nuvem.length][0], y: nuvem[i % nuvem.length][1], z: i * D, gira: 0.4 + (i % 4) * 0.13, fase: i * 1.7 }));
@@ -142,17 +124,19 @@ function historia() {
     return (r > 1.2 ? 700 : r < 0.85 ? 460 : 560) * (c.classList.contains("recorte") ? 1.13 : 1);
   });
   const camDe = (p: number) => (p <= 1 ? -1350 + 1100 * p : (p - 1) * D - 250);
-
-  let W = 0, H = 0, K = 1, emPe = false;
+  let W = 0, Hh = 0, K = 1, emPe = false;
   const medir = () => {
-    W = cena.clientWidth; H = cena.clientHeight; emPe = H > W;
-    K = limita(Math.min(W / 1440, H / 900), emPe ? 0.5 : 0.42, 1.7);
+    W = cena.clientWidth; Hh = cena.clientHeight; emPe = Hh > W;
+    K = limita(Math.min(W / 1440, Hh / 900), emPe ? 0.5 : 0.42, 1.7);
     cartoes.forEach((c, i) => (c.style.width = `${largura[i] * K}px`));
   };
-  let cam = camDe(0), alvo = cam, passo = 0, bloco = -2, visivel = false, raf = 0, ultimo = 0;
+  let passo = 0, passoVisto = 0, cam = camDe(0), alvo = cam, bloco = -2, ativo = false, raf = 0, ultimo = 0;
+  // no modo horizontal o passo anda por degraus (1,6 s entre um marco e outro), como na apresentação
+  let de = 0, para = 0, t0 = 0;
+  const suave = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
 
   const desenhar = (agora: number) => {
-    const fx = W / 2, fy = H * FUGA_Y;
+    const fx = W / 2, fy = Hh * FUGA_Y;
     cartoes.forEach((c, i) => {
       const some = () => { if (c.style.visibility !== "hidden") { c.style.opacity = "0"; c.style.visibility = "hidden"; } };
       const prof = pos[i].z - cam + P;
@@ -166,7 +150,7 @@ function historia() {
       c.style.opacity = op.toFixed(3);
       c.style.transform = `translate3d(${(fx + x * s).toFixed(1)}px, ${(fy + y * s).toFixed(1)}px, 0) translate(-50%, -50%) scale(${s.toFixed(4)}) rotate(${rot.toFixed(2)}deg)`;
       const lente = Math.max(0, (s - 0.9) * 42);
-      const cx = (x * s) / (W / 2), cy = (fy + y * s - H / 2) / (H / 2);
+      const cx = (x * s) / (W / 2), cy = (fy + y * s - Hh / 2) / (Hh / 2);
       const desfoque = Math.min(34, lente + faixa(Math.hypot(cx, cy * 1.2), 0.62, 1.05) * 5);
       const cs = camadas[i];
       if (cs) {
@@ -178,7 +162,7 @@ function historia() {
       c.style.zIndex = String(Math.round(s * 100));
     });
     if (gigante) {
-      const g = passo;
+      const g = passoVisto;
       const esc = 1 + 0.395 * g + 0.405 * g * g;
       const op = g <= 1 ? 1 - 0.06 * g : g <= 2 ? 0.94 - 0.7 * (g - 1) : Math.max(0, 0.24 - 0.6 * (g - 2));
       gigante.style.transform = `scale(${esc.toFixed(3)})`;
@@ -186,59 +170,73 @@ function historia() {
       gigante.style.opacity = op.toFixed(3);
     }
   };
-  const lerRolagem = () => {
-    passo = progressoFixo(sec) * FIM;
-    alvo = camDe(passo);
-    const b = passo < 0.55 ? -1 : Math.min(n - 1, Math.round(passo) - 1);
-    if (b !== bloco) {
-      bloco = b;
-      blocos.forEach((el) => el.classList.toggle("ativo", Number(el.dataset.bloco) === b));
-      if (contador) contador.textContent = String(moedas[Math.max(0, b)] ?? 1).padStart(2, "0");
-    }
-    if (passo > 1.4) dica?.classList.add("some");
+  const textos = (p: number) => {
+    const b = p < 0.55 ? -1 : Math.min(n - 1, Math.round(p) - 1);
+    if (b === bloco) return;
+    bloco = b;
+    blocos.forEach((el) => el.classList.toggle("ativo", Number(el.dataset.bloco) === b));
+    if (contador) contador.textContent = String(moedas[Math.max(0, b)] ?? 1).padStart(2, "0");
   };
   const laco = (agora: number) => {
-    const dt = Math.min(64, agora - (ultimo || agora)); ultimo = agora;
-    cam += (alvo - cam) * (reduz ? 1 : 1 - Math.pow(0.86, dt / 16.7)); // a câmera segue a rolagem com suavidade
+    if (H) {
+      const pr = Math.min(1, (agora - t0) / 1600);
+      passoVisto = de + (para - de) * suave(pr);
+      cam = camDe(passoVisto);
+    } else {
+      const dt = Math.min(64, agora - (ultimo || agora)); ultimo = agora;
+      cam += (alvo - cam) * (reduz ? 1 : 1 - Math.pow(0.86, dt / 16.7));
+      passoVisto = passo;
+    }
     desenhar(agora);
-    if (visivel) raf = requestAnimationFrame(laco);
+    if (ativo) raf = requestAnimationFrame(laco);
   };
-  new IntersectionObserver(([e]) => {
-    visivel = e.isIntersecting;
-    cancelAnimationFrame(raf);
-    if (visivel) { medir(); lerRolagem(); ultimo = 0; raf = requestAnimationFrame(laco); }
-  }).observe(sec);
-  addEventListener("scroll", () => visivel && lerRolagem(), { passive: true });
-  addEventListener("resize", () => { medir(); lerRolagem(); cam = alvo; });
+  const ligar = () => { if (!ativo) { ativo = true; medir(); ultimo = 0; raf = requestAnimationFrame(laco); } };
+  const desligar = () => { ativo = false; cancelAnimationFrame(raf); };
+  addEventListener("resize", () => { medir(); });
 
-  // clique/toque: vai até o próximo marco (no último, segue para a fachada)
-  cena.addEventListener("click", () => {
-    dica?.classList.add("some");
-    const prox = Math.min(FIM, Math.floor(passo + 0.05) + 1);
-    const r = sec.getBoundingClientRect();
-    const total = r.height - innerHeight;
-    const y = scrollY + r.top + (prox / FIM) * total + (prox >= FIM ? 2 : 0);
-    scrollTo({ top: y, behavior: reduz ? "auto" : "smooth" });
-  });
-  medir(); lerRolagem(); cam = alvo; desenhar(performance.now());
+  if (!H) {
+    // celular: a câmera segue a rolagem; toque leva ao próximo marco
+    new IntersectionObserver(([e]) => (e.isIntersecting ? ligar() : desligar())).observe(sec);
+    const ler = () => { passo = progressoFixo(sec) * FIM; alvo = camDe(passo); textos(passo); };
+    addEventListener("scroll", () => ativo && ler(), { passive: true });
+    cena.addEventListener("click", () => {
+      const prox = Math.min(FIM, Math.floor(passo + 0.05) + 1);
+      const r = sec.getBoundingClientRect();
+      scrollTo({ top: scrollY + r.top + (prox / FIM) * (r.height - innerHeight) + 2, behavior: reduz ? "auto" : "smooth" });
+    });
+    medir(); ler(); cam = alvo; desenhar(performance.now());
+    return null;
+  }
+  // computador/tablet: passos 0 (título) … n (último marco); clique avança
+  const irPasso = (p: number, imediato = false) => {
+    passo = limita(p, 0, n);
+    de = imediato ? passo : passoVisto; para = passo; t0 = imediato ? -1e9 : performance.now();
+    textos(passo);
+  };
+  medir(); irPasso(0, true); desenhar(performance.now());
+  return {
+    total: n,
+    get passo() { return passo; },
+    irPasso, ligar, desligar,
+    clique: (cb: () => void) => cena.addEventListener("click", cb),
+  };
 }
 
-// ---------------- 2b · fachada: vídeo quadro a quadro com a rolagem ----------------
+// ======================= 3 · Desde 1984: vídeo quadro a quadro =======================
 function fachada() {
-  const sec = $("[data-video-rolagem]");
-  if (!sec) return;
+  const sec = $("#desde-1984");
+  if (!sec) return null;
   const canvas = $<HTMLCanvasElement>("canvas", sec)!;
   const ctx = canvas.getContext("2d")!;
   const texto = $(".sn-fachada-texto", sec);
   const N = Number(sec.dataset.quadros || 0);
   const pasta = innerWidth < 900 ? "fachada-quadros-720" : "fachada-quadros";
   const quadros: HTMLImageElement[] = [];
-  let carregou = false, atualQ = -1;
+  let carregou = false, atualQ = -1, prog = 0, visto = 0, raf = 0, ativo = false;
   const carregar = () => {
     if (carregou) return; carregou = true;
     for (let i = 1; i <= N; i++) {
-      const im = new Image();
-      im.decoding = "async";
+      const im = new Image(); im.decoding = "async";
       im.src = `/apresentacao/video/${pasta}/q${String(i).padStart(3, "0")}.webp`;
       if (i === 1 || i === N) im.onload = () => { atualQ = -1; desenhar(); };
       quadros.push(im);
@@ -246,14 +244,12 @@ function fachada() {
   };
   const tamanho = () => {
     const dpr = Math.min(2, devicePixelRatio || 1);
-    canvas.width = Math.round(canvas.clientWidth * dpr); canvas.height = Math.round(canvas.clientHeight * dpr);
-    atualQ = -1;
+    canvas.width = Math.round(canvas.clientWidth * dpr); canvas.height = Math.round(canvas.clientHeight * dpr); atualQ = -1;
   };
   const desenhar = () => {
-    const t = progressoFixo(sec);
-    texto?.style.setProperty("--texto", faixa(t, 0.55, 0.85).toFixed(3));
-    let q = Math.round(faixa(t, 0.05, 0.75) * (N - 1));
-    // se o quadro ainda não chegou, usa o mais perto já carregado
+    const t = H ? visto : progressoFixo(sec);
+    texto?.style.setProperty("--texto", faixa(t, 0.6, 0.92).toFixed(3));
+    let q = Math.round(faixa(t, 0.02, 0.8) * (N - 1));
     for (let d = 0; d < N; d++) { const a = quadros[q - d], b = quadros[q + d]; if (a?.complete && a.naturalWidth) { q -= d; break; } if (b?.complete && b.naturalWidth) { q += d; break; } }
     const im = quadros[q];
     if (!im || !im.complete || !im.naturalWidth || q === atualQ) return;
@@ -262,15 +258,27 @@ function fachada() {
     const w = im.naturalWidth * esc, h = im.naturalHeight * esc;
     ctx.drawImage(im, (cw - w) / 2, (ch - h) / 2, w, h);
   };
-  new IntersectionObserver(([e]) => { if (e.isIntersecting) { carregar(); tamanho(); desenhar(); } }, { rootMargin: "150% 0px" }).observe(sec);
-  addEventListener("scroll", () => requestAnimationFrame(desenhar), { passive: true });
   addEventListener("resize", () => { tamanho(); desenhar(); });
+  if (!H) {
+    new IntersectionObserver(([e]) => { if (e.isIntersecting) { carregar(); tamanho(); desenhar(); } }, { rootMargin: "150% 0px" }).observe(sec);
+    addEventListener("scroll", () => requestAnimationFrame(desenhar), { passive: true });
+    return null;
+  }
+  const laco = () => { visto += (prog - visto) * 0.14; desenhar(); if (ativo && Math.abs(prog - visto) > 0.0005) raf = requestAnimationFrame(laco); else if (ativo) raf = requestAnimationFrame(laco); };
+  return {
+    preparar() { carregar(); },
+    get prog() { return prog; },
+    mover(d: number) { prog = limita(prog + d, 0, 1); },
+    definir(v: number) { prog = v; visto = v; atualQ = -1; desenhar(); },
+    ligar() { carregar(); tamanho(); ativo = true; cancelAnimationFrame(raf); raf = requestAnimationFrame(laco); },
+    desligar() { ativo = false; cancelAnimationFrame(raf); },
+  };
 }
 
-// ---------------- 4 · números em odômetro ----------------
+// ======================= 5 · números em odômetro =======================
 function numeros() {
   const grade = $("[data-contagem]");
-  if (!grade) return;
+  if (!grade) return null;
   $$("[data-contar]", grade).forEach((n, k) => {
     const valor = n.dataset.contar!;
     n.setAttribute("aria-label", valor);
@@ -282,49 +290,282 @@ function numeros() {
     }).join("");
     (n.closest(".grade > div") as HTMLElement | null)?.style.setProperty("--k", String(k));
   });
-  if (reduz) { grade.classList.add("contou"); return; }
-  const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { grade.classList.add("contou"); io.disconnect(); } }, { threshold: 0.3 });
-  io.observe(grade);
+  const contar = () => requestAnimationFrame(() => requestAnimationFrame(() => grade.classList.add("contou")));
+  if (reduz) grade.classList.add("contou");
+  else if (!H) { const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { contar(); io.disconnect(); } }, { threshold: 0.3 }); io.observe(grade); }
+  return { entrar: contar, sair: () => grade.classList.remove("contou") };
 }
 
-// ---------------- 6 · como começar: a etapa da vez acende com a rolagem ----------------
+// ======================= 7 · como começar: a etapa da vez acende =======================
 function etapas() {
   const box = $("[data-etapas]");
-  if (!box) return;
+  if (!box) return null;
   const itens = $$(".etapa", box);
-  let ultimo = -2;
-  const ver = () => {
-    const r = box.getBoundingClientRect();
-    const p = faixa(innerHeight * 0.78 - r.top, 0, innerHeight * 0.75);
-    const k = p <= 0 ? -1 : Math.min(itens.length - 1, Math.floor(p * itens.length));
-    if (k === ultimo) return;
-    ultimo = k;
-    itens.forEach((el, i) => el.classList.toggle("destaque", i === k));
+  let timer = 0;
+  const acende = (k: number) => itens.forEach((el, i) => el.classList.toggle("destaque", i === k));
+  if (!H) {
+    let ultimo = -2;
+    const ver = () => {
+      const r = box.getBoundingClientRect();
+      const p = faixa(innerHeight * 0.78 - r.top, 0, innerHeight * 0.75);
+      const k = p <= 0 ? -1 : Math.min(itens.length - 1, Math.floor(p * itens.length));
+      if (k !== ultimo) { ultimo = k; acende(k); }
+    };
+    addEventListener("scroll", () => requestAnimationFrame(ver), { passive: true });
+    ver();
+    return null;
+  }
+  return {
+    entrar() { let k = 0; clearInterval(timer); acende(-1); timer = window.setInterval(() => { acende(k % itens.length); k++; }, 1300); },
+    sair() { clearInterval(timer); acende(-1); },
   };
-  addEventListener("scroll", () => requestAnimationFrame(ver), { passive: true });
-  ver();
 }
 
-// ---------------- 10 · contato: a luz acende conforme a seção chega ----------------
-function luz() {
+// ======================= 10 · contato: clone do hero da Aligno =======================
+// Tempos medidos na referência (relógio virtual, 30 fps): título aparece em t0, letras abrem até +0,56 s,
+// letras piscam de +0,47 a +0,77 s, luz do teto: acende +0,80, apaga +1,00, acende +1,30, apaga +1,40,
+// acende de vez +1,80. Cartão (rodapé): rotateX 40° → 0° e sobe 159 px nos primeiros ~476 px de rolagem.
+function contato() {
   const sec = $("#contato");
-  if (!sec) return;
+  if (!sec) return null;
+  const titulo = $("[data-letras]", sec)!;
+  const palco = $(".ct-palco", sec)!;
+  titulo.innerHTML = [...(titulo.textContent || "")].map((c) => `<span class="l">${c === " " ? "&nbsp;" : c}</span>`).join("");
+  const letras = $$(".l", titulo);
+  let timers: number[] = [];
+  const depois = (ms: number, f: () => void) => timers.push(window.setTimeout(f, ms));
+  const limpar = () => { timers.forEach(clearTimeout); timers = []; };
+
+  // partículas: ~140 pontos brancos de 1 px, deriva lenta (como o canvas 2D da referência)
+  const cv = $<HTMLCanvasElement>(".ct-particulas", sec)!;
+  const cx = cv.getContext("2d")!;
+  let pts: { x: number; y: number; vx: number; vy: number; a: number; f: number }[] = [];
+  let rafP = 0, ligadas = false;
+  const iniciarPts = () => {
+    const w = cv.clientWidth, h = cv.clientHeight, dpr = Math.min(2, devicePixelRatio || 1);
+    cv.width = w * dpr; cv.height = h * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(140 * (w * h) / (1440 * 1220));
+    pts = Array.from({ length: n }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - 0.5) * 0.12, vy: (Math.random() - 0.5) * 0.12 - 0.04, a: 0.25 + Math.random() * 0.6, f: Math.random() * 6.28 }));
+  };
+  const desenharPts = (t: number) => {
+    const w = cv.clientWidth, h = cv.clientHeight;
+    cx.clearRect(0, 0, w, h);
+    for (const p of pts) {
+      p.x = (p.x + p.vx + w) % w; p.y = (p.y + p.vy + h) % h;
+      cx.globalAlpha = p.a * (0.7 + 0.3 * Math.sin(t / 900 + p.f));
+      cx.beginPath(); cx.arc(p.x, p.y, 1, 0, 6.2832); cx.fillStyle = "#fff"; cx.fill();
+    }
+    if (ligadas) rafP = requestAnimationFrame(desenharPts);
+  };
+
+  // o rodapé fica em pé conforme a rolagem (0 → ~476 px da referência, proporcional à tela)
+  const deitar = () => {
+    const k = Math.min(1, innerWidth / 1440);
+    let rolado: number;
+    if (H) rolado = sec.scrollTop;
+    else rolado = innerHeight - palco.getBoundingClientRect().top - 0.35 * innerHeight; // começa quando o cartão aparece
+    const d = 1 - faixa(rolado, 0, 476 * Math.max(0.6, k));
+    sec.style.setProperty("--deita", (reduz ? 0 : Math.pow(d, 1.3)).toFixed(4));
+  };
+
+  const entrar = () => {
+    limpar();
+    sec.classList.remove("entrou", "luz-on");
+    letras.forEach((l) => l.classList.remove("apagada"));
+    void sec.offsetWidth;
+    if (reduz) { sec.classList.add("entrou", "luz-on"); return; }
+    depois(150, () => sec.classList.add("entrou"));
+    // letras piscando (+0,47 s a +0,77 s): a cada quadro algumas somem
+    for (let f = 0; f < 9; f++) depois(150 + 470 + f * 33, () => letras.forEach((l) => l.classList.toggle("apagada", Math.random() < 0.28)));
+    depois(150 + 800, () => { letras.forEach((l) => l.classList.remove("apagada")); sec.classList.add("luz-on"); });
+    depois(150 + 1000, () => sec.classList.remove("luz-on"));
+    depois(150 + 1300, () => sec.classList.add("luz-on"));
+    depois(150 + 1400, () => sec.classList.remove("luz-on"));
+    depois(150 + 1800, () => sec.classList.add("luz-on"));
+    if (!ligadas) { ligadas = true; iniciarPts(); rafP = requestAnimationFrame(desenharPts); }
+    deitar();
+  };
+  const sair = () => { limpar(); ligadas = false; cancelAnimationFrame(rafP); };
+  if (H) sec.addEventListener("scroll", () => requestAnimationFrame(deitar), { passive: true });
+  else {
+    addEventListener("scroll", () => requestAnimationFrame(deitar), { passive: true });
+    new IntersectionObserver(([e]) => (e.isIntersecting ? entrar() : sair()), { threshold: 0.25 }).observe(sec);
+  }
+  addEventListener("resize", () => { if (ligadas) iniciarPts(); deitar(); });
+  deitar();
+  return { entrar, sair };
+}
+
+// ======================= celular: blocos afundam no preto e desfocam ao passar pelo topo =======================
+function afundarNoPreto() {
+  const alvos = $$(".sn-bloco .sn-cab, .sn-bloco .rv, .sn-time .sn-cab");
+  alvos.forEach((el) => (el.dataset.sai = ""));
   const ver = () => {
-    const r = sec.getBoundingClientRect();
-    sec.style.setProperty("--luz", faixa(innerHeight - r.top, innerHeight * 0.1, innerHeight * 0.9).toFixed(3));
+    const lim = innerHeight * 0.16;
+    for (const el of alvos) {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -50 || r.top > innerHeight) continue;
+      el.style.setProperty("--sai", faixa(lim - r.top, 0, Math.max(80, r.height * 0.9)).toFixed(3));
+    }
   };
   addEventListener("scroll", () => requestAnimationFrame(ver), { passive: true });
   ver();
 }
 
-addEventListener("scroll", () => requestAnimationFrame(marcarSecao), { passive: true });
-addEventListener("resize", () => { ajustarGigantes(); marcarSecao(); });
+// ======================= montagem =======================
+const capa = tunelCapa();
+const hist = historia();
+const fach = fachada();
+const nums = numeros();
+const etp = etapas();
+const ctt = contato();
+
+if (!H) {
+  // ---------- CELULAR: rolagem vertical ----------
+  html.classList.toggle("sn-anima", html.classList.contains("sn-anima"));
+  if (html.classList.contains("sn-anima")) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("on"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+    $$(".rv").forEach((el) => io.observe(el));
+  }
+  let idAtual = -1;
+  const ver = () => {
+    let k = 0;
+    paginas.forEach((p, i) => { if (p.getBoundingClientRect().top <= innerHeight * 0.4) k = i; });
+    const max = document.documentElement.scrollHeight - innerHeight;
+    if (scrollY >= max - 4) k = paginas.length - 1;
+    marcarPagina(k, limita(scrollY / Math.max(1, max), 0, 1));
+    if (k !== idAtual) idAtual = k;
+  };
+  addEventListener("scroll", () => requestAnimationFrame(ver), { passive: true });
+  ver();
+  afundarNoPreto();
+} else {
+  // ---------- COMPUTADOR / TABLET: páginas na horizontal ----------
+  // atraso em cascata das entradas
+  paginas.forEach((p) => $$(".rv", p).forEach((el, i) => el.style.setProperty("--d", String(Math.min(8, i)))));
+  let atual = -1, travado = false;
+  const efeitos: Record<string, { entrar?: () => void; sair?: () => void } | null> = {
+    inicio: capa ? { entrar: capa.entrar, sair: capa.sair } : null,
+    historia: hist ? { entrar: hist.ligar, sair: hist.desligar } : null,
+    "desde-1984": fach ? { entrar: fach.ligar, sair: fach.desligar } : null,
+    numeros: nums,
+    comecar: etp,
+    contato: ctt,
+  };
+  const ir = (k: number, dir = 1) => {
+    k = limita(k, 0, paginas.length - 1);
+    if (k === atual) return;
+    const antes = atual;
+    travado = true; setTimeout(() => (travado = false), 900);
+    html.classList.add("trocando"); setTimeout(() => html.classList.remove("trocando"), 650);
+    paginas.forEach((p, i) => {
+      p.classList.toggle("atual", i === k);
+      p.classList.toggle("antes", i < k);
+      p.setAttribute("aria-hidden", String(i !== k));
+    });
+    if (antes >= 0) { efeitos[ids[antes]]?.sair?.(); $$(".rv", paginas[antes]).forEach((el) => el.classList.remove("on")); }
+    atual = k;
+    const pg = paginas[k];
+    $$(".rv", pg).forEach((el) => el.classList.add("on"));
+    // entrando pela frente começa do começo; voltando, começa do fim
+    if (ids[k] === "historia" && hist) hist.irPasso(dir > 0 ? 0 : hist.total, true);
+    if (ids[k] === "desde-1984" && fach) fach.definir(dir > 0 ? 0 : 1);
+    if (pg.hasAttribute("data-rola") || pg.classList.contains("sn-bloco")) pg.scrollTop = dir > 0 ? 0 : pg.scrollHeight;
+    efeitos[ids[k]]?.entrar?.();
+    if (ids[k + 1] === "desde-1984") fach?.preparar();
+    marcarPagina(k);
+    history.replaceState(null, "", k === 0 ? location.pathname : `#${ids[k]}`);
+  };
+  // um "passo" para frente ou para trás, respeitando passos internos e rolagem própria
+  const passo = (dir: number) => {
+    if (travado) return;
+    const id = ids[atual];
+    if (id === "historia" && hist) {
+      const p = hist.passo + dir;
+      if (p >= 0 && p <= hist.total) { hist.irPasso(p); travado = true; setTimeout(() => (travado = false), 650); return; }
+    }
+    ir(atual + dir, dir);
+  };
+  hist?.clique(() => passo(1));
+
+  // roda do mouse / touchpad: um gesto = um passo (eventos com menos de 250 ms entre si)
+  let ultimaRoda = 0, gastoGesto = false;
+  addEventListener("wheel", (e) => {
+    if ((e.target as Element).closest?.("#sn-marca-menu")) return;
+    const pg = paginas[atual];
+    const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    const novo = e.timeStamp - ultimaRoda > 250; ultimaRoda = e.timeStamp;
+    if (novo) gastoGesto = false;
+    // páginas que rolam por dentro: deixam rolar até a borda
+    const rola = pg.classList.contains("sn-bloco") || pg.hasAttribute("data-rola");
+    if (rola && Math.abs(e.deltaY) >= Math.abs(e.deltaX)) {
+      const fim = pg.scrollTop + pg.clientHeight >= pg.scrollHeight - 2, inicio = pg.scrollTop <= 0;
+      if ((d > 0 && !fim) || (d < 0 && !inicio)) { gastoGesto = true; return; }
+    }
+    e.preventDefault();
+    // vídeo da fachada: a rolagem anda o vídeo; nas pontas troca de página
+    if (ids[atual] === "desde-1984" && fach) {
+      const antes = fach.prog;
+      if ((d > 0 && antes < 1) || (d < 0 && antes > 0)) { fach.mover(d / 1400); gastoGesto = true; return; }
+    }
+    if (gastoGesto || Math.abs(d) < 4) return;
+    gastoGesto = true;
+    passo(d > 0 ? 1 : -1);
+  }, { passive: false });
+
+  addEventListener("keydown", (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey || (e.target as Element).closest?.("input, textarea")) return;
+    if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); if (ids[atual] === "desde-1984" && fach && fach.prog < 1) fach.mover(0.25); else passo(1); }
+    else if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); if (ids[atual] === "desde-1984" && fach && fach.prog > 0) fach.mover(-0.25); else passo(-1); }
+    else if (e.key === "Home") ir(0, -1);
+    else if (e.key === "End") ir(paginas.length - 1, 1);
+  });
+
+  // toque (tablet): deslizar na horizontal troca a página; na vertical anda um passo
+  let x0 = 0, y0 = 0, t0 = 0, yAnt = 0;
+  addEventListener("touchstart", (e) => { const t = e.touches[0]; x0 = t.clientX; y0 = yAnt = t.clientY; t0 = e.timeStamp; }, { passive: true });
+  addEventListener("touchmove", (e) => {
+    if (ids[atual] !== "desde-1984" || !fach) return;
+    const y = e.touches[0].clientY; fach.mover((yAnt - y) / 900); yAnt = y;
+  }, { passive: true });
+  addEventListener("touchend", (e) => {
+    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+    if (e.timeStamp - t0 > 900) return;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.3) { ir(atual + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); return; }
+    const pg = paginas[atual];
+    if (Math.abs(dy) > 60 && ids[atual] !== "desde-1984") {
+      const rola = pg.classList.contains("sn-bloco") || pg.hasAttribute("data-rola");
+      const fim = pg.scrollTop + pg.clientHeight >= pg.scrollHeight - 2, inicio = pg.scrollTop <= 0;
+      if (rola && ((dy < 0 && !fim) || (dy > 0 && !inicio))) return;
+      passo(dy < 0 ? 1 : -1);
+    }
+  });
+
+  // links da linha do tempo, do menu e âncoras internas
+  addEventListener("click", (e) => {
+    const a = (e.target as Element).closest?.("a[href^='#']") as HTMLAnchorElement | null;
+    if (!a) return;
+    const k = ids.indexOf(a.getAttribute("href")!.slice(1));
+    if (k < 0) return;
+    e.preventDefault();
+    ir(k, k >= atual ? 1 : -1);
+  });
+
+  // o navegador rola o palco até a âncora do endereço (#numeros etc.); no modo horizontal ele fica sempre parado
+  const palco = $("#sn-palco")!;
+  const zerar = () => { if (palco.scrollTop || palco.scrollLeft) { palco.scrollTop = 0; palco.scrollLeft = 0; } if (scrollY || scrollX) scrollTo(0, 0); };
+  palco.addEventListener("scroll", zerar);
+  addEventListener("scroll", zerar);
+  addEventListener("load", zerar);
+  const inicial = Math.max(0, ids.indexOf(location.hash.slice(1)));
+  ir(inicial, 1);
+}
+
+addEventListener("resize", ajustarGigantes);
 document.fonts?.ready.then(ajustarGigantes);
 ajustarGigantes();
-marcarSecao();
-tunelCapa();
-historia();
-fachada();
-numeros();
-etapas();
-luz();
+
+// muda de celular para computador (ou o contrário) ao girar/redimensionar: recarrega no modo certo
+const modoCerto = () => (Math.min(innerWidth, innerHeight) >= 600 ? "sn-h" : "sn-v");
+let tRes = 0;
+addEventListener("resize", () => { clearTimeout(tRes); tRes = window.setTimeout(() => { if (!html.classList.contains(modoCerto())) location.reload(); }, 400); });
