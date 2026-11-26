@@ -55,6 +55,17 @@ const especializados = servicos.itens.filter((s) => ["Contabilidade Rural", "Con
 const num = telas.numeros.tela;
 const [destA, destB] = num.destaque.split(" — ");
 const time = telas.time.tela;
+// sócios-proprietários em destaque (fotos enviadas pelo Hiago, 26/11/2026) e mais duas gestoras na faixa.
+// Só no site: a apresentação continua com a lista dela.
+const socios = [
+  { nome: "Olavo", papel: "Sócio-proprietário", foto: "gestores/olavo.jpg", enquadrar: "50% 20%" },
+  { nome: "Josiney", papel: "Sócio-proprietário", foto: "gestores/josiney.jpg", enquadrar: "50% 25%" },
+];
+const gestoresSite = [
+  ...time.gestoras,
+  { nome: "Tathiana", setor: "RH", icone: "pessoal", foto: "gestores/tathiana.jpg", enquadrar: "50% 22%" },
+  { nome: "Kênia", setor: "Gestora de Processos", icone: "gestao", foto: "gestores/kenia.jpg", enquadrar: "50% 20%" },
+];
 const comecar = telas.comoComecar.tela;
 const [ap1, ap2] = comecar.apoio.split("? ");
 // produtos (TekZap fora: não é produto da Contábil) — faixa passando em loop no começo do site
@@ -265,9 +276,20 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
         <h2 class="sn-titulo rv"><span class="leve">Estrutura de grande.</span> <strong>Atendimento de perto.</strong></h2>
         <p class="sn-apoio rv"><Txt t={`${time.apoio}.`} /></p>
       </div>
+      <div class="sn-socios">
+        {socios.map((p, i) => (
+          <article class="socio rv" style={`--i:${i}`}>
+            <div class="retrato" style={`--enquadrar:${p.enquadrar}`}><Foto arquivo={p.foto} descricao={`${p.nome}, ${p.papel.toLowerCase()} da Contábil Empresarial`} larguras={[400, 800]} tamanho="(max-width: 700px) 40vw, 240px" /></div>
+            <div class="texto">
+              <p class="papel">({p.papel.toUpperCase()})</p>
+              <p class="nome">{p.nome}</p>
+            </div>
+          </article>
+        ))}
+      </div>
       <div class="faixa-gestoras" data-arrastar aria-label="Gestores: arraste para os lados">
         <div class="trilha">
-          {[0, 1].map((v) => time.gestoras.map((g) => (
+          {[0, 1].map((v) => gestoresSite.map((g) => (
             <article class="cartao-gestora" aria-hidden={v > 0 ? "true" : undefined}>
               <div class="retrato" style={`--enquadrar:${(g as any).enquadrar ?? "50% 25%"}`}>
                 {g.foto && <Foto arquivo={g.foto} descricao={`${g.nome}, ${g.setor}`} larguras={[330, 660]} tamanho="(max-width: 700px) 60vw, 300px" />}

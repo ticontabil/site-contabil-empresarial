@@ -794,3 +794,22 @@ body.sn { background: #000; color: #fff; font-family: var(--fonte); -webkit-font
 .sn-salto { position: fixed; inset: 0; z-index: 105; pointer-events: none; background: rgba(0, 0, 0, 0.92);
   -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); opacity: 0; transition: opacity 0.55s ease; }
 .sn-saltando .sn-salto { opacity: 1; transition: opacity 0.4s ease; }
+
+/* ======================= AJUSTES 26/11 (6): sócios-proprietários em destaque no Time ======================= */
+.sn-socios { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 2vw, 28px); padding: 0 var(--pad); max-width: calc(1100px + 2 * var(--pad)); }
+.socio { display: flex; align-items: stretch; gap: clamp(14px, 1.6vw, 24px); padding: 12px; border-radius: 26px;
+  background: rgba(20, 20, 20, 0.72); border: 1px solid #2a2a2a; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.socio .retrato { flex: none; width: clamp(130px, 15vw, 230px); aspect-ratio: 3 / 4; border-radius: 18px; overflow: hidden; background: #1b1b1b; }
+.socio .retrato img { width: 100%; height: 100%; object-fit: cover; object-position: var(--enquadrar); filter: grayscale(1) contrast(1.08) brightness(0.95); transition: filter 0.5s, transform 0.8s var(--entrada); }
+.socio:hover .retrato img { filter: none; transform: scale(1.03); }
+.socio .texto { display: flex; flex-direction: column; justify-content: flex-end; padding: 6px 8px 10px 0; min-width: 0; }
+.socio .papel { font-size: clamp(10px, 0.3vw + 8px, 12px); font-weight: 700; letter-spacing: 0.16em; color: var(--laranja); }
+.socio .nome { margin-top: 6px; font-size: clamp(28px, 2.6vw + 10px, 56px); font-weight: 700; letter-spacing: -0.035em; line-height: 1; }
+@media (max-width: 700px) {
+  .sn-socios { gap: 10px; }
+  .socio { flex-direction: column; padding: 8px; border-radius: 20px; gap: 10px; }
+  .socio .retrato { width: 100%; }
+  .socio .texto { padding: 0 6px 6px; }
+  .socio .nome { font-size: 26px; }
+  .socio .papel { font-size: 9px; letter-spacing: 0.12em; }
+}
