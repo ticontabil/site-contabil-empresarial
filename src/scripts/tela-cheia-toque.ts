@@ -1,3 +1,4 @@
+import { tatilNosToques } from "./tatil";
 // Celular e tablet: o primeiro toque já coloca a página em tela cheia (mais imersão).
 // Só funciona a partir de um toque da pessoa; o iPhone não permite tela cheia em páginas (iPad e Android sim).
 if (matchMedia("(pointer: coarse)").matches) {
@@ -11,3 +12,5 @@ if (matchMedia("(pointer: coarse)").matches) {
   addEventListener("touchend", uma, { passive: true });
   addEventListener("pointerup", umaPonteiro);
 }
+
+tatilNosToques();

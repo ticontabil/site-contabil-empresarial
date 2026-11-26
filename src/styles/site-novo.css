@@ -830,3 +830,9 @@ body.sn { background: #000; color: #fff; font-family: var(--fonte); -webkit-font
 .cartao-gestora .setor { color: rgba(255, 255, 255, 0.62); }
 .socio .cargo { margin-top: 8px; font-size: clamp(14px, 0.4vw + 11px, 18px); color: rgba(255, 255, 255, 0.66); }
 @media (max-width: 700px) { .socio .cargo { font-size: 13px; margin-top: 4px; } }
+
+/* tablet (tela touch larga): os botões descem, para não ficarem embaixo do "X" de sair da tela cheia
+   que o navegador do iPad/Android mostra no canto superior esquerdo, nem da barra de status */
+@media (pointer: coarse) and (min-width: 761px) {
+  .sn-botoes-topo { top: calc(env(safe-area-inset-top, 0px) + clamp(16px, 3vh, 34px) + 78px); }
+}

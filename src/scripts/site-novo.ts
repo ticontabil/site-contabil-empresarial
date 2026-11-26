@@ -1,6 +1,7 @@
 // Site novo (/novo): o site inteiro rola na vertical (o modo horizontal saiu a pedido do Hiago em 25/11/2026).
 // Mapa da página na lateral esquerda, menu da logo em tela cheia, animações que seguem a rolagem.
 import "./site"; // acordeão "Dúvidas rápidas" do rodapé (mesmo rodapé do site atual)
+import { tatilNosToques } from "./tatil";
 
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s);
 const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => [...r.querySelectorAll<T>(s)];
@@ -52,7 +53,6 @@ const telaCheia = (ligar?: boolean) => {
     try { (doc.exitFullscreen || doc.webkitExitFullscreen)?.call(doc)?.catch?.(() => {}); } catch {}
   }
 };
-const tatil = () => { try { navigator.vibrate?.(12); } catch {} };
 let ultimoToqueLogo = 0;
 marcaBotao.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -62,7 +62,6 @@ marcaBotao.addEventListener("click", (e) => {
     ultimoToqueLogo = 0;
     abrirMenu(false);
     telaCheia();
-    tatil();
     return;
   }
   ultimoToqueLogo = agora;
@@ -595,6 +594,8 @@ coresDasBordas();
   addEventListener("touchend", pedir, { passive: true });
   addEventListener("pointerup", (e) => { if (e.pointerType !== "mouse") pedir(); });
 })();
+
+tatilNosToques();
 
 addEventListener("resize", ajustarGigantes);
 document.fonts?.ready.then(ajustarGigantes);
