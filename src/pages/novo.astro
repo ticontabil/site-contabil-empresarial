@@ -55,11 +55,11 @@ const especializados = servicos.itens.filter((s) => ["Contabilidade Rural", "Con
 const num = telas.numeros.tela;
 const [destA, destB] = num.destaque.split(" — ");
 const time = telas.time.tela;
-// sócios-proprietários em destaque (fotos enviadas pelo Hiago, 26/11/2026) e mais duas gestoras na faixa.
+// diretores em destaque (sem "sócio-proprietário": eles preferem assim) (fotos enviadas pelo Hiago, 26/11/2026) e mais duas gestoras na faixa.
 // Só no site: a apresentação continua com a lista dela.
 const socios = [
-  { nome: "Olavo", papel: "Sócio-proprietário", cargo: "Diretor", foto: "gestores/olavo.jpg", enquadrar: "50% 20%" },
-  { nome: "Josiney", papel: "Sócio-proprietário", cargo: "Diretor", foto: "gestores/josiney.jpg", enquadrar: "50% 25%" },
+  { nome: "Olavo", cargo: "Diretor", foto: "gestores/olavo.jpg", enquadrar: "50% 20%" },
+  { nome: "Josiney", cargo: "Diretor", foto: "gestores/josiney.jpg", enquadrar: "50% 25%" },
 ];
 const gestoresSite = [
   ...time.gestoras,
@@ -280,9 +280,8 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
         {socios.map((p, i) => (
           <article class="socio rv" style={`--i:${i}`}>
             <div class="vidro" aria-hidden="true"><Foto arquivo={p.foto} descricao="" alt="" larguras={[160]} tamanho="160px" /></div>
-            <div class="retrato" style={`--enquadrar:${p.enquadrar}`}><Foto arquivo={p.foto} descricao={`${p.nome}, ${p.papel.toLowerCase()} da Contábil Empresarial`} larguras={[400, 800]} tamanho="(max-width: 700px) 40vw, 240px" /></div>
+            <div class="retrato" style={`--enquadrar:${p.enquadrar}`}><Foto arquivo={p.foto} descricao={`${p.nome}, ${p.cargo.toLowerCase()} da Contábil Empresarial`} larguras={[400, 800]} tamanho="(max-width: 700px) 40vw, 240px" /></div>
             <div class="texto">
-              <p class="papel">({p.papel.toUpperCase()})</p>
               <p class="nome">{p.nome}</p>
               <p class="cargo">{p.cargo}</p>
             </div>
