@@ -1,0 +1,85 @@
+---
+// /novo/noticia?id=… — uma notícia no design do site novo: resumo publicado pela fonte e botão para a matéria original.
+import SiteNovo from "../../layouts/SiteNovo.astro";
+import Footer from "../../components/Footer.astro";
+import { whatsapp, rodape } from "../../data/site";
+---
+<SiteNovo titulo="Notícia · Contábil Empresarial" descricao="Resumo da notícia e link para a matéria original.">
+  <a id="sn-marca" class="sn-marca-link" href="/novo" aria-label="Voltar ao site">
+    <span id="sn-marca-botao"><img src="/logo-negative.png" alt="Contábil Empresarial" width="568" height="229" /><span class="sn-brilho" aria-hidden="true"></span></span>
+  </a>
+  <a class="nt-voltar" href="/novo/noticias" data-voltar>← Todas as notícias</a>
+  <div class="sn-borda topo" aria-hidden="true"><i class="b1"></i><i class="b2"></i></div>
+  <div class="sn-borda base" aria-hidden="true"><i class="b1"></i><i class="b2"></i></div>
+
+  <main class="nt nt-artigo" data-noticia>
+    <div class="sn-atmosfera" aria-hidden="true"><span class="f1"></span></div>
+    <div data-carregando class="nt-carregando" aria-hidden="true"><span></span><span></span><span></span></div>
+    <article data-conteudo hidden>
+      <p class="nt-meta"><span class="tema" data-tema></span><span class="quando" data-data></span></p>
+      <h1 class="nt-titulo" data-titulo></h1>
+      <div data-capa></div>
+      <p class="nt-resumo" data-resumo></p>
+      <div class="nt-fonte-caixa">
+        <p class="sn-rotulo">(FONTE)</p>
+        <p>Matéria publicada por <strong data-fonte></strong><span data-oficial hidden> · fonte oficial</span>.</p>
+        <a data-link target="_blank" rel="noopener" class="sn-btn sn-btn-cheio">Ler a matéria completa <span aria-hidden="true">↗</span></a>
+        <p class="nt-endereco" data-endereco></p>
+      </div>
+      <aside class="nt-cta pequeno">
+        <div>
+          <h2 class="sn-titulo"><strong>Isso muda algo para a sua empresa?</strong></h2>
+          <p class="sn-apoio">Fale com um especialista da Contábil Empresarial.</p>
+        </div>
+        <a class="sn-btn" href={whatsapp.especialista} target="_blank" rel="noopener">Falar no WhatsApp <span aria-hidden="true">→</span></a>
+      </aside>
+      <section class="nt-relacionadas" data-relacionadas-bloco hidden>
+        <p class="sn-rotulo">(MAIS SOBRE O MESMO TEMA)</p>
+        <ol data-relacionadas></ol>
+      </section>
+    </article>
+    <p class="nt-vazio" data-erro hidden>Não encontramos essa notícia. Ela pode ter saído da lista. <a href="/novo/noticias">Ver as notícias mais recentes</a>.</p>
+  </main>
+  <div class="nt-rodape"><Footer slogan={rodape.sloganNovo} /></div>
+</SiteNovo>
+
+<script>
+  import "../../scripts/site";
+  import { fotoNoticia, quando, esc } from "../../scripts/noticias-novo";
+  type Noticia = { id: string; titulo: string; resumo: string; link: string; data: string; fonte: string; oficial: boolean; tema: string; imagem?: string; credito?: string };
+  const raiz = document.querySelector<HTMLElement>("[data-noticia]")!;
+  const $ = <T extends HTMLElement>(s: string) => raiz.querySelector<T>(s)!;
+  const id = new URLSearchParams(location.search).get("id") || "";
+  function mostrar(itens: Noticia[]) {
+    const n = itens.find((x) => x.id === id);
+    $("[data-carregando]").remove();
+    if (!n) { $("[data-erro]").hidden = false; return; }
+    document.title = `${n.titulo} · Notícias · Contábil Empresarial`;
+    $("[data-tema]").textContent = n.tema;
+    $("[data-data]").textContent = new Date(n.data).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }) + ` · ${quando(n.data)}`;
+    $("[data-titulo]").textContent = n.titulo;
+    $("[data-capa]").innerHTML = fotoNoticia(n, true);
+    $("[data-resumo]").textContent = n.resumo || "A fonte não publicou um resumo desta matéria. Toque abaixo para ler na íntegra.";
+    $("[data-fonte]").textContent = n.fonte;
+    $("[data-oficial]").hidden = !n.oficial;
+    const a = $<HTMLAnchorElement>("[data-link]");
+    a.href = n.link;
+    a.innerHTML = `Ler a matéria completa em ${esc(n.fonte)} <span aria-hidden="true">↗</span>`;
+    $("[data-endereco]").textContent = n.link;
+    const rel = itens.filter((x) => x.tema === n.tema && x.id !== n.id).slice(0, 5);
+    if (rel.length) {
+      $("[data-relacionadas]").innerHTML = rel.map((r, i) => `<li><span class="n">(${String(i + 1).padStart(2, "0")})</span><a href="/novo/noticia?id=${encodeURIComponent(r.id)}">${esc(r.titulo)}</a><small>${esc(r.fonte)}</small></li>`).join("");
+      $("[data-relacionadas-bloco]").hidden = false;
+    }
+    $("[data-conteudo]").hidden = false;
+    requestAnimationFrame(() => $("[data-conteudo]").classList.add("on"));
+  }
+  let cache: { itens: Noticia[] } | null = null;
+  try { cache = JSON.parse(sessionStorage.getItem("noticias") || "null"); } catch {}
+  if (cache?.itens?.some((x) => x.id === id)) mostrar(cache.itens);
+  else fetch("/api/noticias.php").then((r) => r.json()).then((d) => mostrar(d.itens || [])).catch(() => mostrar([]));
+  try {
+    const r = new URL(document.referrer);
+    if (r.origin === location.origin && r.pathname === "/novo/noticias") document.querySelector<HTMLAnchorElement>("[data-voltar]")!.href = r.pathname + r.search;
+  } catch {}
+</script>

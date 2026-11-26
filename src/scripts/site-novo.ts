@@ -128,6 +128,8 @@ function tunelCapa() {
       c.style.zIndex = String(100 - d);
     });
     if (contador) contador.textContent = String(frente + 1).padStart(2, "0");
+    const local = $("[data-local-visor]", tunel);
+    if (local) local.textContent = `(${camadas[frente].dataset.local || ""})`;
   };
   aplicar(true);
   if (reduz) return { entrar() {}, sair() {} };
@@ -161,9 +163,11 @@ function historia() {
     return (r > 1.2 ? 700 : r < 0.85 ? 460 : 560) * (c.classList.contains("recorte") ? 1.13 : 1);
   });
   const camDe = (p: number) => (p <= 1 ? -1350 + 1100 * p : (p - 1) * D - 250);
-  let W = 0, Hh = 0, K = 1, emPe = false;
+  let W = 0, Hh = 0, K = 1, emPe = false, compacta = false, deitada = false;
   const medir = () => {
     W = cena.clientWidth; Hh = cena.clientHeight; emPe = Hh > W;
+    compacta = W < 900 || Hh < 560; // celular (em pé ou deitado)
+    deitada = compacta && !emPe;
     K = limita(Math.min(W / 1440, Hh / 900), emPe ? 0.5 : 0.42, 1.7);
     cartoes.forEach((c, i) => (c.style.width = `${largura[i] * K}px`));
   };
@@ -173,8 +177,29 @@ function historia() {
   const suave = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
 
   const desenhar = (agora: number) => {
-    const fx = W / 2, fy = Hh * FUGA_Y;
+    // celular deitado: recortes à direita, texto à esquerda
+    const fx = deitada ? W * 0.68 : W / 2, fy = Hh * (deitada ? 0.5 : FUGA_Y);
+    // celular: no começo o 1º recorte fica grande e na frente; os outros desfocados atrás.
+    // Ao avançar, ele sai para a direita desfocando e a câmera segue normal.
+    const foco = compacta ? 1 - faixa(passoVisto, 0, 1) : 0;
     cartoes.forEach((c, i) => {
+      // celular: depois que o 1º recorte saiu pela direita, ele não volta no meio da câmera
+      if (compacta && i === 0 && foco <= 0) { if (c.style.visibility !== "hidden") { c.style.opacity = "0"; c.style.visibility = "hidden"; } return; }
+      if (foco > 0 && i === 0) {
+        const larg = largura[0] * K;
+        const alvoLarg = deitada ? Math.min(W * 0.36, Hh * 0.62 * 0.8) : W * 0.8;
+        const s0 = alvoLarg / larg;
+        const sai = 1 - foco;
+        const x0 = (deitada ? W * 0.68 : W / 2) + sai * W * 0.75;
+        const y0 = deitada ? Hh * 0.5 : Hh * 0.4;
+        c.style.visibility = "visible";
+        c.style.opacity = Math.max(0, 1 - sai * 1.1).toFixed(3);
+        c.style.transform = `translate3d(${x0.toFixed(1)}px, ${y0.toFixed(1)}px, 0) translate(-50%, -50%) scale(${(s0 * (1 + sai * 0.25)).toFixed(4)}) rotate(${(sai * 6).toFixed(2)}deg)`;
+        c.style.filter = sai > 0.02 ? `blur(${(sai * 26).toFixed(1)}px)` : "";
+        c.style.zIndex = "500";
+        if (nums[0]) nums[0]!.style.opacity = (1 - sai * 3).toFixed(3);
+        return;
+      }
       const some = () => { if (c.style.visibility !== "hidden") { c.style.opacity = "0"; c.style.visibility = "hidden"; } };
       const prof = pos[i].z - cam + P;
       if (prof <= 40) return some();
@@ -188,7 +213,7 @@ function historia() {
       c.style.transform = `translate3d(${(fx + x * s).toFixed(1)}px, ${(fy + y * s).toFixed(1)}px, 0) translate(-50%, -50%) scale(${s.toFixed(4)}) rotate(${rot.toFixed(2)}deg)`;
       const lente = Math.max(0, (s - 0.9) * 42);
       const cx = (x * s) / (W / 2), cy = (fy + y * s - Hh / 2) / (Hh / 2);
-      const desfoque = Math.min(34, lente + faixa(Math.hypot(cx, cy * 1.2), 0.62, 1.05) * 5);
+      const desfoque = Math.min(34, lente + faixa(Math.hypot(cx, cy * 1.2), 0.62, 1.05) * 5 + foco * 12);
       const cs = camadas[i];
       if (cs) {
         cs[0].style.opacity = (1 - faixa(desfoque, 0, 6)).toFixed(3);
@@ -365,10 +390,9 @@ function etapas() {
 function contato() {
   const sec = $("#contato");
   if (!sec) return null;
-  const titulo = $("[data-letras]", sec)!;
   const palco = $(".ct-palco", sec)!;
-  titulo.innerHTML = [...(titulo.textContent || "")].map((c) => `<span class="l">${c === " " ? "&nbsp;" : c}</span>`).join("");
-  const letras = $$(".l", titulo);
+  // a logo não tem letras separadas: ela pisca inteira junto com a luz (classe luz-on)
+  const letras: HTMLElement[] = [];
   let timers: number[] = [];
   const depois = (ms: number, f: () => void) => timers.push(window.setTimeout(f, ms));
   const limpar = () => { timers.forEach(clearTimeout); timers = []; };
@@ -434,6 +458,20 @@ function contato() {
 }
 
 // ======================= celular: blocos afundam no preto e desfocam ao passar pelo topo =======================
+// bordas da tela: o véu de cada borda acompanha a cor da seção que está passando por ela (preto ou cinza-claro)
+function coresDasBordas() {
+  const topo = $(".sn-borda.topo"), base = $(".sn-borda.base");
+  if (!topo || !base) return;
+  const claras = $$(".sn-clara");
+  const ver = () => {
+    const naBorda = (y: number) => claras.some((c) => { const r = c.getBoundingClientRect(); return r.top <= y && r.bottom >= y; });
+    topo.classList.toggle("clara", naBorda(20));
+    base.classList.toggle("clara", naBorda(innerHeight - 20));
+  };
+  addEventListener("scroll", () => requestAnimationFrame(ver), { passive: true });
+  ver();
+}
+
 function afundarNoPreto() {
   const alvos = $$(".sn-bloco .sn-cab, .sn-bloco .rv, .sn-time .sn-cab");
   alvos.forEach((el) => (el.dataset.sai = ""));
@@ -478,6 +516,7 @@ if (!H) {
   afundarNoPreto();
 }
 arrastar();
+coresDasBordas();
 
 addEventListener("resize", ajustarGigantes);
 document.fonts?.ready.then(ajustarGigantes);

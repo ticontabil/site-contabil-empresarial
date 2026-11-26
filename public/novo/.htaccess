@@ -1,0 +1,2 @@
+# /novo/noticias e /novo/noticia: sem o redirecionamento automático para /novo/ (a página /novo é o novo.html)
+DirectorySlash Off

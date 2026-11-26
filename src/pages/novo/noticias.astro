@@ -1,0 +1,128 @@
+---
+// /novo/noticias — feed de notícias no design do site novo (em construção, atrás da mesma senha do /novo).
+// Mesmo conteúdo de /noticias: título + resumo publicados pela fonte e link para a matéria original.
+// Notícia sem foto fica só com texto (sem capa "vazia"); com foto (fontes oficiais), mostra a foto com crédito.
+import SiteNovo from "../../layouts/SiteNovo.astro";
+import Footer from "../../components/Footer.astro";
+import { whatsapp, rodape } from "../../data/site";
+---
+<SiteNovo titulo="Notícias · Contábil Empresarial" descricao="Notícias de contabilidade e impostos, de fontes oficiais e confiáveis.">
+  <a id="sn-marca" class="sn-marca-link" href="/novo" aria-label="Voltar ao site">
+    <span id="sn-marca-botao"><img src="/logo-negative.png" alt="Contábil Empresarial" width="568" height="229" /><span class="sn-brilho" aria-hidden="true"></span></span>
+  </a>
+  <a class="nt-voltar" href="/novo">← Voltar ao site</a>
+  <div class="sn-borda topo" aria-hidden="true"><i class="b1"></i><i class="b2"></i></div>
+  <div class="sn-borda base" aria-hidden="true"><i class="b1"></i><i class="b2"></i></div>
+
+  <main class="nt" data-noticias>
+    <div class="sn-atmosfera" aria-hidden="true"><span class="f1"></span><span class="f2"></span></div>
+    <header class="nt-cab">
+      <p class="sn-rotulo">(NOTÍCIAS)</p>
+      <h1 class="sn-titulo"><span class="leve">O que muda</span> <strong>para a sua empresa.</strong></h1>
+      <p class="sn-apoio">Receita Federal, Reforma Tributária, Simples Nacional, eSocial: o que sai nas fontes oficiais e confiáveis, reunido aqui. Toque para ler o resumo e ir à matéria original.</p>
+      <p class="nt-atualizado" data-atualizado aria-live="polite"></p>
+    </header>
+
+    <div class="nt-filtros">
+      <label class="nt-busca">
+        <span class="sr-only">Buscar notícias</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+        <input type="search" data-busca placeholder="Buscar: CBS, MEI, imposto de renda…" />
+      </label>
+      <select data-fonte aria-label="Fonte"><option value="">Todas as fontes</option></select>
+      <label class="nt-oficiais"><input type="checkbox" data-oficiais /> <span>Só fontes oficiais</span></label>
+    </div>
+    <div class="nt-temas" data-temas role="group" aria-label="Temas"></div>
+
+    <div class="nt-lista" data-lista aria-live="polite">
+      {Array.from({ length: 6 }).map(() => <div class="nt-esqueleto" aria-hidden="true"></div>)}
+    </div>
+    <p class="nt-vazio" hidden data-vazio>Nenhuma notícia encontrada com esses filtros.</p>
+    <div class="nt-mais-caixa"><button type="button" data-mais hidden class="sn-btn">Carregar mais notícias</button></div>
+
+    <aside class="nt-cta">
+      <div>
+        <p class="sn-rotulo">(FALE COM A GENTE)</p>
+        <h2 class="sn-titulo"><strong>Uma mudança dessas afeta a sua empresa?</strong></h2>
+        <p class="sn-apoio">Nossos especialistas explicam o que muda no seu caso e o que fazer.</p>
+      </div>
+      <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
+    </aside>
+    <p class="nt-aviso">As notícias são de responsabilidade das fontes citadas. A Contábil Empresarial mostra o título e o resumo publicados por elas, com o link para a matéria original.</p>
+  </main>
+  <div class="nt-rodape"><Footer slogan={rodape.sloganNovo} /></div>
+</SiteNovo>
+
+<script>
+  import "../../scripts/site";
+  import { fotoNoticia, quando, esc } from "../../scripts/noticias-novo";
+  type Noticia = { id: string; titulo: string; resumo: string; link: string; data: string; fonte: string; fonteId: string; oficial: boolean; tema: string; imagem?: string; credito?: string };
+  type Dados = { atualizado: string | null; itens: Noticia[]; fontes: { id: string; nome: string; oficial: boolean }[]; temas: string[] };
+  const raiz = document.querySelector<HTMLElement>("[data-noticias]")!;
+  const $ = <T extends HTMLElement>(s: string) => raiz.querySelector<T>(s)!;
+  const lista = $("[data-lista]"), busca = $<HTMLInputElement>("[data-busca]"), selFonte = $<HTMLSelectElement>("[data-fonte]");
+  const oficiais = $<HTMLInputElement>("[data-oficiais]"), temasEl = $("[data-temas]"), vazio = $("[data-vazio]");
+  const mais = $<HTMLButtonElement>("[data-mais]"), atualizado = $("[data-atualizado]");
+  const POR_PAGINA = 24;
+  let dados: Dados | null = null, tema = "", mostrando = POR_PAGINA;
+  const sem = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const q = new URLSearchParams(location.search);
+  busca.value = q.get("q") || ""; tema = q.get("tema") || ""; oficiais.checked = q.get("oficiais") === "1";
+  function salvarEstado() {
+    const p = new URLSearchParams();
+    if (busca.value.trim()) p.set("q", busca.value.trim());
+    if (tema) p.set("tema", tema);
+    if (selFonte.value) p.set("fonte", selFonte.value);
+    if (oficiais.checked) p.set("oficiais", "1");
+    history.replaceState(null, "", p.toString() ? `?${p}` : location.pathname);
+  }
+  function desenharTemas() {
+    if (!dados) return;
+    const chip = (nome: string, rotulo: string) => `<button type="button" data-tema="${esc(nome)}" aria-pressed="${tema === nome}">${esc(rotulo)}</button>`;
+    temasEl.innerHTML = chip("", "Todos") + dados.temas.map((t) => chip(t, t)).join("");
+  }
+  function cartao(n: Noticia, i: number) {
+    const foto = fotoNoticia(n);
+    return `<article class="nt-item${foto ? " com-foto" : ""}${i === 0 && foto ? " destaque" : ""}" style="--i:${i % 12}">
+      ${foto}
+      <div class="nt-corpo">
+        <p class="nt-meta"><span class="n">(${String(i + 1).padStart(2, "0")})</span><span class="tema">${esc(n.tema)}</span><span class="quando">${esc(quando(n.data))}</span></p>
+        <h2><a href="/novo/noticia?id=${encodeURIComponent(n.id)}">${esc(n.titulo)}</a></h2>
+        ${n.resumo ? `<p class="resumo">${esc(n.resumo)}</p>` : ""}
+        <p class="fonte">${n.oficial ? '<span class="oficial" title="Fonte oficial">●</span> ' : ""}${esc(n.fonte)} <span aria-hidden="true">→</span></p>
+      </div>
+    </article>`;
+  }
+  function desenhar() {
+    if (!dados) return;
+    const termo = sem(busca.value.trim());
+    const filtradas = dados.itens.filter((n) =>
+      (!tema || n.tema === tema) && (!selFonte.value || n.fonteId === selFonte.value) && (!oficiais.checked || n.oficial) &&
+      (!termo || sem(`${n.titulo} ${n.resumo} ${n.fonte}`).includes(termo)));
+    lista.innerHTML = filtradas.slice(0, mostrando).map(cartao).join("");
+    vazio.hidden = filtradas.length > 0;
+    mais.hidden = filtradas.length <= mostrando;
+    requestAnimationFrame(() => lista.querySelectorAll(".nt-item").forEach((el) => el.classList.add("on")));
+  }
+  temasEl.addEventListener("click", (e) => {
+    const b = (e.target as Element).closest<HTMLButtonElement>("[data-tema]");
+    if (!b) return;
+    tema = b.dataset.tema || ""; mostrando = POR_PAGINA; desenharTemas(); desenhar(); salvarEstado();
+  });
+  let t: number | undefined;
+  busca.addEventListener("input", () => { clearTimeout(t); t = window.setTimeout(() => { mostrando = POR_PAGINA; desenhar(); }, 180); });
+  busca.addEventListener("change", salvarEstado);
+  [selFonte, oficiais].forEach((el) => el.addEventListener("change", () => { mostrando = POR_PAGINA; desenhar(); salvarEstado(); }));
+  mais.addEventListener("click", () => { mostrando += POR_PAGINA; desenhar(); });
+  fetch("/api/noticias.php", { headers: { Accept: "application/json" } })
+    .then((r) => r.json())
+    .then((d: Dados) => {
+      dados = d;
+      try { sessionStorage.setItem("noticias", JSON.stringify(d)); } catch {}
+      selFonte.innerHTML = `<option value="">Todas as fontes</option>` + d.fontes.map((f) => `<option value="${esc(f.id)}">${esc(f.nome)}</option>`).join("");
+      selFonte.value = q.get("fonte") || "";
+      if (d.atualizado) atualizado.textContent = `(Atualizado ${quando(d.atualizado)} · ${d.itens.length} notícias de ${d.fontes.length} fontes)`;
+      desenharTemas(); desenhar();
+    })
+    .catch(() => { lista.innerHTML = ""; vazio.textContent = "Não conseguimos carregar as notícias agora. Tente de novo em alguns minutos."; vazio.hidden = false; });
+</script>

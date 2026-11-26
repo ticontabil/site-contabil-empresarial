@@ -31,12 +31,20 @@ const paginas = [
   { id: "contato", nome: "Contato", icone: "whatsapp" },
 ];
 const externos = [
-  { href: "/noticias", nome: "Notícias", icone: "jornal", fora: false },
+  { href: "/novo/noticias", nome: "Notícias", icone: "jornal", fora: false },
   { href: "/trabalheconosco", nome: "Trabalhe Conosco", icone: "pessoal", fora: false },
   { href: PORTAL, nome: "Portal", icone: "externo", fora: true },
 ];
 
 const capa = telas.capa;
+// capa: fachadas das unidades (fotos enviadas pela Contábil em 26/11/2026, recortadas no formato do quadro)
+const fachadas = [
+  { arquivo: "fachadas/itumbiara.jpg", local: "MATRIZ · ITUMBIARA", descricao: "Fachada da matriz em Itumbiara (GO)" },
+  { arquivo: null, video: "matriz", local: "MATRIZ · ITUMBIARA", descricao: "Vídeo da fachada da matriz" },
+  { arquivo: "fachadas/goiania.jpg", local: "FILIAL · GOIÂNIA", descricao: "Prédio da filial de Goiânia (GO)" },
+  { arquivo: "fachadas/uberlandia.jpg", local: "FILIAL · UBERLÂNDIA", descricao: "Fachada da filial de Uberlândia (MG)" },
+  { arquivo: "fachadas/cachoeira-dourada.jpg", local: "FILIAL · CACHOEIRA DOURADA", descricao: "Fachada da filial de Cachoeira Dourada (GO)" },
+] as { arquivo: string | null; video?: string; local: string; descricao: string }[];
 // "Menos impostos. Mais inovação. Mais resultados." → forte / leve / itálico laranja
 const slogan = rodape.sloganNovo.split(/(?<=\.)\s+/);
 const hist = telas.historia;
@@ -83,6 +91,22 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
     </aside>
   </div>
 
+  <!-- bordas da tela: o conteúdo some no preto, desfocando, com um toque de aberração cromática
+       (referência: vídeo do app do Hiago, 26/11/2026; faixa ≈ 6% da altura em cima e embaixo) -->
+  <div class="sn-borda topo" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="ca"></i></div>
+  <div class="sn-borda base" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="ca"></i></div>
+  <svg class="sn-filtros" width="0" height="0" aria-hidden="true" focusable="false">
+    <filter id="sn-aberracao" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r" />
+      <feOffset in="r" dx="-2" dy="0" result="r2" />
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g" />
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b" />
+      <feOffset in="b" dx="2" dy="0" result="b2" />
+      <feBlend in="r2" in2="g" mode="screen" result="rg" />
+      <feBlend in="rg" in2="b2" mode="screen" />
+    </filter>
+  </svg>
+
   <!-- ================= MAPA DA PÁGINA (vertical, lateral esquerda) ================= -->
   <nav id="sn-mapa" aria-label="Mapa da página">
     <div class="trilho" aria-hidden="true"><span class="cheio" data-cheio></span></div>
@@ -96,8 +120,8 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
     <section id="inicio" class="pg sn-hero" data-pg>
       <div class="sn-atmosfera" aria-hidden="true"><span class="f1"></span><span class="f2"></span><span class="f3"></span></div>
       <div class="sn-tunel" data-tunel-auto aria-hidden="true">
-        {capa.tunel.map((f, i) => (
-          <div class="camada" data-i={i}>
+        {fachadas.map((f, i) => (
+          <div class="camada" data-i={i} data-local={f.local}>
             <div class="moldura">
               {f.video ? (
                 <video muted loop playsinline autoplay preload="metadata" poster={`/apresentacao/video/${f.video}-poster.jpg`}>
@@ -110,8 +134,8 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
         ))}
         <div class="sn-visor">
           <i class="canto c1"></i><i class="canto c2"></i><i class="canto c3"></i><i class="canto c4"></i>
-          <span class="visor-rot">(MATRIZ · ITUMBIARA)</span>
-          <span class="visor-pe">(CAMADA <span data-contador>01</span> / {pad(capa.tunel.length)})</span>
+          <span class="visor-rot" data-local-visor>({fachadas[0].local})</span>
+          <span class="visor-pe">(UNIDADE <span data-contador>01</span> / {pad(fachadas.length)})</span>
           <span class="visor-scan"></span>
         </div>
       </div>
@@ -123,7 +147,7 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
         <p class="sn-apoio rv"><Txt t={capa.tela.apoio} /></p>
         <div class="sn-botoes rv">
           <a class="sn-btn sn-btn-cheio" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista <span aria-hidden="true">→</span></a>
-          <a class="sn-btn sn-btn-leve" href="/noticias"><Icone nome="jornal" tamanho={14} /> Notícias</a>
+          <a class="sn-btn sn-btn-leve" href="/novo/noticias"><Icone nome="jornal" tamanho={14} /> Notícias</a>
           <a class="sn-btn sn-btn-leve" href={PORTAL} target="_blank" rel="noopener"><Icone nome="externo" tamanho={14} /> Portal</a>
         </div>
       </div>
@@ -161,7 +185,6 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
           ))}
         </div>
         <p class="h-topo-esq sn-rotulo">{hist.tela.rotulo}</p>
-        <p class="h-contador sn-rotulo" data-contador-moeda>(MOEDA <span>01</span> / {pad(hist.tela.totalMoedas)})</p>
         <div class="h-texto">
           <div class="h-bloco h-intro ativo" data-bloco="-1">
             <h2 class="sn-titulo"><Txt t={hist.tela.titulo} /></h2>
@@ -323,14 +346,31 @@ const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter(
         <b class="p p1"></b><b class="p p2"></b><b class="p p3"></b><b class="p p4"></b>
       </div>
       <div class="ct-topo">
-        <p class="ct-selo"><span aria-hidden="true">✦</span> Contabilidade desde 1984</p>
-        <h2 class="ct-titulo" data-letras>Contábil</h2>
+        <!-- a logo inteira em branco: apagada no escuro; acende onde a luz do teto bate -->
+        <h2 class="ct-logo">
+          <img class="apagada" src="/logo-negative.png" alt="Contábil Empresarial" width="568" height="229" />
+          <img class="acesa" src="/logo-negative.png" alt="" aria-hidden="true" width="568" height="229" />
+          <span class="reflexo" aria-hidden="true"></span>
+        </h2>
         <p class="ct-sub">{rodape.sloganNovo}<br />Fale com um especialista e veja o que muda na sua empresa.</p>
         <a class="ct-botao" href={whatsapp.especialista} target="_blank" rel="noopener">Falar com um especialista</a>
       </div>
       <div class="ct-palco">
         <div class="ct-brilho" aria-hidden="true"></div>
         <div class="ct-cartao"><Footer slogan={rodape.sloganNovo} /></div>
+      </div>
+      <!-- nossos produtos passando embaixo do rodapé, como a fileira de logos da referência -->
+      <div class="ct-produtos">
+        <p>(Ecossistema Contábil)</p>
+        <div class="faixa" aria-label={`Produtos e parceiros: ${produtos.map((p) => p.nome).join(", ")}`}>
+          <div class="trilha">
+            {[0, 1, 2, 3].map((v) => produtos.map((p) => (
+              <div class="item" aria-hidden={v > 0 ? "true" : undefined}>
+                {p.logo ? <Foto arquivo={`parceiros/${p.logo}`} descricao={p.nome} alt={p.nome} larguras={[160, 320]} tamanho="140px" /> : <span>{p.nome}</span>}
+              </div>
+            )))}
+          </div>
+        </div>
       </div>
     </section>
   </main>
