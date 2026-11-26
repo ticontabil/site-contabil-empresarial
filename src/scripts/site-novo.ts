@@ -187,11 +187,11 @@ function historia() {
       if (compacta && i === 0 && foco <= 0) { if (c.style.visibility !== "hidden") { c.style.opacity = "0"; c.style.visibility = "hidden"; } return; }
       if (foco > 0 && i === 0) {
         const larg = largura[0] * K;
-        const alvoLarg = deitada ? Math.min(W * 0.36, Hh * 0.62 * 0.8) : W * 0.8;
+        const alvoLarg = deitada ? Math.min(W * 0.36, Hh * 0.62 * 0.8) : W * 0.72;
         const s0 = alvoLarg / larg;
         const sai = 1 - foco;
         const x0 = (deitada ? W * 0.68 : W / 2) + sai * W * 0.75;
-        const y0 = deitada ? Hh * 0.5 : Hh * 0.4;
+        const y0 = deitada ? Hh * 0.5 : Hh * 0.46; // abaixo do rótulo "(NOSSA HISTÓRIA)"
         c.style.visibility = "visible";
         c.style.opacity = Math.max(0, 1 - sai * 1.1).toFixed(3);
         c.style.transform = `translate3d(${x0.toFixed(1)}px, ${y0.toFixed(1)}px, 0) translate(-50%, -50%) scale(${(s0 * (1 + sai * 0.25)).toFixed(4)}) rotate(${(sai * 6).toFixed(2)}deg)`;
