@@ -1,0 +1,368 @@
+/* =====================================================================
+   Portal do Cliente — movimento orgânico + cabeçalho acrílico
+   Carregar por último (depois de ux-ajustes.css).
+   1. Curvas de mola no lugar das curvas fixas
+   2. Animações de entrada só ao trocar de tela (nada de piscar em filtros)
+   3. Troca de tela e de tema com View Transitions
+   4. Microinterações (apertar, soltar, passar o mouse)
+   5. Cabeçalho acrílico (translúcido, com desfoque e granulado)
+   ===================================================================== */
+
+/* ---------- 1. Curvas de mola ---------- */
+:root {
+  --t-fast: 200ms;
+  --t-med: 380ms;
+  --t-slow: 620ms;
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    /* mola suave: chega rápido e assenta com 1–2% de sobra, como algo físico */
+    --ease-soft: linear(0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%, 0.849 31.5%,
+      0.937 38.1%, 0.968 41.8%, 0.991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%, 1.001 85.9%, 1);
+    /* mola com mais vida, para escolhas, interruptores e o soltar de botões */
+    --ease-spring: linear(0, 0.013 0.6%, 0.05 1.2%, 0.2 2.5%, 0.687 6.8%, 0.861 8.6%, 0.99 10.4%,
+      1.082 12.3%, 1.133 14.2%, 1.153 16%, 1.141 18.2%, 1.109 20.2%, 1.031 25.2%, 0.996 28.8%,
+      0.982 32.4%, 0.987 39.4%, 1.002 49.7%, 1);
+  }
+}
+
+/* entrada mais limpa: do invisível, subindo pouco */
+@keyframes ceRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes ceFade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- 2. Entrada só ao trocar de tela ---------- */
+.app-v2:not(.entrando) :is(
+  .topbar, .subnav .pill, .content > *,
+  .guia-grid > *, .kpi-grid > *, .guia-summary > *, .home-side > *, .quick-row > *,
+  .act-list > li, .obr-list li, .spark span, .revenue-bar, .meter span,
+  .info-wrap > .info-strip
+) { animation: none !important; }
+
+/* durante a transição entre telas, a própria transição faz a entrada do bloco;
+   só as listas e cartões internos entram em cascata */
+.vt-ativa .app-v2 .content > * { animation: none !important; }
+
+/* ---------- 3. View Transitions ---------- */
+.app-v2 .hdr { view-transition-name: vt-hdr; }
+.app-v2 .info-wrap { view-transition-name: vt-banner; }
+.app-v2 .menu-wrap { view-transition-name: vt-menu; }
+.app-v2 .main { view-transition-name: vt-main; }
+.app-v2 .subnav-wrap:not(.empty) { view-transition-name: vt-abas; }
+
+::view-transition-group(*) { animation-duration: 560ms; animation-timing-function: var(--ease-soft); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 240ms; }
+/* cabeçalho não se mexe */
+::view-transition-old(vt-hdr), ::view-transition-new(vt-hdr) { animation: none; }
+::view-transition-group(vt-hdr) { animation: none; z-index: 10; }
+/* conteúdo: o antigo recua e some rápido, o novo sobe com mola */
+::view-transition-old(vt-main) { animation: 200ms cubic-bezier(.4, 0, 1, 1) both vtSair; }
+::view-transition-new(vt-main) { animation: 600ms var(--ease-soft) 60ms both vtEntrar; }
+::view-transition-old(vt-abas) { animation: 160ms ease-in both vtSumir; }
+::view-transition-new(vt-abas) { animation: 420ms var(--ease-soft) both vtEntrar; }
+::view-transition-old(vt-banner) { animation: 220ms ease-in both vtSair; }
+::view-transition-new(vt-banner) { animation: 520ms var(--ease-soft) both vtEntrar; }
+@keyframes vtSair { to { opacity: 0; transform: translateY(-8px) scale(.992); } }
+@keyframes vtEntrar { from { opacity: 0; transform: translateY(18px); } }
+@keyframes vtSumir { to { opacity: 0; } }
+
+/* troca de tema: o novo tema se espalha num círculo a partir do interruptor */
+.vt-tema .app-v2 :is(.hdr, .info-wrap, .menu-wrap, .main, .subnav-wrap) { view-transition-name: none !important; }
+.vt-tema *, .vt-tema *::before, .vt-tema *::after { transition: none !important; }
+.vt-tema::view-transition-old(root) { animation: none; }
+.vt-tema::view-transition-new(root) {
+  animation: 760ms var(--ease-soft) both vtTema;
+}
+@keyframes vtTema {
+  from { clip-path: circle(0 at var(--vt-x, 90%) var(--vt-y, 40px)); }
+  to { clip-path: circle(150vmax at var(--vt-x, 90%) var(--vt-y, 40px)); }
+}
+
+/* ---------- 4. Microinterações ---------- */
+/* botões: afundam rápido ao apertar e voltam com mola ao soltar */
+.app-v2 .btn, .modal .btn, .login-card .btn {
+  transition: transform var(--t-med) var(--ease-spring), box-shadow var(--t-med) var(--ease-soft),
+    filter var(--t-med) var(--ease-soft), background-color var(--t-med) var(--ease-soft), opacity var(--t-med) !important;
+}
+.app-v2 .btn:active:not(:disabled), .modal .btn:active:not(:disabled), .login-card .btn:active:not(:disabled) {
+  transform: scale(.965); transition-duration: 110ms !important; transition-timing-function: ease-out !important;
+}
+
+/* peças do menu, ferramentas, abas e cartões: sobem e assentam com mola */
+.app-v2 :is(.opt, .tool, .pill, .chip-filter, .hcard, .guia-card, .kpi-card, .quick-tile .qi, .icon-btn, .avatar, .is-arrow) {
+  transition-property: transform, box-shadow, background-color, color, opacity, filter !important;
+  transition-duration: var(--t-med) !important;
+  transition-timing-function: var(--ease-spring) !important;
+}
+.app-v2 :is(.opt, .tool, .pill, .chip-filter, .icon-btn, .avatar):active { transform: scale(.955) !important; transition-duration: 110ms !important; transition-timing-function: ease-out !important; }
+.app-v2 .opt.open:active { transform: none !important; }
+
+/* ícone do menu "respira" de leve enquanto o mouse está em cima */
+@keyframes ceRespira { 0%, 100% { transform: translateY(-2px) scale(1.06); } 50% { transform: translateY(-3px) scale(1.1); } }
+@media (hover: hover) {
+  .app-v2 .opt:not(.open):hover .ico-svg { animation: ceRespira 2.4s ease-in-out .35s infinite; }
+}
+
+/* bolinhas do banner e interruptor de tema esticam com mola */
+.is-dot { transition: width var(--t-slow) var(--ease-spring), background-color var(--t-med) var(--ease-soft) !important; }
+.neu-toggle::after { transition: transform var(--t-slow) var(--ease-spring), background var(--t-med) !important; }
+
+/* janelas: véu com desfoque, janela cresce com mola */
+.modal-backdrop { backdrop-filter: blur(6px) saturate(120%); -webkit-backdrop-filter: blur(6px) saturate(120%); }
+.modal { animation: ceModalIn var(--t-slow) var(--ease-soft) backwards; }
+@keyframes ceModalIn { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: none; } }
+
+/* ---------- 5. Cabeçalho acrílico ---------- */
+:root { --acr-tinta: rgba(233, 237, 242, .62); --acr-borda: rgba(255, 255, 255, .55); --acr-sombra: rgba(120, 135, 160, .22); }
+:root[data-theme="dark"] { --acr-tinta: rgba(28, 31, 37, .58); --acr-borda: rgba(255, 255, 255, .07); --acr-sombra: rgba(0, 0, 0, .45); }
+
+.app-v2 .hdr {
+  position: sticky; top: 0; z-index: 40;
+  background-color: var(--acr-tinta) !important;
+  /* granulado bem fino, como acrílico de verdade */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") !important;
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  border-bottom: 1px solid var(--acr-borda) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .25) inset, 0 10px 30px -18px var(--acr-sombra) !important;
+  transition: box-shadow var(--t-med) var(--ease-soft), background-color var(--t-slow) var(--ease-soft) !important;
+}
+/* ao rolar, a sombra aparece um pouco mais (o conteúdo "passa por baixo") */
+.app-v2 .hdr.rolou { box-shadow: 0 1px 0 rgba(255, 255, 255, .25) inset, 0 14px 34px -16px var(--acr-sombra) !important; }
+/* navegador sem desfoque: fundo quase sólido para manter a leitura */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .app-v2 .hdr { background-color: var(--neu-bg) !important; }
+}
+
+/* ---------- 6. Submenu (painel de ferramentas) leve ----------
+   A altura é animada pelo JS (o conteúdo de baixo desce junto). Aqui sai o que pesava:
+   recorte (clip-path), achatamento (scaleY) e sombra animada do quadrado aberto. */
+.app-v2 .opts .tools { animation: none !important; }
+.app-v2 .opt { transition-property: transform, background-color, color !important; }
+/* ferramentas entram em cascata só com opacidade e deslocamento (barato para a placa de vídeo) */
+@keyframes ceToolIn { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+.app-v2 .tools .tool { animation: ceToolIn 520ms var(--ease-soft) backwards !important; }
+.app-v2 .tools .tool:nth-child(1) { animation-delay: 40ms !important; }
+.app-v2 .tools .tool:nth-child(2) { animation-delay: 75ms !important; }
+.app-v2 .tools .tool:nth-child(3) { animation-delay: 110ms !important; }
+.app-v2 .tools .tool:nth-child(4) { animation-delay: 145ms !important; }
+.app-v2 .tools .tool:nth-child(5) { animation-delay: 180ms !important; }
+.app-v2 .tools .tool:nth-child(n+6) { animation-delay: 210ms !important; }
+/* a ponte entre o quadrado e o painel cresce junto */
+.app-v2 .opt.open::before { animation: ceBridge 300ms var(--ease-soft) backwards; }
+
+/* ---------- 7. Menu: opções com relevo; a aberta desce para o plano ----------
+   Os quadrados continuam neumórficos. Ao abrir, a opção perde o relevo e fica no plano
+   do fundo, e as ferramentas aparecem no mesmo plano, com o mesmo visual dela. */
+.app-v2 .opts {
+  row-gap: 0 !important;                 /* o espaço vertical vem da margem das opções (abrir o painel não dá pulo) */
+  --neu-well: var(--neu-bg);             /* aberta = mesmo fundo da página, no plano */
+}
+.app-v2 .opts > .opt { margin-bottom: var(--menu-gap); }
+/* seção atual (sem o painel aberto): traço laranja embaixo */
+.app-v2 .opt.active:not(.open)::after {
+  content: ""; position: absolute; left: 50%; bottom: 10px; width: 22px; height: 3px; margin-left: -11px;
+  border-radius: 3px; background: var(--neu-accent);
+}
+/* opção aberta: no plano, sem relevo */
+.app-v2 .opt.open { background: var(--neu-bg) !important; box-shadow: none !important; color: var(--neu-accent) !important; }
+.app-v2 .opts .tools { background: var(--neu-bg) !important; box-shadow: none !important; }
+/* ferramentas: mesmo visual da opção aberta (no plano, ícone laranja) */
+.app-v2 .opts .tools .tool {
+  background: transparent !important; box-shadow: none !important; border: 0 !important;
+}
+.app-v2 .opts .tools .tool .ico-svg { color: var(--neu-accent) !important; }
+.app-v2 .opts .tools .tool:hover { background: color-mix(in srgb, var(--neu-text) 6%, transparent) !important; transform: none !important; }
+.app-v2 .opts .tools .tool:active { background: color-mix(in srgb, var(--neu-text) 9%, transparent) !important; }
+.app-v2 .opts .tools .tool.active { color: var(--neu-accent) !important; }
+.app-v2 .opts .tools .tool.active::after {
+  content: ""; position: absolute; left: 14px; bottom: 9px; width: 18px; height: 3px; border-radius: 3px; background: var(--neu-accent);
+}
+.app-v2 .opts .tools .tool { position: relative; }
+/* ao abrir, a forma da opção "escorre" para o plano do painel: fundo, cantos e posição mudam juntos */
+.app-v2 .opt {
+  transition-property: transform, background-color, color, box-shadow, border-bottom-left-radius, border-bottom-right-radius !important;
+  transition-duration: var(--t-slow) !important;
+}
+.app-v2 .opt.open { transition-timing-function: var(--ease-soft) !important; }
+.app-v2 .opt.open::before { animation-duration: 420ms; }
+
+/* ---------- 8. Janelas acrílicas (Conversas e Notificações) ---------- */
+:root {
+  --acr-pop-tinta: rgba(246, 248, 251, .67);
+  --acr-pop-borda: rgba(255, 255, 255, .7);
+  --acr-pop-linha: rgba(60, 70, 90, .09);
+  --acr-pop-hover: rgba(255, 255, 255, .6);
+  --acr-pop-skel: rgba(60, 70, 90, .08);
+  --acr-pop-sombra: 0 30px 70px -20px rgba(30, 40, 60, .35), 0 10px 24px -12px rgba(30, 40, 60, .18);
+}
+:root[data-theme="dark"] {
+  --acr-pop-tinta: rgba(30, 33, 40, .61);
+  --acr-pop-borda: rgba(255, 255, 255, .09);
+  --acr-pop-linha: rgba(255, 255, 255, .06);
+  --acr-pop-hover: rgba(255, 255, 255, .06);
+  --acr-pop-skel: rgba(255, 255, 255, .07);
+  --acr-pop-sombra: 0 30px 70px -20px rgba(0, 0, 0, .7), 0 10px 24px -12px rgba(0, 0, 0, .5);
+}
+.acr-pop {
+  position: fixed; z-index: 60; display: flex; flex-direction: column; min-height: 160px;
+  border-radius: 22px; color: var(--neu-text);
+  background-color: var(--acr-pop-tinta);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--acr-pop-borda);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), var(--acr-pop-sombra);
+  transform-origin: var(--seta-x, 90%) -8px;
+  animation: acrIn 420ms var(--ease-spring) both;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .acr-pop { background-color: var(--neu-bg); }
+}
+/* setinha apontando para o ícone */
+.acr-pop::before {
+  content: ""; position: absolute; top: -8px; left: calc(var(--seta-x, 90%) - 7px); width: 14px; height: 14px;
+  background-color: var(--acr-pop-tinta);
+  border-left: 1px solid var(--acr-pop-borda); border-top: 1px solid var(--acr-pop-borda);
+  border-top-left-radius: 4px; transform: rotate(45deg);
+  backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+}
+.acr-pop.saindo { animation: acrOut 170ms cubic-bezier(.4, 0, 1, 1) both; pointer-events: none; }
+@keyframes acrIn { from { opacity: 0; transform: translateY(-10px) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes acrOut { to { opacity: 0; transform: translateY(-6px) scale(.97); } }
+
+.acr-head { display: flex; align-items: center; gap: 12px; padding: 16px 16px 12px 18px; border-bottom: 1px solid var(--acr-pop-linha); }
+.acr-head > div { flex: 1; min-width: 0; }
+.acr-head h3 { margin: 0; font-size: 16px; letter-spacing: -.01em; }
+.acr-sub { display: block; margin-top: 2px; font-size: 12.5px; color: var(--neu-text-soft); }
+.acr-ico { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; color: var(--neu-accent);
+  background: color-mix(in srgb, var(--neu-accent) 13%, transparent); }
+.acr-ico .ico-svg { width: 19px; height: 19px; }
+.acr-x { width: 30px; height: 30px; border: 0; border-radius: 50%; background: transparent; color: var(--neu-text-soft); font-size: 20px; line-height: 1; cursor: pointer; transition: background-color var(--t-fast); }
+.acr-x:hover { background: var(--acr-pop-hover); color: var(--neu-text); }
+
+.acr-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 6px; scrollbar-width: thin; }
+.acr-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.acr-item {
+  width: 100%; display: flex; gap: 12px; align-items: flex-start; text-align: left; padding: 11px 12px; border: 0; border-radius: 14px;
+  background: transparent; color: inherit; font: inherit; cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-soft), transform var(--t-med) var(--ease-spring);
+}
+.acr-item:hover { background: var(--acr-pop-hover); }
+.acr-item:active { transform: scale(.98); transition-duration: 90ms; }
+.acr-item:focus-visible, .acr-link:focus-visible, .acr-x:focus-visible { outline: 2px solid var(--neu-accent); outline-offset: 1px; }
+.acr-av { position: relative; flex: 0 0 auto; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px;
+  color: var(--neu-icon); background: var(--acr-pop-hover); }
+.acr-av .ico-svg { width: 17px; height: 17px; }
+.acr-dot { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: var(--neu-accent); box-shadow: 0 0 0 2px var(--neu-bg); }
+.acr-item.novo .acr-av { color: var(--neu-accent); }
+.acr-item.tom-danger .acr-av { color: #DC2626; background: color-mix(in srgb, #DC2626 12%, transparent); }
+.acr-item.tom-warn .acr-av { color: #D97706; background: color-mix(in srgb, #D97706 13%, transparent); }
+.acr-item.tom-info .acr-av { color: #2563EB; background: color-mix(in srgb, #2563EB 11%, transparent); }
+:root[data-theme="dark"] .acr-item.tom-danger .acr-av { color: #F87171; }
+:root[data-theme="dark"] .acr-item.tom-warn .acr-av { color: #FBBF24; }
+:root[data-theme="dark"] .acr-item.tom-info .acr-av { color: #60A5FA; }
+:root[data-theme="dark"] .acr-av .ico-svg { filter: drop-shadow(0 0 3px currentColor); }
+.acr-txt { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.acr-top { display: flex; align-items: baseline; gap: 8px; }
+.acr-top b { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 650; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acr-item.novo .acr-top b { font-weight: 750; }
+.acr-top time { flex: 0 0 auto; font-size: 11.5px; color: var(--neu-text-soft); }
+.acr-txt small { font-size: 12.5px; line-height: 1.4; color: var(--neu-text-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.acr-chips { display: flex; gap: 6px; margin-top: 2px; }
+.acr-chips .status-chip { font-size: 11px; }
+.acr-prazo { font-size: 12px; font-weight: 600; color: var(--neu-text-soft); }
+.acr-vazio { display: grid; justify-items: center; gap: 4px; padding: 28px 16px; text-align: center; color: var(--neu-text-soft); }
+.acr-vazio > span { color: #16A34A; }
+.acr-vazio b { color: var(--neu-text); }
+
+/* itens entram em cascata */
+.acr-list > li { animation: ceRise 460ms var(--ease-soft) backwards; }
+.acr-list > li:nth-child(2) { animation-delay: 35ms; }
+.acr-list > li:nth-child(3) { animation-delay: 70ms; }
+.acr-list > li:nth-child(4) { animation-delay: 105ms; }
+.acr-list > li:nth-child(5) { animation-delay: 140ms; }
+.acr-list > li:nth-child(n+6) { animation-delay: 170ms; }
+
+/* carregando: linhas que "respiram" */
+.acr-skel { display: flex; gap: 12px; padding: 11px 12px; }
+.acr-skel i { width: 34px; height: 34px; border-radius: 11px; }
+.acr-skel span { flex: 1; display: grid; gap: 7px; padding-top: 3px; }
+.acr-skel b { height: 11px; width: 70%; border-radius: 6px; }
+.acr-skel em { height: 9px; width: 45%; border-radius: 6px; }
+.acr-skel i, .acr-skel b, .acr-skel em { background: var(--acr-pop-skel); animation: acrPulso 1.2s ease-in-out infinite; }
+@keyframes acrPulso { 50% { opacity: .45; } }
+
+.acr-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px 12px 18px; border-top: 1px solid var(--acr-pop-linha); }
+.acr-foot:empty { display: none; }
+.acr-link { border: 0; background: none; padding: 6px 0; color: var(--neu-accent); font: 600 13px/1.2 inherit; cursor: pointer; }
+.acr-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ícone do cabeçalho com a janela aberta fica marcado */
+.app-v2 .icon-btn.acr-on { color: var(--neu-accent); box-shadow: var(--neu-in-sm) !important; }
+.app-v2 .icon-btn.acr-on .ico-svg { color: var(--neu-accent); }
+.acr-chips .status-chip { box-shadow: none !important; background: var(--acr-pop-hover) !important; padding: 3px 9px; }
+.acr-body { overflow-x: hidden; }
+
+/* ---------- 9. Respiro entre blocos (todas as telas) ----------
+   O relevo usa sombras de ~24px de desfoque; com 10–16px entre os blocos elas se encostam.
+   Escala: 32px entre seções · 24px entre cartões lado a lado · 18px em grades internas. */
+:root { --gap-secao: 32px; --gap-cards: 24px; --gap-interno: 18px; --menu-gap: 18px; }
+@media (max-width: 700px) { :root { --gap-secao: 24px; --gap-cards: 16px; --gap-interno: 14px; --menu-gap: 10px; } }
+
+/* seções da tela: espaço único entre um bloco e o próximo */
+.app-v2 .content > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+.app-v2 .content > :not([hidden]):not(.hide) ~ :not([hidden]):not(.hide) { margin-top: var(--gap-secao) !important; }
+
+/* grades de cartões */
+.app-v2 :is(.kpi-grid, .guia-grid, .guia-summary, .fat-kpis, .fat-top, .home-grid, .home-side, .home-main,
+  .ag-body, .obr-extra, .essential-grid, .quick-row, .dv2-grid, .cert2-grid, .fin2-grid) { gap: var(--gap-cards) !important; }
+/* grades pequenas dentro de um cartão */
+.app-v2 :is(.fat-det-grid, .cert2-facts, .agreement-money, .installment-metrics) { gap: var(--gap-interno) !important; }
+/* blocos empilhados dentro de um cartão (ex.: consultas oficiais) */
+.app-v2 .hcard > .hcard + .hcard, .app-v2 .consultas-oficiais > * + * { margin-top: var(--gap-interno); }
+
+/* menu de quadrados */
+.app-v2 .opts { column-gap: var(--menu-gap) !important; }
+.app-v2 .opts .tools { gap: var(--gap-interno) !important; }
+
+/* ---------- 10. Redesenho dentro da tela (filtros, abas, mês) ----------
+   Só a área do conteúdo troca, num esmaecimento curto e sem "mergulho" de brilho;
+   cabeçalho, banner, menu e abas ficam parados. */
+.vt-redesenho::view-transition-group(vt-main) { animation-duration: 340ms; animation-timing-function: var(--ease-soft); }
+.vt-redesenho::view-transition-image-pair(vt-main) { isolation: isolate; }
+.vt-redesenho::view-transition-old(vt-main) { animation: 200ms ease-out both vtSumir; mix-blend-mode: plus-lighter; }
+.vt-redesenho::view-transition-new(vt-main) { animation: 240ms ease-out both vtSurgir; mix-blend-mode: plus-lighter; }
+@keyframes vtSurgir { from { opacity: 0; } }
+.vt-redesenho::view-transition-group(vt-banner), .vt-redesenho::view-transition-group(vt-menu), .vt-redesenho::view-transition-group(vt-abas),
+.vt-redesenho::view-transition-old(vt-banner), .vt-redesenho::view-transition-new(vt-banner),
+.vt-redesenho::view-transition-old(vt-menu), .vt-redesenho::view-transition-new(vt-menu),
+.vt-redesenho::view-transition-old(vt-abas), .vt-redesenho::view-transition-new(vt-abas) { animation: none; }
+/* linhas de listas com um pouco mais de ar */
+.app-v2 .content :is(.act-list, .obr-list ul) > li { padding-top: 14px !important; padding-bottom: 14px !important; }
+@media (max-width: 700px) { .app-v2 .content :is(.act-list, .obr-list ul) > li { padding-top: 12px !important; padding-bottom: 12px !important; } }
+
+/* sem barra de rolagem na lateral (a página continua rolando com roda, teclado e toque) */
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* ---------- 11. Logo da Contábil Empresarial ----------
+   Logo toda branca dentro de um retângulo laranja (no lugar do selo "CE"), igual nos dois temas. */
+.logo-ce {
+  display: inline-flex; align-items: center; justify-content: center; line-height: 0; box-sizing: border-box;
+  border-radius: 12px; background: linear-gradient(145deg, var(--neu-accent-2, #FF7A2F), var(--neu-accent));
+  box-shadow: 4px 4px 10px var(--neu-accent-shadow, rgba(251, 93, 2, .35)), -4px -4px 10px var(--neu-light);
+}
+:root[data-theme="dark"] .logo-ce { box-shadow: 4px 4px 12px rgba(0, 0, 0, .45), 0 0 18px -6px rgba(255, 106, 20, .45); }
+.logo-ce img { display: block; height: 100%; width: auto; }
+/* cabeçalho: retângulo laranja + divisória + "Portal do Cliente" */
+.app-v2 .hdr-brand { gap: 14px; }
+.app-v2 .hdr-brand .logo-ce { height: 46px; padding: 7px 12px; }
+.app-v2 .hdr-brand .brand-txt { padding-left: 14px; border-left: 1px solid color-mix(in srgb, var(--neu-text) 18%, transparent); }
+.app-v2 .hdr-brand .brand-txt b { font-size: 14px; font-weight: 650; color: var(--neu-text); white-space: nowrap; }
+/* login: retângulo maior no topo do cartão */
+.login-v2 .login-logo { display: flex; justify-content: center; margin: 4px 0 20px; }
+.login-v2 .login-logo .logo-ce { height: 78px; padding: 12px 20px; border-radius: 16px; }
+.login-v2 .login-card h1 { margin-top: 0; }
+@media (max-width: 700px) {
+  .app-v2 .hdr-brand .logo-ce { height: 40px; padding: 6px 10px; border-radius: 10px; }
+  .login-v2 .login-logo .logo-ce { height: 66px; padding: 10px 16px; }
+}

@@ -1,0 +1,45 @@
+/* =====================================================================
+   Portal do Cliente — neon sutil nos símbolos, só no tema escuro
+   Nada de borda ou halo em botões: só os ícones brilham, na própria cor.
+   Carregar depois de ux-motion.css.
+   ===================================================================== */
+
+:root {
+  --neon-ico: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 8px rgba(255, 106, 20, .28));
+  --neon-ico-soft: drop-shadow(0 0 3px currentColor);
+  --neon-ico-strong: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 12px rgba(255, 106, 20, .45));
+}
+
+/* Ícones do menu, das ferramentas e do acesso rápido: laranja com brilho leve */
+:root[data-theme="dark"] .app-v2 .opt .ico-svg,
+:root[data-theme="dark"] .app-v2 .tool .ico-svg,
+:root[data-theme="dark"] .app-v2 .quick-tile .qi .ico-svg {
+  color: var(--neu-accent); filter: var(--neon-ico); transition: filter var(--t-med, .28s) ease, color var(--t-med, .28s) ease, transform var(--t-med, .28s) ease;
+}
+:root[data-theme="dark"] .app-v2 .opt:hover .ico-svg,
+:root[data-theme="dark"] .app-v2 .opt.active .ico-svg,
+:root[data-theme="dark"] .app-v2 .opt.open .ico-svg,
+:root[data-theme="dark"] .app-v2 .tool:hover .ico-svg,
+:root[data-theme="dark"] .app-v2 .tool.active .ico-svg,
+:root[data-theme="dark"] .app-v2 .quick-tile:hover .qi .ico-svg { filter: var(--neon-ico-strong); }
+:root[data-theme="dark"] .app-v2 .quick-tile .qi { color: var(--neu-accent) !important; }
+
+/* Ícones do cabeçalho: cinza em repouso, acendem no hover */
+:root[data-theme="dark"] .app-v2 .icon-btn:hover .ico-svg,
+:root[data-theme="dark"] .app-v2 .search-btn:hover .ico-svg { color: var(--neu-accent); filter: var(--neon-ico); }
+
+/* Ícones de situação: brilham na cor deles (vermelho, âmbar, azul, verde) */
+:root[data-theme="dark"] .app-v2 .act-ico,
+:root[data-theme="dark"] .app-v2 .obr-hero-ico,
+:root[data-theme="dark"] .app-v2 .act-ok > span,
+:root[data-theme="dark"] .app-v2 .installment-symbol { text-shadow: 0 0 6px currentColor; }
+:root[data-theme="dark"] .app-v2 .act-ico .ico-svg,
+:root[data-theme="dark"] .app-v2 .obr-hero-ico .ico-svg { filter: var(--neon-ico-soft); }
+:root[data-theme="dark"] .app-v2 .status-chip > span[aria-hidden="true"] { text-shadow: 0 0 5px currentColor; }
+
+/* Login: ícones dos campos e o olho da senha */
+:root[data-theme="dark"] .login-v2 .in-ico > .ico-svg { color: var(--neu-accent); filter: var(--neon-ico-soft); }
+:root[data-theme="dark"] .login-v2 .pw-toggle[aria-pressed="true"] .ico-svg { filter: var(--neon-ico); }
+
+/* Setas do menu (chevron) */
+:root[data-theme="dark"] .app-v2 .opt.open .chev { color: var(--neu-accent); filter: var(--neon-ico-soft); }

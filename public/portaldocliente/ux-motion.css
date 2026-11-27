@@ -1,0 +1,145 @@
+/* =====================================================================
+   Portal do Cliente — movimento
+   Carregar por último. Tudo suave e curto: as peças "afundam" e "saltam"
+   como borracha macia, o conteúdo entra subindo de leve, em cascata.
+   Desligado por completo para quem pede menos movimento no sistema.
+   ===================================================================== */
+
+:root {
+  --ease-soft: cubic-bezier(.22, .8, .24, 1);      /* saída suave */
+  --ease-spring: cubic-bezier(.34, 1.4, .5, 1);    /* pequeno passo além, para interruptores e escolhas */
+  --t-fast: 160ms;
+  --t-med: 280ms;
+  --t-slow: 460ms;
+}
+
+html { scroll-behavior: smooth; }
+
+/* ---------- Troca de tema: cores e sombras deslizam ---------- */
+body, .app-v2, .hdr, .subnav-wrap,
+.app-v2 .hcard, .app-v2 .guia-card, .app-v2 .panel, .app-v2 .card, .app-v2 .opt, .app-v2 .tool, .app-v2 .tools,
+.app-v2 .pill, .app-v2 .btn.ghost, .app-v2 .icon-btn, .app-v2 .search-btn, .app-v2 .avatar, .app-v2 .emp-switch,
+.app-v2 input, .app-v2 select, .app-v2 textarea, .login-card, .login-wrap {
+  transition:
+    background-color var(--t-slow) var(--ease-soft),
+    color var(--t-med) var(--ease-soft),
+    box-shadow var(--t-med) var(--ease-soft),
+    transform var(--t-med) var(--ease-soft),
+    border-color var(--t-med) var(--ease-soft),
+    opacity var(--t-med) var(--ease-soft) !important;
+}
+
+/* ---------- Botões: sobem um pouco no hover, afundam ao pressionar ---------- */
+.app-v2 .btn, .modal .btn, .login-card .btn {
+  transition: transform var(--t-fast) var(--ease-soft), box-shadow var(--t-med) var(--ease-soft), filter var(--t-med) var(--ease-soft), opacity var(--t-med) !important;
+}
+.app-v2 .btn:hover:not(:disabled), .modal .btn:hover:not(:disabled), .login-card .btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.04); }
+.app-v2 .btn:active:not(:disabled), .modal .btn:active:not(:disabled), .login-card .btn:active:not(:disabled) { transform: translateY(1px) scale(.985); transition-duration: 90ms !important; }
+.app-v2 .icon-btn:hover, .app-v2 .avatar:hover { transform: translateY(-2px); }
+.app-v2 .icon-btn:active, .app-v2 .avatar:active, .app-v2 .pill:active { transform: scale(.96); }
+.app-v2 .link-btn { transition: color var(--t-fast), opacity var(--t-fast); }
+
+/* ---------- Menu em quadrados ---------- */
+.app-v2 .opt:hover { transform: translateY(-3px); }
+.app-v2 .opt:active { transform: translateY(0) scale(.98); }
+.app-v2 .opt .ico-svg { transition: transform var(--t-med) var(--ease-spring), color var(--t-med) var(--ease-soft); }
+.app-v2 .opt:hover .ico-svg { transform: translateY(-2px) scale(1.06); }
+.app-v2 .opt.open .ico-svg { transform: scale(1.04); }
+.app-v2 .opt .chev { transition: transform var(--t-med) var(--ease-soft), top var(--t-med) var(--ease-soft), opacity var(--t-med); }
+
+/* Painel de ferramentas: abre crescendo do topo, itens em cascata */
+.app-v2 .tools { animation: ceToolsIn var(--t-med) var(--ease-soft) backwards; transform-origin: top center; }
+@keyframes ceToolsIn { from { opacity: .4; transform: translateY(-8px) scale(.985); } to { opacity: 1; transform: none; } }
+.app-v2 .tools .tool { animation: ceRise var(--t-med) var(--ease-soft) backwards; }
+.app-v2 .tools .tool:nth-child(1) { animation-delay: 30ms; }
+.app-v2 .tools .tool:nth-child(2) { animation-delay: 60ms; }
+.app-v2 .tools .tool:nth-child(3) { animation-delay: 90ms; }
+.app-v2 .tools .tool:nth-child(4) { animation-delay: 120ms; }
+.app-v2 .tools .tool:nth-child(5) { animation-delay: 150ms; }
+.app-v2 .tools .tool:nth-child(6) { animation-delay: 180ms; }
+.app-v2 .tools .tool:nth-child(n+7) { animation-delay: 210ms; }
+.app-v2 .tool:hover { transform: translateY(-2px); }
+.app-v2 .tool:active { transform: scale(.98); }
+.app-v2 .tool .ico-svg { transition: transform var(--t-med) var(--ease-spring); }
+.app-v2 .tool:hover .ico-svg { transform: scale(1.08) rotate(-3deg); }
+
+/* ---------- Conteúdo: entra subindo de leve, em cascata ---------- */
+@keyframes ceRise { from { opacity: .35; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes ceFade { from { opacity: .4; } to { opacity: 1; } }
+.app-v2 .topbar { animation: ceFade var(--t-med) var(--ease-soft) backwards; }
+.app-v2 .subnav .pill { animation: ceRise var(--t-med) var(--ease-soft) backwards; }
+.app-v2 .content > * { animation: ceRise var(--t-slow) var(--ease-soft) backwards; }
+.app-v2 .content > *:nth-child(2) { animation-delay: 50ms; }
+.app-v2 .content > *:nth-child(3) { animation-delay: 100ms; }
+.app-v2 .content > *:nth-child(4) { animation-delay: 150ms; }
+.app-v2 .content > *:nth-child(5) { animation-delay: 200ms; }
+.app-v2 .content > *:nth-child(n+6) { animation-delay: 240ms; }
+/* cards dentro de grades também entram em cascata */
+.app-v2 .guia-grid > *, .app-v2 .kpi-grid > *, .app-v2 .guia-summary > *, .app-v2 .home-side > *, .app-v2 .quick-row > * { animation: ceRise var(--t-slow) var(--ease-soft) backwards; }
+.app-v2 :is(.guia-grid, .kpi-grid, .guia-summary, .home-side, .quick-row) > :nth-child(2) { animation-delay: 70ms; }
+.app-v2 :is(.guia-grid, .kpi-grid, .guia-summary, .home-side, .quick-row) > :nth-child(3) { animation-delay: 130ms; }
+.app-v2 :is(.guia-grid, .kpi-grid, .guia-summary, .home-side, .quick-row) > :nth-child(4) { animation-delay: 180ms; }
+.app-v2 :is(.guia-grid, .kpi-grid, .guia-summary, .home-side, .quick-row) > :nth-child(n+5) { animation-delay: 220ms; }
+/* linhas de listas */
+.app-v2 .act-list > li, .app-v2 .obr-list li { animation: ceRise var(--t-med) var(--ease-soft) backwards; }
+.app-v2 :is(.act-list, .obr-list ul) > li:nth-child(2) { animation-delay: 40ms; }
+.app-v2 :is(.act-list, .obr-list ul) > li:nth-child(3) { animation-delay: 80ms; }
+.app-v2 :is(.act-list, .obr-list ul) > li:nth-child(4) { animation-delay: 120ms; }
+.app-v2 :is(.act-list, .obr-list ul) > li:nth-child(n+5) { animation-delay: 150ms; }
+
+/* Cards clicáveis respondem ao toque */
+.app-v2 .hcard.clickable:hover, .app-v2 .kpi-card:hover:not(:disabled), .app-v2 .guia-card:hover { transform: translateY(-3px); }
+.app-v2 .quick-tile .qi { transition: transform var(--t-med) var(--ease-spring), box-shadow var(--t-med) var(--ease-soft), color var(--t-med); }
+.app-v2 .quick-tile:hover .qi { transform: translateY(-3px); }
+.app-v2 .quick-tile:active .qi { transform: scale(.94); }
+
+/* ---------- Gráficos e medidores crescem ao aparecer ---------- */
+@keyframes ceGrowY { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes ceGrowX { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.app-v2 .spark span, .app-v2 .revenue-bar { transform-origin: bottom; animation: ceGrowY 700ms var(--ease-soft) backwards; }
+.app-v2 .spark span:nth-child(2) { animation-delay: 60ms; } .app-v2 .spark span:nth-child(3) { animation-delay: 120ms; }
+.app-v2 .spark span:nth-child(4) { animation-delay: 180ms; } .app-v2 .spark span:nth-child(5) { animation-delay: 240ms; }
+.app-v2 .spark span:nth-child(6) { animation-delay: 300ms; }
+.app-v2 .meter span { transform-origin: left; animation: ceGrowX 900ms var(--ease-soft) 150ms backwards; }
+.app-v2 .guia-steps li::before { transition: background-color var(--t-med), box-shadow var(--t-med); }
+
+/* ---------- Interruptor com mola ---------- */
+.neu-toggle { transition: background var(--t-med) var(--ease-soft), box-shadow var(--t-med) var(--ease-soft) !important; }
+.neu-toggle::after { transition: transform var(--t-med) var(--ease-spring), background var(--t-med) !important; }
+.neu-toggle:active::after { width: 30px; }
+.neu-toggle[aria-pressed="true"]:active::after { transform: translateX(26px); }
+
+/* Checkbox e rádio: o check "salta" */
+@keyframes cePop { 0% { transform: rotate(45deg) scale(.2); opacity: 0; } 70% { transform: rotate(45deg) scale(1.15); opacity: 1; } 100% { transform: rotate(45deg) scale(1); } }
+@keyframes cePopDot { 0% { transform: scale(.2); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+.app-v2 input[type=checkbox]:checked::after, .modal input[type=checkbox]:checked::after { animation: cePop var(--t-med) var(--ease-soft) backwards; }
+.app-v2 input[type=radio]:checked::after, .modal input[type=radio]:checked::after, .login-v2 input[type=radio]:checked::after { animation: cePopDot var(--t-med) var(--ease-soft) backwards; }
+.app-v2 input[type=checkbox], .app-v2 input[type=radio], .modal input[type=checkbox] { transition: box-shadow var(--t-med) var(--ease-soft); }
+
+/* ---------- Janelas: véu escurece devagar, janela cresce de leve ---------- */
+.modal-backdrop { animation: ceFade var(--t-med) var(--ease-soft) backwards; }
+.modal { animation: ceModalIn 340ms var(--ease-soft) backwards; }
+@keyframes ceModalIn { from { opacity: .4; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+.cmdk-back { animation: ceFade var(--t-fast) var(--ease-soft) backwards; }
+.cmdk { animation: ceModalIn var(--t-med) var(--ease-soft) backwards; }
+.cmdk li { transition: background-color var(--t-fast), box-shadow var(--t-fast); }
+.user-pop:not([hidden]) { animation: cePopIn var(--t-med) var(--ease-soft) backwards; transform-origin: top right; }
+@keyframes cePopIn { from { opacity: .4; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: none; } }
+
+/* Detalhes recolhidos abrem suavemente */
+details[open] > :not(summary) { animation: ceRise var(--t-med) var(--ease-soft) backwards; }
+details > summary { transition: color var(--t-fast); }
+
+/* Login: cartão entra flutuando */
+.login-v2 .login-card { animation: ceModalIn 520ms var(--ease-soft) backwards; }
+.login-v2 .brand-badge { animation: cePopDot 520ms var(--ease-spring) 120ms backwards; }
+.login-v2 .pw-toggle { transition: box-shadow var(--t-med) var(--ease-soft), color var(--t-med); }
+
+/* Foco visível também desliza */
+:focus-visible { transition: outline-offset var(--t-fast) var(--ease-soft); }
+
+/* ---------- Menos movimento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; }
+}
