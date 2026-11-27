@@ -13,6 +13,10 @@ RewriteCond %{HTTPS} !=on [OR]
 RewriteCond %{HTTP_HOST} ^www\. [NC]
 RewriteRule ^(.*)$ https://contabilempresarial.com.br/$1 [R=301,L,NE]
 
+# ---- Portal do Cliente (página do site em /portaldocliente) ----
+# atalho para quem digitar sem o "l"
+RewriteRule ^portadocliente/?$ /portaldocliente/ [R=301,L]
+
 # ---- Painel de acessos e arquivos internos ----
 RewriteRule ^painel/?$ painel.php [L,QSA]
 RewriteRule ^painel-config\.php$ - [F,L]
