@@ -1,5 +1,6 @@
 ---
 // /apresentacao — apresentação comercial (página oculta: noindex, fora do menu e do sitemap).
+import PreloaderLogo from "../../components/apresentacao/PreloaderLogo.astro";
 import Apresentacao from "../../layouts/Apresentacao.astro";
 import Icone from "../../components/apresentacao/Icone.astro";
 import Capa from "../../components/apresentacao/telas/Capa.astro";
@@ -71,7 +72,7 @@ const emPreparacao = import.meta.env.PROD && !publicar && import.meta.env.PUBLIC
       <div id="preloader" aria-hidden="true">
         <div class="pl-brilho"></div>
         <div class="pl-centro">
-          <div class="pl-logo"><img src="/logo-negative.png" alt="" width="568" height="229" /><span class="pl-reflexo"></span></div>
+          <PreloaderLogo />
           <div class="pl-barra"><span id="pl-progresso"></span></div>
           <p class="pl-rotulo"><span>DESDE 1984</span><span id="pl-porcento">00</span></p>
         </div>

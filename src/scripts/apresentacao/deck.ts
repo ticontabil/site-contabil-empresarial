@@ -344,8 +344,8 @@ if (html.classList.contains("imprimir") && botaoImprimir) {
 iniciarEfeitos(telas, (t, p) => ir(t, p));
 
 // ---------------- Pré-loader ----------------
-// Mostra a logo se desenhando enquanto carregam a fonte e as imagens da primeira tela (mínimo 1,8 s,
-// máximo 6 s). Ao sair, tudo se fecha numa linha de luz e a primeira tela entra.
+// Monta a logo peça por peça (PreloaderLogo.astro) enquanto carregam a fonte e as imagens da primeira tela (mínimo 2,9 s,
+// máximo 6,5 s). Ao sair, tudo se fecha numa linha de luz e a primeira tela entra.
 const preloader = document.getElementById("preloader");
 const semPreloader = embutido || html.classList.contains("estatico") || !preloader;
 function abrirApresentacao() {
@@ -357,7 +357,7 @@ if (semPreloader) {
 } else {
   const inicio = performance.now();
   const rapido = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const MIN = rapido ? 300 : 1800, MAX = 6000;
+  const MIN = rapido ? 300 : 2900, MAX = 6500; // 2,9 s: tempo da logo se montar inteira
   const barra = document.getElementById("pl-progresso")!;
   const porcento = document.getElementById("pl-porcento")!;
   const alvo = lerHash();
