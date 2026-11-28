@@ -1,0 +1,36 @@
+---
+// Obrigado (fechamento da proposta comercial): agradecimento, contatos e os parceiros com suas redes.
+import Tela from "../Tela.astro";
+import Titulo from "../Titulo.astro";
+import Foto from "../Foto.astro";
+import Icone from "../Icone.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.obrigado.tela;
+const insta = '<rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>';
+const globo = '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>';
+---
+<Tela info={info}>
+  <div class="obg-texto">
+    <p class="rotulo entra">{t.rotulo}</p>
+    <Titulo t={t.titulo} class="entra d2" />
+    <p class="apoio entra d3">{t.apoio}</p>
+    <ul class="obg-contatos entra d4">
+      {t.telefones.map((f) => <li><span class="obg-ico"><Icone nome="whatsapp" tamanho={26} /></span>{f}</li>)}
+      <li><span class="obg-ico"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={insta} /></span>{t.instagram}</li>
+      <li><span class="obg-ico"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={globo} /></span>{t.site}</li>
+    </ul>
+  </div>
+  <div class="obg-parceiros entra d3">
+    <p class="rotulo">(NOSSOS PARCEIROS)</p>
+    <ul>
+      {t.parceiros.map((p) => (
+        <li>
+          <div class="obg-logo">{p.logo ? <Foto arquivo={`parceiros/${p.logo}`} descricao={p.nome} alt={p.nome} larguras={[240, 480]} tamanho="240px" /> : <b>{p.nome}</b>}</div>
+          <span>{p.rede}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Tela>

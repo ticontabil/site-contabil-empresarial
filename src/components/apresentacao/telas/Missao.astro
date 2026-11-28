@@ -1,0 +1,41 @@
+---
+// Missão, Visão e Valores (proposta comercial). Os valores sobem no passo 1.
+import Tela from "../Tela.astro";
+import Titulo from "../Titulo.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.missao.tela;
+const icones: Record<string, string> = {
+  // alvo e olho (traço no estilo lucide)
+  missao: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  visao: '<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>',
+};
+---
+<Tela info={info} tema="clara">
+  <p class="rotulo entra">{t.rotulo}</p>
+  <Titulo t={t.titulo} class="entra d2" />
+  <div class="mv-cartoes">
+    {[["missao", "Missão", t.missao], ["visao", "Visão", t.visao]].map(([chave, nome, texto], i) => (
+      <article class:list={["mv-cartao entra", i ? "d4" : "d3"]}>
+        <div class="mv-cab">
+          <span class="mv-ico"><svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icones[chave]} /></span>
+          <h3>{nome}</h3>
+        </div>
+        <p>{texto}</p>
+      </article>
+    ))}
+  </div>
+  <div class="mv-valores" data-passo="1">
+    <h3 class="rotulo">(VALORES)</h3>
+    <ol>
+      {t.valores.map((v, i) => (
+        <li style={`--i:${i}`}>
+          <span class="mv-n">{String(i + 1).padStart(2, "0")}</span>
+          <b>{v.nome}</b>
+          <p>{v.texto}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</Tela>

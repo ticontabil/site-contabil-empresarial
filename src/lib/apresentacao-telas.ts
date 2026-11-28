@@ -31,6 +31,10 @@ function passosDe(chave: ChaveTela): number {
     case "comoComecar": return telas.comoComecar.tela.etapas.length + 1; // + apoio
     case "investimento": return 0;
     case "proximoPasso": return 0;
+    case "quemSomos": return 0;
+    case "missao": return 1; // valores
+    case "observacoes": return 0;
+    case "obrigado": return 0;
   }
 }
 

@@ -1,0 +1,38 @@
+---
+// Observações da proposta. O enquadramento (o que está sendo contratado e o valor) muda em cada proposta:
+// o Pedro troca em /apresentacao/configurar (efeitos.ts aplica o que foi salvo; vazio = o quadro some).
+import Tela from "../Tela.astro";
+import { telas } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.observacoes.tela;
+const letras = "abcdefghij";
+---
+<Tela info={info} tema="clara" atmosfera={false}>
+  <aside class="ob-painel granulado">
+    <p class="rotulo entra">{t.rotulo}</p>
+    <h2 class="titulo entra d2"><strong>{t.titulo}</strong></h2>
+    <p class="ob-resp entra d3">{t.responsabilidade}</p>
+    <p class="ob-exemplo entra d3">{t.exemplo}</p>
+    <div class="ob-enquadramento entra d4" data-enquadramento hidden={!t.enquadramento}>
+      <span class="rotulo">(ENQUADRAMENTO DA PROPOSTA)</span>
+      <p class="ob-enq-texto" data-campo="enquadramento">{t.enquadramento}</p>
+      <p class="ob-enq-detalhe" data-campo="enquadramentoDetalhe">{t.enquadramentoDetalhe}</p>
+    </div>
+  </aside>
+  <div class="ob-extras">
+    <h3 class="ob-extras-titulo entra">{t.extrasTitulo}</h3>
+    <section class="ob-bloco entra d2">
+      <h4><span></span>{t.pf.titulo}</h4>
+      <p class="ob-intro">{t.pf.intro}</p>
+      <ol class="ob-lista">
+        {t.pf.itens.map((it, i) => <li><b>{letras[i]})</b> {it}</li>)}
+      </ol>
+    </section>
+    <section class="ob-bloco entra d3">
+      <h4><span></span>{t.pj.titulo}</h4>
+      <p class="ob-intro">{t.pj.texto}</p>
+    </section>
+  </div>
+  <script type="application/json" data-observacoes-padrao set:html={JSON.stringify({ enquadramento: t.enquadramento, enquadramentoDetalhe: t.enquadramentoDetalhe })}></script>
+</Tela>

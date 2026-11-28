@@ -497,9 +497,34 @@ function investimento(tela: HTMLElement) {
   aplicar();
 }
 
+/**
+ * Tela de observações: aplica o enquadramento salvo em /apresentacao/configurar (mesmo registro dos valores).
+ * Enquadramento vazio esconde o quadro.
+ */
+function observacoes(tela: HTMLElement) {
+  const quadro = tela.querySelector<HTMLElement>("[data-enquadramento]");
+  if (!quadro) return;
+  const padrao = JSON.parse(tela.querySelector("[data-observacoes-padrao]")?.textContent || "{}");
+  const aplicar = () => {
+    let v = { ...padrao };
+    try { v = { ...padrao, ...JSON.parse(localStorage.getItem(CHAVE_VALORES) || "{}") }; } catch {}
+    const texto = String(v.enquadramento ?? "").trim();
+    const detalhe = String(v.enquadramentoDetalhe ?? "").trim();
+    quadro.querySelector<HTMLElement>('[data-campo="enquadramento"]')!.textContent = texto;
+    const d = quadro.querySelector<HTMLElement>('[data-campo="enquadramentoDetalhe"]')!;
+    d.textContent = detalhe;
+    d.hidden = !detalhe;
+    quadro.hidden = !texto && !detalhe;
+  };
+  addEventListener("storage", (e) => e.key === CHAVE_VALORES && aplicar());
+  if ("BroadcastChannel" in window) new BroadcastChannel("contabil-apresentacao").addEventListener("message", (e) => e.data?.tipo === "valores" && aplicar());
+  aplicar();
+}
+
 export function iniciarEfeitos(telas: HTMLElement[], ir: IrPara) {
   telas.forEach((t, k) => {
     investimento(t);
+    observacoes(t);
     destaquePorPasso(t);
     timecode(t);
     prepararPalavras(t);

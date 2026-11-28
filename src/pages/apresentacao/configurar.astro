@@ -7,7 +7,9 @@ import { publicar, telas } from "../../data/apresentacao.ts";
 import { telasAtivas } from "../../lib/apresentacao-telas.ts";
 
 const t = telas.investimento.tela;
-const padrao = { nome: t.plano.nome, descricao: t.plano.descricao, valor: t.plano.valor, periodo: t.plano.periodo, desconto: t.desconto };
+const ob = telas.observacoes.tela;
+const padrao = { nome: t.plano.nome, descricao: t.plano.descricao, valor: t.plano.valor, periodo: t.plano.periodo, desconto: t.desconto,
+  enquadramento: ob.enquadramento, enquadramentoDetalhe: ob.enquadramentoDetalhe };
 const listaTelas = telasAtivas().map(({ chave, rotuloNumero, titulo, ato, passos }) => ({ chave, numero: rotuloNumero, titulo, ato, passos }));
 const telaPreco = "investimento";
 const emPreparacao = import.meta.env.PROD && !publicar && import.meta.env.PUBLIC_APRESENTACAO_PREVIA !== "1";
@@ -27,7 +29,8 @@ const emPreparacao = import.meta.env.PROD && !publicar && import.meta.env.PUBLIC
         .cfg .sub { color: #a0a0a0; font-size: 17px; line-height: 1.5; margin-top: 10px; max-width: 720px; }
         .cfg form { margin-top: 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px 22px; }
         .cfg label { display: flex; flex-direction: column; gap: 9px; font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #9a9a9a; }
-        .cfg label.inteiro { grid-column: 1 / -1; }
+        .cfg label.inteiro, .cfg .inteiro { grid-column: 1 / -1; }
+        .cfg-secao { font-size: 22px; font-weight: 700; margin-top: 18px; padding-top: 26px; border-top: 1px solid #262626; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
         .cfg input, .cfg textarea { font: 500 22px/1.35 var(--fonte); color: #fff; background: #151515; border: 1.5px solid #2c2c2c; border-radius: 16px; padding: 16px 18px; letter-spacing: 0; text-transform: none; outline: none; transition: border-color 0.2s; width: 100%; }
         .cfg textarea { resize: vertical; min-height: 96px; }
         .cfg input:focus, .cfg textarea:focus { border-color: #fb5d02; }
@@ -93,7 +96,7 @@ const emPreparacao = import.meta.env.PROD && !publicar && import.meta.env.PUBLIC
           <a class="cfg-voltar" href="/apresentacao" aria-label="Voltar para a apresentação"><Icone nome="inicio" tamanho={24} /></a>
         </div>
         <h1>Valores da apresentação</h1>
-        <p class="sub">O que você salvar aqui aparece na tela de investimento. Vale só neste aparelho e funciona sem internet.</p>
+        <p class="sub">O que você salvar aqui aparece nas telas de investimento e de observações. Vale só neste aparelho e funciona sem internet.</p>
 
         <form id="cfg-form" autocomplete="off">
           <label>Nome do plano<input name="nome" maxlength="40" required /></label>
@@ -101,6 +104,10 @@ const emPreparacao = import.meta.env.PROD && !publicar && import.meta.env.PUBLIC
           <label class="inteiro">Descrição<textarea name="descricao" maxlength="140" rows="2"></textarea></label>
           <label>Valor<span class="dinheiro"><input name="valor" inputmode="decimal" required /></span></label>
           <label>Valor com desconto <span class="ajuda">aparece depois de riscar o preço</span><span class="dinheiro"><input name="desconto" inputmode="decimal" placeholder="opcional" /></span></label>
+
+          <h2 class="cfg-secao inteiro">Enquadramento da proposta <span class="ajuda">tela de observações · deixe em branco para esconder o quadro</span></h2>
+          <label class="inteiro">O que está sendo contratado e o valor<textarea name="enquadramento" maxlength="200" rows="2" placeholder="Ex.: Abertura de duas empresas no valor de R$ 2.102,00."></textarea></label>
+          <label class="inteiro">Detalhe <span class="ajuda">opcional</span><input name="enquadramentoDetalhe" maxlength="160" placeholder="Ex.: Empresa I Simples Nacional; Empresa II Lucro Presumido." /></label>
 
           <div class="previa" aria-live="polite">
             <b id="pv-nome"></b>
@@ -168,9 +175,10 @@ const emPreparacao = import.meta.env.PROD && !publicar && import.meta.env.PUBLIC
           return Number.isFinite(n) ? n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : s;
         };
         const ler = () => { try { return { ...padrao, ...JSON.parse(localStorage.getItem(CHAVE_VALORES) || "{}") }; } catch { return { ...padrao }; } };
-        const preencher = (v: any) => { for (const k of ["nome", "descricao", "valor", "periodo", "desconto"]) campo(k).value = v[k] ?? ""; previa(); };
+        const preencher = (v: any) => { for (const k of ["nome", "descricao", "valor", "periodo", "desconto", "enquadramento", "enquadramentoDetalhe"]) campo(k).value = v[k] ?? ""; previa(); };
         const valores = () => ({ nome: campo("nome").value.trim(), descricao: campo("descricao").value.trim(), valor: formatar(campo("valor").value),
-          periodo: campo("periodo").value.trim(), desconto: formatar(campo("desconto").value) });
+          periodo: campo("periodo").value.trim(), desconto: formatar(campo("desconto").value),
+          enquadramento: campo("enquadramento").value.trim(), enquadramentoDetalhe: campo("enquadramentoDetalhe").value.trim() });
         function previa() {
           const v = valores();
           document.getElementById("pv-nome")!.textContent = v.nome;

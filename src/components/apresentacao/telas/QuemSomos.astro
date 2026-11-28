@@ -1,0 +1,30 @@
+---
+// Quem Somos (proposta comercial): texto da proposta à esquerda, fachada da matriz à direita.
+import Tela from "../Tela.astro";
+import Titulo from "../Titulo.astro";
+import Foto from "../Foto.astro";
+import { telas, numeroClientes } from "../../../data/apresentacao.ts";
+import type { TelaAtiva } from "../../../lib/apresentacao-telas.ts";
+const { info } = Astro.props as { info: TelaAtiva };
+const t = telas.quemSomos.tela;
+// "mais de {clientes} clientes em mais de 5 regiões do Brasil" fica em negrito, como na proposta
+const [antesDestaque, resto] = t.hoje.split("mais de {clientes}");
+const [destaque, depois] = ("mais de {clientes}" + resto).split(", com cases");
+const destaqueTexto = destaque.replace("{clientes}", String(numeroClientes.valor));
+---
+<Tela info={info}>
+  <div class="qs-foto abre-linha" aria-hidden="true">
+    <Foto arquivo={t.foto.arquivo} descricao={t.foto.descricao} larguras={[960, 1440]} tamanho="46vw" />
+    <span class="qs-selo">DESDE 1984</span>
+  </div>
+  <div class="qs-texto">
+    <p class="rotulo entra">{t.rotulo}</p>
+    <Titulo t={t.titulo} class="entra d2" />
+    <p class="qs-p entra d3">{t.historia}</p>
+    <p class="qs-p entra d3">{antesDestaque}<strong>{destaqueTexto}</strong>, com cases{depois}</p>
+    <p class="qs-pilares entra d4">
+      {t.pilares.map((p) => <span>{p}</span>)}
+      <em>{t.pilaresTexto}</em>
+    </p>
+  </div>
+</Tela>

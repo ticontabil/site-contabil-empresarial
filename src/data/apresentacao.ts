@@ -82,7 +82,7 @@ export const telas = {
     ativo: true,
     ato: "abertura",
     tela: {
-      sobretitulo: "APRESENTAÇÃO COMERCIAL 2026",
+      sobretitulo: "PROPOSTA COMERCIAL 2026",
       titulo: "Tradição que se traduz em resultados.",
       apoio: "Há mais de 40 anos do lado de quem empreende.",
       nomeGigante: "CONTÁBIL EMPRESARIAL",
@@ -100,11 +100,11 @@ export const telas = {
       { arquivo: "video/filial-cachoeira-dourada.jpg", descricao: "Unidade de Cachoeira Dourada" },
       { arquivo: "video/filial-goiania.jpg", descricao: "Unidade de Goiânia" },
     ] as Foto[],
-    fala: "Antes de falar da Contábil, quero falar do momento que toda empresa está vivendo. É ele que mostra por que a escolha da contabilidade pesa tanto agora.",
+    fala: "Obrigado pelo tempo. Em poucos minutos eu mostro quem é a Contábil, o que a gente faz pela sua empresa e a proposta que preparamos para você.",
   },
 
   reforma: {
-    ativo: true,
+    ativo: false, // fora da proposta comercial (27/11/2026)
     ato: "abertura",
     tela: {
       rotulo: "(A REFORMA)",
@@ -126,7 +126,7 @@ export const telas = {
   },
 
   datas: {
-    ativo: true,
+    ativo: false, // fora da proposta comercial (27/11/2026)
     ato: "abertura",
     tela: {
       rotulo: "(O NOTICIÁRIO)",
@@ -147,7 +147,7 @@ export const telas = {
   },
 
   impacto: {
-    ativo: true,
+    ativo: false, // fora da proposta comercial (27/11/2026)
     ato: "abertura",
     tela: {
       rotulo: "(SUA EMPRESA)",
@@ -177,7 +177,7 @@ export const telas = {
   },
 
   virada: {
-    ativo: true,
+    ativo: false, // fora da proposta comercial (27/11/2026)
     ato: "abertura",
     tela: {
       frase: "Quem espera a certeza chega atrasado.",
@@ -193,7 +193,7 @@ export const telas = {
 
   // ======================= ATO 1 · TRADIÇÃO =======================
   historia: {
-    ativo: true,
+    ativo: false, // fora da proposta comercial (27/11/2026)
     ato: "ato1",
     tela: {
       rotulo: "(NOSSA HISTÓRIA)",
@@ -258,7 +258,7 @@ export const telas = {
       // Se o expediente for 9 h, trocar por "menos de 3 minutos".
       destaqueValidado: false,
     },
-    fala: "Esses números resumem o que 40 anos constroem. O que eu mais gosto de mostrar é este: 48 mil obrigações entregues por ano. Dá mais de 190 por dia útil, uma a cada dois minutos e meio. É essa estrutura que vai cuidar da sua empresa durante a Reforma.",
+    fala: "Esses números resumem o que 40 anos constroem. O que eu mais gosto de mostrar é este: 48 mil obrigações entregues por ano. Dá mais de 190 por dia útil, uma a cada dois minutos e meio. É essa estrutura que vai cuidar da sua empresa.",
   },
 
   time: {
@@ -307,10 +307,10 @@ export const telas = {
       tituloForte: "Quatro departamentos.",
       tituloLeve: "Um só parceiro.",
       itens: [
-        { ativo: true, categoria: "DEPARTAMENTO 01", nome: "Legalização", texto: "Sua empresa em dia, da abertura ao encerramento.", linhaFina: "abertura, alterações, certidões, licenças e alvarás", icone: "legalizacao" as Foto },
-        { ativo: true, categoria: "DEPARTAMENTO 02", nome: "Pessoal", texto: "Folha certa, no prazo, com segurança trabalhista.", linhaFina: "folha, FGTS, férias, rescisões e eSocial", icone: "pessoal" as Foto },
-        { ativo: true, categoria: "DEPARTAMENTO 03", nome: "Fiscal", texto: "Imposto certo, no prazo, no regime mais adequado.", linhaFina: "apuração, guias, obrigações acessórias e créditos", icone: "fiscal" as Foto },
-        { ativo: true, categoria: "DEPARTAMENTO 04", nome: "Contábil", texto: "Números que mostram onde a empresa está e para onde pode ir.", linhaFina: "escrituração, balanços e consultoria", icone: "contabil" as Foto },
+        { ativo: true, categoria: "DEPARTAMENTO 01", nome: "Legalização", descricao: "Suporte completo na regularização e gestão legal da sua empresa, realizando abertura, alterações e encerramento de empresas, emissão de certidões, obtenção e renovação de licenças e alvarás, regularização de pendências cadastrais e fiscais, além do acompanhamento do certificado digital e da documentação necessária para manter o negócio em conformidade.", texto: "Sua empresa em dia, da abertura ao encerramento.", linhaFina: "abertura, alterações, certidões, licenças e alvarás", icone: "legalizacao" as Foto },
+        { ativo: true, categoria: "DEPARTAMENTO 02", nome: "Pessoal", descricao: "Gestão do Departamento Pessoal, desde a admissão de colaboradores, folha de pagamento, FGTS, férias, rescisões, afastamentos e benefícios, até o envio dos eventos ao eSocial e o cumprimento de todas as obrigações trabalhistas e previdenciárias. Também oferecemos assessoria especializada para garantir conformidade e segurança em todas as rotinas da empresa.", texto: "Folha certa, no prazo, com segurança trabalhista.", linhaFina: "folha, FGTS, férias, rescisões e eSocial", icone: "pessoal" as Foto },
+        { ativo: true, categoria: "DEPARTAMENTO 03", nome: "Fiscal", descricao: "Gestão fiscal e tributária da sua empresa, realizando a apuração de impostos, conferência de notas fiscais, entrega das obrigações acessórias e emissão das guias de pagamento dentro dos prazos. Também identificamos possíveis divergências e oferecemos orientação para a escolha do regime tributário mais vantajoso e o melhor aproveitamento de créditos fiscais.", texto: "Imposto certo, no prazo, no regime mais adequado.", linhaFina: "apuração, guias, obrigações acessórias e créditos", icone: "fiscal" as Foto },
+        { ativo: true, categoria: "DEPARTAMENTO 04", nome: "Contábil", descricao: "Gestão contábil da sua empresa, com escrituração, fechamento contábil, elaboração de balanços e demonstrações financeiras, apuração de tributos, cumprimento das obrigações acessórias, controle do ativo imobilizado e consultoria contábil e tributária para garantir segurança e conformidade nas operações.", texto: "Números que mostram onde a empresa está e para onde pode ir.", linhaFina: "escrituração, balanços e consultoria", icone: "contabil" as Foto },
         // Serviços especializados: desligados até a Contábil confirmar.
         { ativo: false, categoria: "ESPECIALIZADO", nome: "Contabilidade Rural", texto: "Produtor rural e agronegócio.", linhaFina: "ITR, LCDPR e gestão fiscal do agro", icone: "contabil" as Foto },
         { ativo: false, categoria: "ESPECIALIZADO", nome: "Holding", texto: "Planejamento e estruturação de holdings.", linhaFina: "proteção patrimonial e sucessão", icone: "legalizacao" as Foto },
@@ -318,11 +318,11 @@ export const telas = {
         { ativo: false, categoria: "ESPECIALIZADO", nome: "Consultoria", texto: "Decisões financeiras e tributárias.", linhaFina: "orientação estratégica", icone: "pessoal" as Foto },
       ],
     },
-    fala: "No dia a dia, quatro departamentos integrados cuidam de tudo: da existência legal da sua empresa à folha, aos impostos e aos números. Isso toda empresa precisa. O que faz diferença é o que a gente faz além disso, a começar pela Reforma.",
+    fala: "No dia a dia, quatro departamentos integrados cuidam de tudo: da existência legal da sua empresa à folha, aos impostos e aos números. Isso toda empresa precisa, e cada departamento tem gestor próprio, que você conhece pelo nome.",
   },
 
   preparacao: {
-    ativo: true,
+    ativo: false, // fora da proposta comercial (27/11/2026)
     ato: "ato2",
     tela: {
       rotulo: "(PREPARAÇÃO PARA A REFORMA)",
@@ -347,7 +347,7 @@ export const telas = {
     tela: {
       rotulo: "(ECOSSISTEMA)",
       titulo: "Mais que contabilidade: um ecossistema de gestão.",
-      apoio: "Parceiros selecionados para você reduzir custos, ganhar eficiência e vender mais.",
+      apoio: "Parceiros selecionados para gerar redução de custos, mais eficiência na gestão e otimização das vendas.",
       // logo: arquivo em src/assets/apresentacao/parceiros/ (branco, fundo transparente); null = aparece o nome.
       // Os logos passam numa faixa na base da tela. Fonte: "Página 30.pdf" (Empresas Parceiras).
       grupos: [
@@ -368,7 +368,7 @@ export const telas = {
         ] },
       ],
     },
-    fala: "A Reforma não mexe só no imposto: mexe em notas, sistemas e rotinas. Por isso a gente não para na contabilidade. Ao longo dos anos, selecionamos parceiros que resolvem outras dores do empresário: ponto, RH, notas, rotinas administrativas, atendimento. Você chega a todos eles pela indicação de quem já conhece a sua empresa por dentro.",
+    fala: "A gente não para na contabilidade. Ao longo dos anos, selecionamos parceiros que resolvem outras dores do empresário: ponto, RH, notas, rotinas administrativas, atendimento. Você chega a todos eles pela indicação de quem já conhece a sua empresa por dentro.",
   },
 
   // ======================= ATO 3 · EM RESULTADOS =======================
@@ -391,7 +391,7 @@ export const telas = {
   },
 
   comoComecar: {
-    ativo: true,
+    ativo: false, // fora da proposta comercial (27/11/2026)
     ato: "ato3",
     tela: {
       rotulo: "(COMO COMEÇAR)",
@@ -407,6 +407,44 @@ export const telas = {
       apoio: "Vai abrir empresa? Começamos do zero, com você.",
     },
     fala: "Muita gente adia a troca de contabilidade porque imagina dor de cabeça. A transição fica com a gente: conversa, diagnóstico, documentos e acompanhamento. E, se você ainda vai abrir a empresa, melhor: ela já nasce preparada para a Reforma.",
+  },
+
+  // ======================= PROPOSTA COMERCIAL (27/11/2026) =======================
+  // Telas da proposta comercial do Pedro (PROPOSTA COMERCIAL CONTABIL EMPRESARIAL 2026.pptx).
+  // Os números seguem o site: na proposta estava "mais de 400 clientes" e "+500 clientes ativos"; vale numeroClientes (+700).
+  quemSomos: {
+    ativo: true,
+    ato: "ato1",
+    tela: {
+      rotulo: "(QUEM SOMOS)",
+      titulo: "Referência em soluções contábeis. Há mais de 40 anos.",
+      historia: "Fundada em 1984 pelo Dr. Geraldo Augusto Mateus e fortalecida pela atuação de Olavo Mateus Tinôco, a Contábil Empresarial é referência em soluções contábeis há mais de 40 anos.",
+      // {clientes} vira o número de clientes do site (numeroClientes)
+      hoje: "Hoje, sob a liderança de Olavo Mateus Tinôco Júnior e Josiney Campos Mateus, une tradição e inovação para atender mais de {clientes} clientes em mais de 5 regiões do Brasil, com cases de sucesso nos principais segmentos do comércio e dos serviços.",
+      pilares: ["Compromisso", "Excelência", "Confiança"],
+      pilaresTexto: "são os pilares que sustentam a nossa história.",
+      foto: { arquivo: "matriz-fachada.jpg", descricao: "Entrada da matriz em Itumbiara, com a placa da Contábil" } as Foto,
+    },
+    fala: "A Contábil nasceu em 1984, com o Dr. Geraldo. Cresceu com o Olavo e hoje está com a nova geração, o Olavo Júnior e o Josiney. São mais de 40 anos e mais de 700 clientes, do comércio aos serviços.",
+  },
+
+  missao: {
+    ativo: true,
+    ato: "ato1",
+    tela: {
+      rotulo: "(MISSÃO, VISÃO E VALORES)",
+      titulo: "O que nos guia. Todos os dias.",
+      missao: "Prestar serviços contábeis de qualidade, garantindo eficácia e dedicação na gestão do patrimônio de nossos clientes, contribuindo para seu crescimento e sucesso no mercado.",
+      visao: "Ser referência em serviços contábeis na cidade de Itumbiara-GO e região, reconhecida pela excelência no atendimento e pela capacidade de inovar, adaptando-se às constantes mudanças na legislação e no mercado.",
+      valores: [
+        { nome: "Qualidade", texto: "Buscamos sempre entregar um trabalho de alta qualidade, para garantir a satisfação de nossos clientes." },
+        { nome: "Dedicação", texto: "Nos dedicamos a entender as necessidades de cada cliente para fornecer soluções contábeis personalizadas." },
+        { nome: "Eficácia", texto: "Trabalhamos com eficiência e agilidade, para garantir que nossos clientes tenham sempre os melhores resultados." },
+        { nome: "Integridade", texto: "Atuamos com transparência e honestidade, valorizando a confiança depositada em nós por nossos clientes." },
+        { nome: "Inovação", texto: "Estamos sempre em busca de novas formas de melhorar nossos serviços e nos adaptar às mudanças do mercado." },
+      ],
+    },
+    fala: "Isso é o que guia o nosso dia a dia: cuidar do patrimônio do cliente com qualidade e dedicação, e acompanhar cada mudança da legislação para que você não precise se preocupar com ela.",
   },
 
   investimento: {
@@ -432,7 +470,7 @@ export const telas = {
   },
 
   proximoPasso: {
-    ativo: true,
+    ativo: false, // fora da proposta comercial (27/11/2026)
     ato: "ato3",
     tela: {
       titulo: "Sua empresa está pronta para 2027?",
@@ -443,14 +481,72 @@ export const telas = {
     },
     fala: "O próximo passo é simples: um diagnóstico de prontidão da sua empresa para a Reforma. A gente olha as suas notas, simula o impacto e mostra com clareza o que fazer e quando. Quando a regra muda, faz diferença quem está do seu lado. Posso agendar com você?",
   },
+  observacoes: {
+    ativo: true,
+    ato: "ato3",
+    tela: {
+      rotulo: "(OBSERVAÇÕES DA PROPOSTA)",
+      titulo: "Observações da proposta",
+      responsabilidade: "A condução dos serviços sobre demandas são de inteira responsabilidade do cliente, ficando a Contábil Empresarial responsável por fornecer a documentação a partir de solicitação da empresa.",
+      exemplo: "Exemplo: cadastros bancários, documentos para licitação e editais.",
+      // Enquadramento: muda em cada proposta. O Pedro troca em /apresentacao/configurar (vazio = o quadro some).
+      enquadramento: "Abertura de duas empresas no valor de R$ 2.102,00.",
+      enquadramentoDetalhe: "Empresa I Simples Nacional; Empresa II Lucro Presumido.",
+      extrasTitulo: "Não estão inclusos nos honorários mensais",
+      pf: {
+        titulo: "Serviços extras · Pessoa Física",
+        intro: "São considerados serviços extraordinários, não obrigatórios, isentos de responsabilidade técnica e não inclusos nos valores de honorários pagos pela contratante, tais como:",
+        itens: [
+          "Preenchimento de cadastros de instituições financeiras;",
+          "Serviços da área trabalhista referentes a interesses particulares, como obras, acertos e preenchimento de documentos de domésticos (caseiros, vigias, jardineiros, motoristas etc.);",
+          "Soluções e processos em repartições públicas referentes a transtornos com bens particulares, como IPTU, ITBI, ISTI, IPVA, ISSQN Autônomo etc.;",
+          "Soluções e processos em repartições públicas referentes a assuntos específicos ao objeto social da contratante, como entidades específicas, conselhos de classe profissional, cartórios específicos e demais repartições não utilizadas pela atuação profissional contábil;",
+          "Contratos de compra e venda particular;",
+          "Contratos de aluguel particular;",
+          "Treinamentos e cursos de aperfeiçoamento.",
+        ],
+      },
+      pj: {
+        titulo: "Serviços extras · Pessoa Jurídica",
+        texto: "Auditoria Tributária, revisão da base de dados cadastral de produtos, recuperação tributária de impostos pagos indevidamente sobre folha e sobre faturamento, constituição de novas sociedades, alterações contratuais (mudança do endereço empresarial, de atividades econômicas e criação de filiais), transformação societária, fusão, cisão, cisão parcial, incorporação e baixa de empresas, e Defesas Fiscais em qualquer âmbito: Municipal, Estadual, Federal, Procon, Ibama, Inmetro e demais órgãos.",
+      },
+    },
+    fala: "Para ficar tudo claro desde o começo: estes são os serviços que ficam fora da mensalidade. Se precisar de algum deles, a gente orça à parte.",
+  },
+
+  obrigado: {
+    ativo: true,
+    ato: "ato3",
+    tela: {
+      rotulo: "(OBRIGADO)",
+      titulo: "Obrigado pela sua atenção e confiança.",
+      apoio: "Estamos à disposição para construir uma parceria sólida, baseada em transparência, excelência e resultados.",
+      telefones: ["(64) 3431-6397", "(35) 98424-3358", "(64) 99249-1244"],
+      instagram: "@contabilempresarial",
+      site: "contabilempresarial.com.br",
+      parceiros: [
+        { nome: "Ponto Aqui", rede: "@pontoaquibr", logo: "pontoaqui.png" as string | null },
+        { nome: "Conecta Pessoas RH", rede: "@conecta_rhbr", logo: "conecta-pessoas.png" as string | null },
+        { nome: "Emmit Fácil", rede: "@emmitfacil_", logo: "emmit-facil.png" as string | null },
+        { nome: "Nexxo BPO", rede: "@nexxo_bpo", logo: "nexxo-bpo.png" as string | null },
+        { nome: "Contábil Cast", rede: "YouTube · @contabil.empresarial", logo: "contabil-cast.png" as string | null },
+        { nome: "Capacita Contabilidade", rede: "@capacitacontabilidade", logo: null as string | null },
+        { nome: "TekZap", rede: "@tekzapconversas", logo: null as string | null },
+      ],
+    },
+    fala: "Obrigado pelo seu tempo. Fico à disposição para qualquer dúvida sobre a proposta. Podemos seguir?",
+  },
 };
 
 export type ChaveTela = keyof typeof telas;
 
 /** Ordem das telas (a numeração na tela se ajusta sozinha quando uma está desligada). */
+// Proposta comercial (27/11/2026): Capa, Quem Somos, Time, Missão/Visão/Valores, Serviços, Números, Parceiros,
+// Investimento, Observações e Obrigado. As telas da Reforma ficam no arquivo, desligadas (ativo: false).
 export const ordem: ChaveTela[] = [
-  "capa", "reforma", "datas", "impacto", "virada",
-  "historia", "numeros", "time",
-  "departamentos", "preparacao", "parceiros",
-  "resultados", "comoComecar", "investimento", "proximoPasso",
+  "capa", "quemSomos", "time", "missao",
+  "departamentos", "numeros", "parceiros",
+  "investimento", "observacoes", "obrigado",
+  "reforma", "datas", "impacto", "virada", "historia", "preparacao",
+  "resultados", "comoComecar", "proximoPasso",
 ];

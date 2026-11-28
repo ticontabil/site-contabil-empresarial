@@ -27,8 +27,8 @@ const itens = ativos(t.itens);
         <li data-i={i} class:list={{ ativo: i === 0 }}>
           <div class="cat">({it.categoria})</div>
           <div class="nome">{it.nome}</div>
-          <div class="desc"><Txt t={it.texto} /></div>
-          <div class="fina">{it.linhaFina}</div>
+          {/* texto completo da proposta comercial quando existe; senão, a frase curta e a linha fina */}
+          {"descricao" in it && it.descricao ? <div class="desc desc-longa">{it.descricao}</div> : <><div class="desc"><Txt t={it.texto} /></div><div class="fina">{it.linhaFina}</div></>}
         </li>
       ))}
     </ol>

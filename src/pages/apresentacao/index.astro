@@ -17,6 +17,10 @@ import Resultados from "../../components/apresentacao/telas/Resultados.astro";
 import ComoComecar from "../../components/apresentacao/telas/ComoComecar.astro";
 import ProximoPasso from "../../components/apresentacao/telas/ProximoPasso.astro";
 import Investimento from "../../components/apresentacao/telas/Investimento.astro";
+import QuemSomos from "../../components/apresentacao/telas/QuemSomos.astro";
+import Missao from "../../components/apresentacao/telas/Missao.astro";
+import Observacoes from "../../components/apresentacao/telas/Observacoes.astro";
+import Obrigado from "../../components/apresentacao/telas/Obrigado.astro";
 import { publicar } from "../../data/apresentacao.ts";
 import { telasAtivas } from "../../lib/apresentacao-telas.ts";
 
@@ -25,6 +29,7 @@ const componentes = {
   historia: Historia, numeros: Numeros, time: Time,
   departamentos: Departamentos, preparacao: Preparacao, parceiros: Parceiros,
   resultados: Resultados, comoComecar: ComoComecar, investimento: Investimento, proximoPasso: ProximoPasso,
+  quemSomos: QuemSomos, missao: Missao, observacoes: Observacoes, obrigado: Obrigado,
 } as const;
 
 const lista = telasAtivas();

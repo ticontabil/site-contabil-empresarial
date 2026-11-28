@@ -1002,3 +1002,124 @@ html.estatico body { touch-action: pan-x pan-y; }
 .tela:not(.atual):not(.vizinha)::after,
 .tela:not(.atual):not(.vizinha) *::before,
 .tela:not(.atual):not(.vizinha) *::after { animation-play-state: paused !important; }
+
+/* ======================= PROPOSTA COMERCIAL (27/11/2026) =======================
+   Telas novas da proposta do Pedro: Quem Somos, Missão/Visão/Valores, Observações e Obrigado.
+   Mesmo vocabulário das outras telas (rótulo entre parênteses, título leve + forte, laranja só de destaque).
+   Palco: 1080 de altura e largura de 1440 (iPad) a 2560; por isso as larguras são em %. Peso máximo 700. */
+
+/* ---- Quem Somos: texto à esquerda, fachada da matriz à direita ---- */
+.quemSomos .qs-foto { position: absolute; top: 0; right: 0; bottom: 0; width: 44%; overflow: hidden; }
+.quemSomos .qs-foto picture, .quemSomos .qs-foto img { width: 100%; height: 100%; object-fit: cover; }
+.quemSomos .qs-foto img { filter: grayscale(0.15) contrast(1.05); transform: scale(1.06); transition: transform 2.4s var(--entrada) 0.6s; }
+.tela.atual.quemSomos .qs-foto img, .estatico .quemSomos .qs-foto img { transform: none; }
+.quemSomos .qs-foto::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.55) 22%, rgba(0, 0, 0, 0) 55%), linear-gradient(0deg, rgba(0, 0, 0, 0.55), transparent 35%); }
+.quemSomos .qs-selo { position: absolute; right: 56px; bottom: 150px; z-index: 2; font-size: 18px; font-weight: 700; letter-spacing: 0.3em; color: #fff;
+  padding: 14px 22px; border: 1.5px solid rgba(255, 255, 255, 0.5); border-radius: 999px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); background: rgba(0, 0, 0, 0.25); }
+.quemSomos .qs-texto { position: relative; z-index: 3; width: 56%; max-width: 980px; padding-right: 40px; }
+.quemSomos .titulo { margin-top: 26px; font-size: 58px; }
+.quemSomos .qs-p { font-size: 26px; line-height: 1.5; font-weight: 300; color: var(--cinza); margin-top: 30px; max-width: 900px; }
+.quemSomos .qs-p + .qs-p { margin-top: 18px; }
+.quemSomos .qs-p strong { font-weight: 700; color: #fff; }
+.quemSomos .qs-pilares { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; margin-top: 44px; }
+.quemSomos .qs-pilares span { font-size: 20px; font-weight: 700; letter-spacing: 0.04em; padding: 12px 22px; border-radius: 999px; border: 1.5px solid var(--laranja); color: #fff; background: rgba(251, 93, 2, 0.08); }
+.quemSomos .qs-pilares em { font-style: normal; font-size: 22px; font-weight: 300; color: var(--cinza); flex-basis: 100%; margin-top: 4px; }
+
+/* ---- Missão, Visão e Valores (clara) ---- */
+.missao .titulo { margin-top: 26px; font-size: 58px; }
+.missao .mv-cartoes { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 54px; }
+.missao .mv-cartao { background: #fff; border-radius: 28px; padding: 38px 44px 42px; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.07); position: relative; overflow: hidden; }
+.missao .mv-cartao::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--laranja); }
+.missao .mv-cab { display: flex; align-items: center; gap: 18px; }
+.missao .mv-ico { width: 60px; height: 60px; border-radius: 16px; background: #000; color: var(--laranja); display: grid; place-items: center; flex: none; }
+.missao .mv-cab h3 { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; }
+.missao .mv-cartao p { font-size: 24px; line-height: 1.5; color: #2b2b2b; margin-top: 22px; }
+.missao .mv-valores { margin-top: 46px; }
+.missao .mv-valores .rotulo { font-size: 16px; }
+.missao .mv-valores ol { list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-top: 18px; }
+.missao .mv-valores li { border-top: 2px solid #000; padding-top: 18px; opacity: 0; transform: translateY(24px);
+  transition: opacity 0.7s var(--entrada) calc(var(--i) * 0.08s), transform 0.9s var(--entrada) calc(var(--i) * 0.08s); }
+.missao .mv-valores.on li, .estatico .missao .mv-valores li { opacity: 1; transform: none; }
+.missao .mv-n { font-size: 15px; font-weight: 700; letter-spacing: 0.2em; color: var(--laranja); }
+.missao .mv-valores b { display: block; font-size: 27px; font-weight: 700; margin-top: 8px; letter-spacing: -0.01em; }
+.missao .mv-valores p { font-size: 18px; line-height: 1.45; color: #444; margin-top: 10px; }
+
+/* ---- Serviços: texto completo da proposta no departamento da vez ---- */
+.departamentos .area { grid-template-columns: 1fr minmax(560px, 40%); }
+.lista-dep li.ativo .desc.desc-longa { font-size: 19px; line-height: 1.5; color: #2b2b2b; }
+
+/* ---- Observações (painel preto à esquerda, como na proposta) ---- */
+.observacoes { padding: 0; display: grid; grid-template-columns: minmax(560px, 36%) 1fr; }
+.observacoes .ob-painel { position: relative; overflow: hidden; background: #000; color: #fff; padding: 110px 64px 130px 120px; display: flex; flex-direction: column; }
+.palco-estreito .observacoes .ob-painel { padding-left: 90px; }
+.observacoes .ob-painel .rotulo { color: var(--cinza); }
+.observacoes .ob-painel .titulo { margin-top: 26px; font-size: 52px; color: #fff; }
+.observacoes .ob-resp { font-size: 22px; line-height: 1.55; font-weight: 300; color: #d6d6d6; margin-top: 30px; }
+.observacoes .ob-exemplo { font-size: 18px; line-height: 1.5; color: #8a8a8a; margin-top: 16px; }
+.observacoes .ob-enquadramento { margin-top: auto; border: 1.5px solid var(--laranja); border-radius: 22px; padding: 24px 28px; background: rgba(251, 93, 2, 0.08); }
+.observacoes .ob-enquadramento[hidden] { display: none; }
+.observacoes .ob-enquadramento .rotulo { font-size: 14px; color: var(--laranja); }
+.observacoes .ob-enq-texto { font-size: 25px; line-height: 1.4; font-weight: 700; margin-top: 10px; }
+.observacoes .ob-enq-detalhe { font-size: 19px; line-height: 1.45; color: #cfcfcf; margin-top: 8px; }
+.observacoes .ob-enq-detalhe[hidden] { display: none; }
+.observacoes .ob-extras { padding: 110px 120px 130px 70px; display: flex; flex-direction: column; gap: 30px; }
+.palco-estreito .observacoes .ob-extras { padding-right: 90px; padding-left: 56px; }
+.observacoes .ob-extras-titulo { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; }
+.observacoes .ob-bloco h4 { display: flex; align-items: center; gap: 14px; font-size: 16px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #000; }
+.observacoes .ob-bloco h4 span { width: 26px; height: 4px; border-radius: 2px; background: var(--laranja); }
+.observacoes .ob-intro { font-size: 18px; line-height: 1.55; color: #333; margin-top: 12px; }
+.observacoes .ob-lista { list-style: none; columns: 2; column-gap: 40px; margin-top: 14px; }
+.observacoes .ob-lista li { font-size: 17px; line-height: 1.5; color: #333; padding: 7px 0; break-inside: avoid; border-top: 1px solid #dcdcdc; }
+.observacoes .ob-lista li b { color: var(--laranja); font-weight: 700; }
+
+/* ---- Obrigado: agradecimento e contatos à esquerda, parceiros à direita ---- */
+.obrigado { display: grid; grid-template-columns: 1fr minmax(560px, 40%); gap: 70px; align-items: center; }
+.obrigado .titulo { margin-top: 26px; font-size: 64px; }
+.obrigado .apoio { margin-top: 24px; font-size: 27px; max-width: 900px; }
+.obrigado .obg-contatos { list-style: none; margin-top: 50px; display: grid; grid-template-columns: repeat(2, max-content); gap: 18px 46px; }
+.obrigado .obg-contatos li { display: flex; align-items: center; gap: 16px; font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+.obrigado .obg-ico { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: #151515; border: 1px solid #2a2a2a; color: var(--laranja); flex: none; }
+.obrigado .obg-parceiros { align-self: center; background: #0b0b0b; border: 1px solid #222; border-radius: 30px; padding: 34px 36px; }
+.obrigado .obg-parceiros ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; margin-top: 16px; }
+.obrigado .obg-parceiros li { display: flex; flex-direction: column; gap: 8px; padding: 18px 0; border-bottom: 1px solid #1f1f1f; }
+.obrigado .obg-logo { height: 44px; display: flex; align-items: center; }
+.obrigado .obg-logo img { height: 40px; width: auto; max-width: 100%; object-fit: contain; object-position: left center; }
+.obrigado .obg-logo b { font-size: 24px; font-weight: 700; }
+.obrigado .obg-parceiros li span { font-size: 17px; color: #9a9a9a; }
+
+/* ---- Versão em pé / impressão ---- */
+.estatico .quemSomos .qs-texto { width: 100%; }
+.estatico .quemSomos .qs-foto { position: relative; width: 100%; height: 420px; margin-top: 40px; }
+.estatico .observacoes, .estatico .obrigado { display: block; }
+/* observações: o contador fica sobre o painel preto, então volta a ser claro */
+#palco.tema-clara:has(.observacoes.atual) #progresso { color: rgba(255, 255, 255, 0.55); }
+
+/* proposta comercial no palco estreito (iPad 4:3, 1440 de largura): textos mais compactos para caber */
+.palco-estreito .observacoes { grid-template-columns: 480px 1fr; }
+.palco-estreito .observacoes .ob-painel { padding: 100px 40px 120px 90px; }
+.palco-estreito .observacoes .ob-painel .titulo { font-size: 42px; }
+.palco-estreito .observacoes .ob-resp { font-size: 19px; margin-top: 22px; }
+.palco-estreito .observacoes .ob-exemplo { font-size: 16px; }
+.palco-estreito .observacoes .ob-enquadramento { padding: 18px 22px; }
+.palco-estreito .observacoes .ob-enq-texto { font-size: 21px; }
+.palco-estreito .observacoes .ob-enq-detalhe { font-size: 16px; }
+.palco-estreito .observacoes .ob-extras { padding: 100px 90px 120px 44px; gap: 18px; }
+.palco-estreito .observacoes .ob-extras-titulo { font-size: 28px; }
+.palco-estreito .observacoes .ob-intro { font-size: 15.5px; line-height: 1.45; margin-top: 8px; }
+.palco-estreito .observacoes .ob-lista { column-gap: 28px; margin-top: 8px; }
+.palco-estreito .observacoes .ob-lista li { font-size: 14.5px; line-height: 1.42; padding: 4px 0; }
+.palco-estreito .obrigado { grid-template-columns: 1fr 500px; gap: 44px; }
+.palco-estreito .obrigado .titulo { font-size: 54px; }
+.palco-estreito .obrigado .apoio { font-size: 24px; }
+.palco-estreito .obrigado .obg-contatos { grid-template-columns: max-content; gap: 14px; margin-top: 36px; }
+.palco-estreito .obrigado .obg-contatos li { font-size: 23px; }
+.palco-estreito .obrigado .obg-parceiros { padding: 28px 28px; }
+.palco-estreito .obrigado .obg-parceiros li { padding: 14px 0; }
+.palco-estreito .obrigado .obg-parceiros li span { font-size: 15px; }
+.palco-estreito .quemSomos .titulo { font-size: 52px; }
+.palco-estreito .quemSomos .qs-p { font-size: 23px; }
+.palco-estreito .missao .mv-cartao p { font-size: 21px; }
+.palco-estreito .missao .mv-valores p { font-size: 16px; }
+.palco-estreito .missao .mv-valores b { font-size: 23px; }
+.observacoes .ob-extras-titulo { padding-right: 180px; } /* não passa por baixo da logo */
