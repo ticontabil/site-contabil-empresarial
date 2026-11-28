@@ -13,10 +13,6 @@ RewriteCond %{HTTPS} !=on [OR]
 RewriteCond %{HTTP_HOST} ^www\. [NC]
 RewriteRule ^(.*)$ https://contabilempresarial.com.br/$1 [R=301,L,NE]
 
-# ---- Portal do Cliente (página do site em /portaldocliente) ----
-# atalho para quem digitar sem o "l"
-RewriteRule ^portadocliente/?$ /portaldocliente/ [R=301,L]
-
 # ---- Painel de acessos e arquivos internos ----
 RewriteRule ^painel/?$ painel.php [L,QSA]
 RewriteRule ^painel-config\.php$ - [F,L]
@@ -33,8 +29,6 @@ RewriteRule ^apresentacao-portao-config\.php$ - [F,L]
 RewriteRule ^(apresentacao.*)$ apresentacao-portao.php?arquivo=$1 [L,QSA,B]
 # /novo: versão nova do site, em construção, atrás da mesma senha (sai daqui quando virar a página principal)
 RewriteRule ^(novo(?:[./].*)?)$ apresentacao-portao.php?arquivo=$1 [L,QSA,B]
-# /portaldocliente: demonstração do Portal do Cliente, atrás da mesma senha
-RewriteRule ^(portaldocliente(?:/.*)?)$ apresentacao-portao.php?arquivo=$1 [L,QSA,B]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
