@@ -197,6 +197,14 @@ const emPreparacao = import.meta.env.PROD && !publicar && import.meta.env.PUBLIC
           canal?.postMessage({ tipo: "valores" });
           return true;
         };
+        // grava sozinho enquanto o Pedro digita: o último preço/desconto fica guardado mesmo sem clicar em Salvar
+        let espera = 0;
+        const salvarSozinho = () => {
+          clearTimeout(espera);
+          espera = window.setTimeout(() => { if (campo("nome").value.trim() && campo("valor").value.trim() && salvar()) avisar("Salvo automaticamente neste aparelho."); }, 500);
+        };
+        form.addEventListener("input", salvarSozinho);
+        form.addEventListener("change", salvarSozinho);
         form.addEventListener("submit", (e) => {
           e.preventDefault();
           if (!form.reportValidity() || !salvar()) return;
@@ -205,10 +213,12 @@ const emPreparacao = import.meta.env.PROD && !publicar && import.meta.env.PUBLIC
           location.href = depois === "inicio" ? "/apresentacao#01" : `/apresentacao#${telaPreco}`;
         });
         document.getElementById("cfg-restaurar")!.addEventListener("click", () => {
-          try { localStorage.removeItem(CHAVE_VALORES); } catch {}
-          canal?.postMessage({ tipo: "valores" });
-          preencher(padrao);
-          avisar("Valores originais restaurados.");
+          // volta ao original, mas mantém o último valor com desconto que o Pedro usou
+          clearTimeout(espera);
+          const ultimoDesconto = formatar(campo("desconto").value) || ler().desconto || "";
+          preencher({ ...padrao, desconto: ultimoDesconto });
+          salvar();
+          avisar(ultimoDesconto ? "Valores originais restaurados (o último desconto ficou guardado)." : "Valores originais restaurados.");
         });
         preencher(ler());
 

@@ -68,8 +68,8 @@ const gestoresSite = [
 ];
 const comecar = telas.comoComecar.tela;
 const [ap1, ap2] = comecar.apoio.split("? ");
-// produtos (TekZap fora: não é produto da Contábil) — faixa passando em loop no começo do site
-const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros).filter((p) => p.nome !== "TekZap");
+// produtos — faixa passando em loop no começo do site
+const produtos = telas.parceiros.tela.grupos.flatMap((g) => g.parceiros);
 ---
 <SiteNovo titulo="Contábil Empresarial · Contabilidade desde 1984" descricao="Contabilidade em Itumbiara, Goiânia, Uberlândia e Cachoeira Dourada desde 1984.">
   <!-- ================= LOGO + MENU (canto superior direito, como na apresentação) ================= -->

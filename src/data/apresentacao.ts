@@ -360,15 +360,12 @@ export const telas = {
           { nome: "Emmit Fácil", texto: "entrada e emissão de notas", logo: "emmit-facil.png" as string | null },
           { nome: "Nexxo BPO", texto: "terceirização de rotinas administrativas", logo: "nexxo-bpo.png" as string | null },
         ] },
-        { nome: "Vendas e atendimento", parceiros: [
-          { nome: "TekZap", texto: "atendimento, conversas e automação de vendas", logo: null as string | null },
-        ] },
         { nome: "Conhecimento", parceiros: [
           { nome: "Contábil Cast", texto: "conteúdo leve e prático sobre gestão, legislação e mercado", logo: "contabil-cast.png" as string | null },
         ] },
       ],
     },
-    fala: "A gente não para na contabilidade. Ao longo dos anos, selecionamos parceiros que resolvem outras dores do empresário: ponto, RH, notas, rotinas administrativas, atendimento. Você chega a todos eles pela indicação de quem já conhece a sua empresa por dentro.",
+    fala: "A gente não para na contabilidade. Ao longo dos anos, selecionamos parceiros que resolvem outras dores do empresário: ponto, RH, notas, rotinas administrativas, treinamento. Você chega a todos eles pela indicação de quem já conhece a sua empresa por dentro.",
   },
 
   // ======================= ATO 3 · EM RESULTADOS =======================
@@ -531,7 +528,6 @@ export const telas = {
         { nome: "Nexxo BPO", rede: "@nexxo_bpo", logo: "nexxo-bpo.png" as string | null },
         { nome: "Contábil Cast", rede: "YouTube · @contabil.empresarial", logo: "contabil-cast.png" as string | null },
         { nome: "Capacita Contabilidade", rede: "@capacitacontabilidade", logo: null as string | null },
-        { nome: "TekZap", rede: "@tekzapconversas", logo: null as string | null },
       ],
     },
     fala: "Obrigado pelo seu tempo. Fico à disposição para qualquer dúvida sobre a proposta. Podemos seguir?",
